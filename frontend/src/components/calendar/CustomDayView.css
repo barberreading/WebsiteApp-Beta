@@ -1,0 +1,584 @@
+.custom-day-view {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  /* background: white; - Removed to allow booking colors to show */
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.day-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 0;
+}
+
+.nav-arrow {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.nav-arrow:hover {
+  background: #0056b3;
+}
+
+.day-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  flex: 1;
+}
+
+.day-content-container {
+  overflow-x: auto;
+  overflow-y: auto;
+  position: relative;
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #007bff #f1f1f1;
+}
+
+.day-content-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.day-content-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.day-content-container::-webkit-scrollbar-thumb {
+  background: #007bff;
+  border-radius: 4px;
+}
+
+.day-content-container::-webkit-scrollbar-thumb:hover {
+  background: #0056b3;
+}
+
+.staff-headers-row {
+  display: flex;
+  background: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  flex-shrink: 0;
+}
+
+/* Fixed width columns for all staff counts to prevent wrapping */
+.custom-day-view .staff-header {
+  min-width: 150px !important;
+  max-width: 150px !important;
+  flex: 0 0 150px !important;
+  width: 150px !important;
+  flex-shrink: 0;
+}
+
+.custom-day-view .staff-time-slot {
+  min-width: 150px !important;
+  max-width: 150px !important;
+  flex: 0 0 150px !important;
+  width: 150px !important;
+  flex-shrink: 0;
+}
+
+/* Removed responsive width calculations to prevent wrapping issues */
+
+.day-header {
+  display: flex;
+  background: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+}
+
+.time-column-header {
+  width: 100px;
+  min-width: 100px;
+  padding: 10px;
+  font-weight: bold;
+  text-align: center;
+  border-right: 1px solid #dee2e6;
+  background: #e9ecef;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+  left: 0;
+  z-index: 100;
+  flex-shrink: 0;
+  box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+}
+
+.staff-headers {
+  display: flex;
+  flex-wrap: nowrap;
+  width: max-content;
+  min-width: calc(150px * var(--staff-count, 1));
+  flex-shrink: 0;
+  will-change: transform;
+  gap: 0;
+  overflow: visible;
+}
+
+.staff-header {
+  padding: 10px;
+  text-align: center;
+  border-right: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 80px;
+  justify-content: center;
+  /* Fixed width to prevent wrapping - overridden by main rule above */
+}
+
+.staff-header:last-child {
+  border-right: none;
+}
+
+.staff-photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.staff-photo-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6c757d, #495057);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.staff-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.day-content {
+  flex: 1;
+  min-width: calc(100px + (150px * var(--staff-count, 1)));
+  position: relative;
+  min-height: 0;
+}
+
+.time-row {
+  display: flex;
+  flex-wrap: nowrap;
+  border-bottom: 1px solid #eee;
+  min-height: 60px;
+  width: max-content;
+  min-width: calc(80px + (150px * var(--staff-count, 1)));
+}
+
+.time-row:hover {
+  background-color: #f8f9fa;
+}
+
+.time-label {
+  width: 100px;
+  min-width: 100px;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  color: #6c757d;
+  text-align: center;
+  border-right: 1px solid #dee2e6;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  position: sticky;
+  left: 0;
+  z-index: 50;
+  flex-shrink: 0;
+  box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+  /* Ensure it stays above other content */
+  background-clip: padding-box;
+}
+
+.staff-columns {
+  display: flex;
+  flex-wrap: nowrap;
+  width: max-content;
+  min-width: calc(150px * var(--staff-count, 1));
+  flex-shrink: 0;
+  gap: 0;
+  overflow: visible;
+}
+
+.staff-time-slot {
+  padding: 8px;
+  border-right: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  min-height: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  /* Fixed width to prevent wrapping - overridden by main rule above */
+}
+
+.staff-time-slot:last-child {
+  border-right: none;
+}
+
+.staff-time-slot.empty:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+.staff-time-slot.has-booking {
+  /* background and border removed to allow service colors to show */
+}
+
+/* Prevent cell hover effects when booking is present */
+.staff-time-slot.has-booking:hover {
+  background-color: transparent !important;
+  transform: none !important;
+}
+
+.booking-event {
+  width: 100%;
+  padding: 8px;
+  /* background removed to allow JavaScript backgroundColor to take effect */
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-align: center;
+  margin-bottom: -1px;
+  position: relative;
+  border: 2px solid rgba(0, 0, 0, 0.8);
+}
+
+/* Remove border radius for continuous booking segments */
+.staff-time-slot:not(:first-child) .booking-event {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.staff-time-slot:not(:last-child) .booking-event {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Booking event styling for continuous bookings */
+.staff-time-slot .booking-event.booking-start {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-bottom: 0;
+}
+
+.staff-time-slot .booking-event.booking-middle {
+  border-radius: 0;
+  border-top: none;
+  border-bottom: none;
+  margin-top: 0;
+  margin-bottom: 0;
+  /* Hide content in middle segments to avoid repetition */
+}
+
+.staff-time-slot .booking-event.booking-middle .booking-title,
+.staff-time-slot .booking-event.booking-middle .booking-client,
+.staff-time-slot .booking-event.booking-middle .booking-time,
+.staff-time-slot .booking-event.booking-middle .booking-service,
+.staff-time-slot .booking-event.booking-middle .service-color-indicator {
+  opacity: 0.3;
+  font-size: 0.8em;
+}
+
+.staff-time-slot .booking-event.booking-end {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: none;
+  margin-top: 0;
+  /* Hide content in end segments to avoid repetition */
+}
+
+.staff-time-slot .booking-event.booking-end .booking-title,
+.staff-time-slot .booking-event.booking-end .booking-client,
+.staff-time-slot .booking-event.booking-end .booking-time,
+.staff-time-slot .booking-event.booking-end .booking-service,
+.staff-time-slot .booking-event.booking-end .service-color-indicator {
+  opacity: 0.3;
+  font-size: 0.8em;
+}
+
+
+
+.booking-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+  z-index: 20;
+}
+
+/* Prevent parent cell hover when booking is hovered */
+.staff-time-slot:has(.booking-event:hover) {
+  background-color: transparent !important;
+  transform: none !important;
+}
+
+/* Fallback for browsers that don't support :has() */
+.booking-event:hover {
+  position: relative;
+}
+
+.booking-event:hover::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Continuous booking overlay specific styles */
+.booking-continuous {
+  pointer-events: auto;
+  z-index: 15 !important;
+}
+
+.booking-continuous:hover {
+  z-index: 25 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4);
+}
+
+/* Prevent underlying cells from interfering with continuous bookings */
+.staff-time-slot:has(.booking-continuous) {
+  pointer-events: none;
+}
+
+.staff-time-slot:has(.booking-continuous) .booking-continuous {
+  pointer-events: auto;
+}
+
+/* Ensure continuous bookings override cell hover states */
+.staff-time-slot.has-booking .booking-continuous {
+  position: absolute;
+  z-index: 15;
+}
+
+.staff-time-slot.has-booking:hover .booking-continuous {
+  z-index: 25;
+}
+
+.booking-title {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.booking-client {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.booking-time {
+  font-size: 0.9em;
+  color: #000;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+.booking-service {
+  font-size: 0.85em;
+  color: #000;
+  margin-top: 1px;
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .staff-header {
+    padding: 8px 4px;
+    min-height: 70px;
+  }
+  
+  .staff-photo {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .staff-name {
+    font-size: 0.8rem;
+  }
+  
+  .time-label {
+    width: 60px;
+    min-width: 60px;
+    font-size: 0.8rem;
+    position: sticky;
+    left: 0;
+    z-index: 50;
+    background: #f8f9fa;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+  }
+  
+  .time-column-header {
+    width: 60px;
+  }
+  
+  .booking-title {
+    font-size: 0.8rem;
+  }
+  
+  .booking-client {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .staff-header {
+    padding: 6px 2px;
+    min-height: 60px;
+  }
+  
+  .staff-photo {
+    width: 25px;
+    height: 25px;
+  }
+  
+  .staff-name {
+    font-size: 0.75rem;
+  }
+  
+  .day-content {
+    max-height: 500px;
+  }
+  
+  .time-row {
+    min-height: 50px;
+  }
+  
+  .staff-time-slot {
+    min-height: 50px;
+    padding: 4px;
+  }
+}
+
+/* Non-working hours styling */
+.staff-time-slot.non-working-hours {
+  background-color: #f5f5f5;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.05) 2px,
+    rgba(0, 0, 0, 0.05) 4px
+  );
+  opacity: 0.6;
+  cursor: pointer; /* Keep clickable */
+}
+
+.staff-time-slot.non-working-hours:hover {
+  background-color: #eeeeee;
+  opacity: 0.8;
+}
+
+/* Ensure bookings in non-working hours are still visible */
+.staff-time-slot.non-working-hours.has-booking {
+  opacity: 1;
+  background-color: inherit;
+  background-image: none;
+}
+
+.staff-time-slot.non-working-hours.has-booking .booking-event {
+  opacity: 1;
+}
+
+/* Force booking colors - IE Compatible (no CSS variables) */
+.booking-event-colored {
+  color: white !important;
+  font-weight: bold !important;
+  border: 2px solid black !important;
+}
+
+/* Maximum specificity override - Target Bootstrap div defaults */
+div.booking-event-colored {
+  background-image: none !important;
+}
+
+/* Ultra-specific override for Bootstrap */
+.custom-day-view .day-content .time-row .staff-time-slot div.booking-event-colored {
+  background-image: none !important;
+}
+
+/* Override any Bootstrap utility classes */
+.booking-event-colored.bg-white,
+.booking-event-colored.bg-light {
+  background-image: none !important;
+}
+
+/* Service color indicator styles */
+.service-color-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.service-color-circle {
+  display: block !important;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+/* Ensure inline styles take precedence for service color circles - IE Compatible */
+.service-color-circle[style*="background-color"] {
+  /* Inline styles will take precedence in IE */
+}
+
+.service-color-circle:hover {
+  transform: scale(1.2);
+}

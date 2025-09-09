@@ -1,0 +1,15 @@
+{
+  "workspaces": [
+    "backend"
+  ],
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.6"
+  },
+  "scripts": {
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "backend/**/*.js": "npm test -w backend"
+  }
+}

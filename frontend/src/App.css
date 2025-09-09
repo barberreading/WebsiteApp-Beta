@@ -1,0 +1,107 @@
+/* Main App Styles */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px 0;
+}
+
+/* Navbar Styles */
+.navbar-brand {
+  font-weight: bold;
+}
+
+/* Footer Styles */
+.footer {
+  margin-top: auto;
+  padding: 20px 0;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+/* Calendar Styles */
+.fc-event {
+  cursor: pointer;
+}
+
+.fc-toolbar-title {
+  font-size: 1.5rem !important;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+  transition: transform 0.3s;
+  height: 100%;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+}
+
+.dashboard-icon {
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+/* Auth Pages */
+.auth-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.5rem;
+}
+
+/* GDPR Consent Banner */
+.gdpr-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 15px;
+  z-index: 1000;
+}
+
+/* Clock In/Out Button */
+.clock-button {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 0 auto;
+  transition: all 0.3s;
+}
+
+.clock-in {
+  background-color: #28a745;
+}
+
+.clock-out {
+  background-color: #dc3545;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .fc-toolbar {
+    flex-direction: column;
+  }
+  
+  .fc-toolbar-title {
+    margin-bottom: 10px;
+  }
+}
