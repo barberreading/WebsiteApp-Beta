@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { body } = require('express-validator');
 const {
   register,
   login,
+  logout,
   getMe,
   forgotPassword,
   resetPassword,
@@ -11,28 +11,28 @@ const {
   changePassword,
 } = require('./auth.controllers');
 const { protect } = require('../../middleware/auth');
+const {
+  sanitizeBody,
+  validateUserRegistration,
+  validateUserLogin,
+  validatePasswordChange
+} = require('../../middleware/validation');
+const { authLimiter, passwordResetLimiter } = require('../../middleware/rateLimiter');
 
-router.post(
-  '/register',
-  [
-    body('name', 'Name is required').not().isEmpty(),
-    body('email', 'Please include a valid email').isEmail(),
-    body('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
-    body('role', 'Role is required').isIn(['superuser', 'manager', 'staff', 'client']),
-  ],
-  register
-);
+router.post('/register', authLimiter, sanitizeBody, validateUserRegistration, register);
 
-router.post('/login', login);
+router.post('/login', authLimiter, sanitizeBody, validateUserLogin, login);
+
+router.post('/logout', protect, logout);
 
 router.get('/me', protect, getMe);
 
-router.post('/forgot-password', forgotPassword);
+router.post('/forgot-password', passwordResetLimiter, forgotPassword);
 
-router.post('/reset-password/:resetToken', resetPassword);
+router.post('/reset-password/:resetToken', passwordResetLimiter, resetPassword);
 
 router.post('/update-email', protect, updateEmail);
 
-router.post('/change-password', protect, changePassword);
+router.post('/change-password', protect, sanitizeBody, validatePasswordChange, changePassword);
 
 module.exports = router;

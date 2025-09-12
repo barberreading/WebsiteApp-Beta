@@ -271,9 +271,10 @@ UserSchema.pre('save', async function(next) {
 });
 
 // Sign JWT and return
-UserSchema.methods.getSignedJwtToken = function() {
+UserSchema.methods.getSignedJwtToken = function(rememberMe = false) {
+  const expiresIn = rememberMe ? '30d' : process.env.JWT_EXPIRE || '1d';
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE
+    expiresIn: expiresIn
   });
 };
 

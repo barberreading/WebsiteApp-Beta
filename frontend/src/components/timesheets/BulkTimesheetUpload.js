@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance';
 import { Box, Button, Card, CardContent, CircularProgress, Container, Divider, FormControl, FormControlLabel, FormGroup, Grid, IconButton, Paper, Radio, RadioGroup, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography, Alert, Switch, Chip } from '@mui/material';
 import { CloudUpload, Delete, Edit, CheckCircle, Error, Refresh, GetApp } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
@@ -58,7 +58,7 @@ const BulkTimesheetUpload = () => {
     });
 
     try {
-      const res = await axios.post('/timesheets/bulk-upload', formData, {
+      const res = await axiosInstance.post('/timesheets/bulk-upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -104,7 +104,7 @@ const BulkTimesheetUpload = () => {
     };
 
     try {
-      const res = await axios.post('/timesheets/process-ocr', {
+      const res = await axiosInstance.post('/timesheets/process-ocr', {
         files: processedResults,
         breakRules
       });
@@ -170,12 +170,6 @@ const BulkTimesheetUpload = () => {
   const fetchOnlineTimesheets = async () => {
     try {
       setLoadingOnlineTimesheets(true);
-      const config = {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-
       // Build query parameters
       const params = new URLSearchParams();
       if (onlineTimesheetFilter === 'approved') {
@@ -184,7 +178,7 @@ const BulkTimesheetUpload = () => {
       params.append('startDate', dateRange.startDate);
       params.append('endDate', dateRange.endDate);
 
-      const res = await axios.get(`/timesheets/online?${params.toString()}`, config);
+      const res = await axiosInstance.get(`/timesheets/online?${params.toString()}`);
       setOnlineTimesheets(res.data);
     } catch (err) {
       setAlert({

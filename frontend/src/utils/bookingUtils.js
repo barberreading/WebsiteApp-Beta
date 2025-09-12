@@ -117,8 +117,8 @@ export const getStaffLeaveRequestsForDate = (leaveRequests, staffId, date) => {
     const leaveStart = normalizeBookingDates(leaveRequest.start);
     const leaveEnd = normalizeBookingDates(leaveRequest.end);
     
-    // Check if the date falls within the leave request period
-    const dateMatch = date >= leaveStart && date < leaveEnd;
+    // Check if the date falls within the leave request period (inclusive of end date)
+    const dateMatch = date >= leaveStart && date <= leaveEnd;
     const staffMatch = leaveRequest.extendedProps?.staff?._id === staffId || 
                       leaveRequest.extendedProps?.staff?.id === staffId;
     
@@ -176,20 +176,56 @@ export const getLeaveRequestAtTimeSlot = (leaveRequests, staffId, date, timeSlot
 };
 
 /**
- * Find any event (booking or leave request) that overlaps with a specific time slot
+ * Get booking alert at a specific time slot for a staff member
+ * @param {Array} bookingAlerts - All booking alerts
+ * @param {string} staffId - Staff member ID
+ * @param {Date} date - Target date
+ * @param {string} timeSlot - Time slot string
+ * @returns {object|null} - Booking alert object or null
+ */
+export const getBookingAlertAtTimeSlot = (bookingAlerts, staffId, date, timeSlot) => {
+  if (!bookingAlerts || bookingAlerts.length === 0) return null;
+  
+  return bookingAlerts.find(alert => {
+    if (!alert || alert.extendedProps?.type !== 'booking-alert') return false;
+    
+    // Check if alert is for this date
+    const alertDate = new Date(alert.start);
+    if (!isSameDay(alertDate, date)) return false;
+    
+    // Check if alert overlaps with this time slot
+    const slotDateTime = createSlotDateTime(date, timeSlot);
+    const alertStart = new Date(alert.start);
+    const alertEnd = new Date(alert.end);
+    
+    return slotDateTime >= alertStart && slotDateTime < alertEnd;
+  }) || null;
+};
+
+/**
+ * Get event (booking, leave request, or booking alert) at a specific time slot for a staff member
  * @param {Array} bookings - All bookings
  * @param {Array} leaveRequests - All leave requests
+ * @param {Array} bookingAlerts - All booking alerts
  * @param {string} staffId - Staff member ID
  * @param {Date} date - Target date
  * @param {string} timeSlot - Time slot string
  * @returns {object|null} - Event object or null
  */
-export const getEventAtTimeSlot = (bookings, leaveRequests, staffId, date, timeSlot) => {
-  // Check for leave requests first (they take priority)
+export const getEventAtTimeSlot = (bookings, leaveRequests, bookingAlerts, staffId, date, timeSlot) => {
+  // Check for leave requests first (highest priority)
   const leaveRequest = getLeaveRequestAtTimeSlot(leaveRequests, staffId, date, timeSlot);
-  if (leaveRequest) return leaveRequest;
+  if (leaveRequest) {
+    return leaveRequest;
+  }
   
-  // If no leave request, check for bookings
+  // Then check for booking alerts
+  const bookingAlert = getBookingAlertAtTimeSlot(bookingAlerts, staffId, date, timeSlot);
+  if (bookingAlert) {
+    return bookingAlert;
+  }
+  
+  // Finally check for regular bookings
   return getBookingAtTimeSlot(bookings, staffId, date, timeSlot);
 };
 
@@ -212,8 +248,13 @@ export const getBookingPosition = (bookings, staffId, date, timeSlots, currentIn
   const prevBooking = prevTimeSlot ? getBookingAtTimeSlot(bookings, staffId, date, prevTimeSlot) : null;
   const nextBooking = nextTimeSlot ? getBookingAtTimeSlot(bookings, staffId, date, nextTimeSlot) : null;
   
-  const hasPrevSameBooking = prevBooking && prevBooking.id === currentBooking.id;
-  const hasNextSameBooking = nextBooking && nextBooking.id === currentBooking.id;
+  // Handle both FullCalendar format (id) and raw booking format (_id)
+  const currentBookingId = currentBooking.id || currentBooking._id;
+  const prevBookingId = prevBooking?.id || prevBooking?._id;
+  const nextBookingId = nextBooking?.id || nextBooking?._id;
+  
+  const hasPrevSameBooking = prevBooking && prevBookingId === currentBookingId;
+  const hasNextSameBooking = nextBooking && nextBookingId === currentBookingId;
   
   if (!hasPrevSameBooking && hasNextSameBooking) {
     return 'booking-start';
@@ -240,6 +281,39 @@ export const formatBookingTime = (booking) => {
 };
 
 /**
+ * Calculate the height of a booking based on the number of time slots it spans
+ * @param {Array} bookings - All bookings
+ * @param {string} staffId - Staff member ID
+ * @param {Date} date - Target date
+ * @param {Array} timeSlots - Array of time slot strings
+ * @param {number} currentIndex - Current time slot index
+ * @param {object} currentBooking - Current booking object
+ * @returns {number} - Height in pixels
+ */
+export const getBookingHeight = (bookings, staffId, date, timeSlots, currentIndex, currentBooking) => {
+  if (!currentBooking) return 60; // Default slot height
+  
+  // For leave requests, use a fixed height since they are all-day events
+  if (currentBooking.extendedProps?.type === 'leave-request' || currentBooking.type === 'leave_request') {
+    return 60; // Fixed height for leave requests
+  }
+  
+  // Count how many consecutive slots this booking spans
+  const bookingSlots = timeSlots.filter((slot, idx) => {
+    const slotBooking = getBookingAtTimeSlot(bookings, staffId, date, slot);
+    return slotBooking && slotBooking.id === currentBooking.id;
+  }).length;
+  
+  // Limit height to remaining slots to prevent running off calendar
+  const remainingSlots = timeSlots.length - currentIndex;
+  const slotHeight = 60; // Height per time slot
+  const maxHeight = remainingSlots * slotHeight;
+  const totalHeight = Math.min(bookingSlots * slotHeight, maxHeight);
+  
+  return totalHeight;
+};
+
+/**
  * Get booking display data with all necessary information
  * @param {object} booking - Booking object
  * @returns {object} - Formatted booking display data
@@ -250,6 +324,7 @@ export const getBookingDisplayData = (booking) => {
   return {
     id: booking.id,
     title: booking.title || 'Untitled Booking',
+    client: booking.extendedProps?.clientName || 'Unknown Client', // Add client property
     clientName: booking.extendedProps?.clientName || 'Unknown Client',
     serviceName: booking.extendedProps?.service?.name || 
                  booking.extendedProps?.serviceName || 
@@ -295,7 +370,8 @@ export const getLeaveRequestDisplayData = (leaveRequest) => {
   
   return {
     id: leaveRequest.id,
-    title: `🏖️ ${staffName} - ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+    title: `🏖️ ${staffName}`,
+    client: reason, // Use 'client' property to match booking format structure
     staffName: staffName,
     reason: reason,
     status: status,
@@ -317,6 +393,17 @@ export const getEventDisplayData = (event) => {
   
   if (event.extendedProps?.type === 'leave-request') {
     return getLeaveRequestDisplayData(event);
+  } else if (event.extendedProps?.type === 'booking-alert') {
+    // Handle booking alerts with special display data
+    return {
+      title: event.title || 'Booking Alert',
+      service: event.extendedProps?.service || 'Alert',
+      time: event.extendedProps?.time || '',
+      location: event.extendedProps?.location || '',
+      client: event.extendedProps?.client || 'Alert',
+      status: 'alert',
+      type: 'booking-alert'
+    };
   } else {
     return getBookingDisplayData(event);
   }

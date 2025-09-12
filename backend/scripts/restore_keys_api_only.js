@@ -23,24 +23,22 @@ const locationAreasData = [
 const BASE_URL = 'http://localhost:3002';
 
 async function loginAsAdmin() {
+  const adminEmail = process.env.ADMIN_EMAIL || 'andrew@everythingchildcareagency.co.uk';
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  
+  if (!adminPassword) {
+    throw new Error('ADMIN_PASSWORD environment variable is required for authentication');
+  }
+  
   try {
-    console.log('Attempting to login as Andrew (superuser)...');
+    console.log('Attempting to login as admin user...');
     const response = await axios.post(`${BASE_URL}/api/auth/login`, {
-      email: 'andrew@everythingchildcareagency.co.uk',
-      password: 'password123'
+      email: adminEmail,
+      password: adminPassword
     });
     return response.data.token;
   } catch (error) {
-    console.log('Andrew login failed, trying default password...');
-    try {
-      const response = await axios.post(`${BASE_URL}/api/auth/login`, {
-        email: 'andrew@everythingchildcareagency.co.uk',
-        password: 'admin123'
-      });
-      return response.data.token;
-    } catch (superError) {
-      throw new Error('Andrew login failed with both passwords');
-    }
+    throw new Error(`Admin login failed: ${error.response?.data?.msg || error.message}`);
   }
 }
 

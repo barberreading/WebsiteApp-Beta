@@ -181,9 +181,14 @@ export const fetchLeaveRequestsForUser = async (currentUser, hasRole, startDateP
       const startDate = new Date(request.startDate);
       const endDate = new Date(request.endDate);
       
-      // Add one day to end date for all-day events
+      // For FullCalendar all-day events, we need to add one day to the end date
+      // but only for display purposes. We'll use the original endDate for conflict detection
       const adjustedEndDate = new Date(endDate);
       adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);
+      
+      // Store the original end date for accurate conflict detection
+      const originalEndDate = new Date(endDate);
+      originalEndDate.setHours(23, 59, 59, 999); // End of the actual day
       
       let backgroundColor, textColor, title;
       
@@ -224,7 +229,8 @@ export const fetchLeaveRequestsForUser = async (currentUser, hasRole, startDateP
           status: request.status || 'pending',
           denialReason: request.denialReason,
           reviewedBy: request.reviewedBy,
-          reviewedAt: request.reviewedAt
+          reviewedAt: request.reviewedAt,
+          originalEndDate: originalEndDate // Store original end date for conflict detection
         },
         backgroundColor: backgroundColor,
         borderColor: backgroundColor,

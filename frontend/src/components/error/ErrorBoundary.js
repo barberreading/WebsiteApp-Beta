@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Alert, Card, Container, Row, Col } from 'react-bootstrap';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -35,7 +35,6 @@ class ErrorBoundary extends Component {
 
   logErrorToServer = async (error, errorInfo) => {
     try {
-      const token = localStorage.getItem('token');
       const errorData = {
         message: error.toString(),
         stack: error.stack,
@@ -45,10 +44,9 @@ class ErrorBoundary extends Component {
         timestamp: new Date().toISOString()
       };
 
-      await axios.post('/errors/log', errorData, {
+      await axiosInstance.post('/errors/log', errorData, {
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : ''
+          'Content-Type': 'application/json'
         }
       });
 

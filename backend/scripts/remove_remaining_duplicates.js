@@ -10,11 +10,18 @@ const remainingDuplicateIds = [
 ];
 
 async function loginAsAdmin() {
+  const adminEmail = process.env.ADMIN_EMAIL || 'andrew@everythingchildcareagency.co.uk';
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  
+  if (!adminPassword) {
+    throw new Error('ADMIN_PASSWORD environment variable is required for authentication');
+  }
+  
   try {
-    console.log('Logging in as Andrew (superuser)...');
+    console.log('Logging in as admin user...');
     const response = await axios.post(`${BASE_URL}/api/auth/login`, {
-      email: 'andrew@everythingchildcareagency.co.uk',
-      password: 'admin123'
+      email: adminEmail,
+      password: adminPassword
     });
     
     if (response.data.token) {

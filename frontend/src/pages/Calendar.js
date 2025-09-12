@@ -611,9 +611,14 @@ const Calendar = () => {
         const startDate = new Date(request.startDate);
         const endDate = new Date(request.endDate);
         
-        // Add one day to end date for all-day events to include the end date
+        // For FullCalendar all-day events, we need to add one day to the end date
+        // but only for display purposes. We'll use the original endDate for conflict detection
         const adjustedEndDate = new Date(endDate);
         adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);
+        
+        // Store the original end date for accurate conflict detection
+        const originalEndDate = new Date(endDate);
+        originalEndDate.setHours(23, 59, 59, 999); // End of the actual day
         
         let backgroundColor, textColor, title;
         
@@ -654,7 +659,8 @@ const Calendar = () => {
             status: request.status,
             denialReason: request.denialReason,
             reviewedBy: request.reviewedBy,
-            reviewedAt: request.reviewedAt
+            reviewedAt: request.reviewedAt,
+            originalEndDate: originalEndDate // Store original end date for conflict detection
           },
           backgroundColor: backgroundColor,
           borderColor: backgroundColor,
@@ -931,7 +937,7 @@ const Calendar = () => {
         console.log('🔧 DEBUG: Current user has name?', !!currentUser?.name);
         console.log('🔧 DEBUG: Current user has _id?', !!currentUser?._id);
         apiRequests.unshift(Promise.resolve({ data: [currentUser] }));
-        apiRequests.push(axiosInstance.get('/clients?active=true')); // Staff can see clients for bookings
+        apiRequests.push(axiosInstance.get('/clients')); // Staff can see clients for bookings
       } else if (currentUser?.role === 'client') {
         // Clients don't need to see staff list or other clients
         apiRequests.unshift(Promise.resolve({ data: [] }));
@@ -939,7 +945,7 @@ const Calendar = () => {
       } else if (currentUser?.role === 'manager' || currentUser?.role === 'superuser' || currentUser?.role === 'admin') {
         // Managers, superusers, and admins can see all staff and clients
         apiRequests.unshift(axiosInstance.get('/users/staff'));
-        apiRequests.push(axiosInstance.get('/clients?active=true'));
+        apiRequests.push(axiosInstance.get('/clients'));
       } else {
         // Default: no access
         // No access for this role
@@ -1462,7 +1468,10 @@ const Calendar = () => {
           leaveRequest.extendedProps.staff?._id === staffId
         ) {
           const leaveStart = new Date(leaveRequest.start);
-          const leaveEnd = new Date(leaveRequest.end);
+          // Use original end date for accurate conflict detection
+          const leaveEnd = leaveRequest.extendedProps.originalEndDate ? 
+            new Date(leaveRequest.extendedProps.originalEndDate) : 
+            new Date(leaveRequest.end);
           
           // Check if the clicked time overlaps with the leave request
           return clickedDateTime < leaveEnd && endDateTime > leaveStart;
@@ -1702,7 +1711,7 @@ const Calendar = () => {
       
       // Base booking data
       const baseBookingData = {
-        title: `${selectedBookingKey.name} - ${selectedClient.name}`,
+        title: `${selectedBookingKey.name} - ${selectedClient.firstName && selectedClient.lastName ? `${selectedClient.firstName} ${selectedClient.lastName}` : selectedClient.name}`,
         description: formData.notes,
         bookingKey: formData.bookingKey,
         service: formData.service,
@@ -1785,7 +1794,7 @@ const Calendar = () => {
       
       // Create all bookings
       const promises = bookingsToCreate.map(booking => 
-        axiosInstance.post('api/bookings', booking)
+        axiosInstance.post('/bookings', booking)
       );
       
       await Promise.all(promises);
@@ -1848,7 +1857,10 @@ const Calendar = () => {
             (leaveRequest.extendedProps.status === 'pending' || leaveRequest.extendedProps.status === 'approved')
           ) {
             const leaveStart = new Date(leaveRequest.start);
-            const leaveEnd = new Date(leaveRequest.end);
+            // Use original end date for accurate conflict detection
+            const leaveEnd = leaveRequest.extendedProps.originalEndDate ? 
+              new Date(leaveRequest.extendedProps.originalEndDate) : 
+              new Date(leaveRequest.end);
             
             // Check if the booking staff matches the leave request staff
             if (
@@ -2028,6 +2040,7 @@ const Calendar = () => {
                   }).filter(Boolean)}
                   bookings={filteredBookings}
                   leaveRequests={leaveRequests}
+                  bookingAlerts={bookingAlerts}
                   businessHours={businessHours}
                   onTimeSlotClick={handleDateClick}
                   onEventClick={handleEventClick}
@@ -2042,6 +2055,7 @@ const Calendar = () => {
                   }).filter(Boolean)}
                   bookings={filteredBookings}
                   leaveRequests={leaveRequests}
+                  bookingAlerts={bookingAlerts}
                   businessHours={businessHours}
                   onTimeSlotClick={handleDateClick}
                   onEventClick={handleEventClick}
@@ -2078,6 +2092,7 @@ const Calendar = () => {
                 slotMaxTime={businessHours.endTime}
                 allDaySlot={true}
                 eventDisplay="block"
+                dayMaxEventRows={false}
                 displayEventTime={true}
                 displayEventEnd={false}
                 eventOverlap={false}
@@ -2159,7 +2174,7 @@ const Calendar = () => {
                 dateClick={handleDateClick}
                 eventClick={handleEventClick}
                 height="auto"
-                dayMaxEvents={currentView === 'month' ? 3 : true}
+                dayMaxEvents={currentView === 'month' ? 10 : true}
                 selectable={currentView !== 'month'}
                 selectMirror={true}
                 eventContent={(arg) => {
@@ -2526,7 +2541,7 @@ const Calendar = () => {
                         <option value="">Choose a client...</option>
                         {clientList.map(client => (
                           <option key={client._id} value={client._id}>
-                            {client.name} - {client.email}
+                            {client.firstName && client.lastName ? `${client.firstName} ${client.lastName}` : client.name} - {client.email}
                           </option>
                         ))}
                       </Form.Select>
@@ -2538,7 +2553,7 @@ const Calendar = () => {
                           const selectedClient = clientList.find(c => c._id === formData.client);
                           return selectedClient ? (
                             <div>
-                              <h6>{selectedClient.name}</h6>
+                              <h6>{selectedClient.firstName && selectedClient.lastName ? `${selectedClient.firstName} ${selectedClient.lastName}` : selectedClient.name}</h6>
                               <p className="mb-1"><strong>Email:</strong> {selectedClient.email}</p>
                               {selectedClient.phone && (
                                 <p className="mb-1"><strong>Phone:</strong> {selectedClient.phone}</p>

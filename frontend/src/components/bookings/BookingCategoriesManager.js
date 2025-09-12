@@ -24,7 +24,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 
 const BookingCategoriesManager = () => {
@@ -52,11 +52,11 @@ const BookingCategoriesManager = () => {
     setLoading(true);
     try {
       // Fetch booking keys
-      const keysRes = await axios.get('/booking-categories/keys');
+      const keysRes = await axiosInstance.get('/booking-categories/keys');
       setKeys(keysRes.data.data);
       
       // Fetch location areas
-      const areasRes = await axios.get('/booking-categories/areas');
+      const areasRes = await axiosInstance.get('/booking-categories/areas');
       setAreas(areasRes.data.data);
     } catch (err) {
       console.error('Error fetching categories:', err);
@@ -112,10 +112,10 @@ const BookingCategoriesManager = () => {
     
     try {
       if (mode === 'add') {
-        await axios.post(endpoint, formData);
+        await axiosInstance.post(endpoint, formData);
         setSuccess(`${type === 'key' ? 'Booking key' : 'Location area'} created successfully!`);
       } else if (mode === 'edit' && item) {
-        await axios.put(`${endpoint}/${item._id}`, formData);
+        await axiosInstance.put(`${endpoint}/${item._id}`, formData);
         setSuccess(`${type === 'key' ? 'Booking key' : 'Location area'} updated successfully!`);
       }
       
@@ -138,7 +138,7 @@ const BookingCategoriesManager = () => {
     const endpoint = type === 'key' ? '/booking-categories/keys' : '/booking-categories/areas';
     
     try {
-      await axios.delete(`${endpoint}/${id}`);
+      await axiosInstance.delete(`${endpoint}/${id}`);
       setSuccess(`${type === 'key' ? 'Booking key' : 'Location area'} deleted successfully!`);
       fetchCategories();
     } catch (err) {

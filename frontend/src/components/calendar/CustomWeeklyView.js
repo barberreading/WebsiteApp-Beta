@@ -7,8 +7,10 @@ import {
   normalizeBookingDates,
   getBookingAtTimeSlot,
   getLeaveRequestAtTimeSlot,
+  getBookingAlertAtTimeSlot,
   getEventAtTimeSlot,
   getBookingPosition,
+  getBookingHeight,
   formatDisplayTime,
   getBookingDisplayData,
   getLeaveRequestDisplayData,
@@ -18,7 +20,7 @@ import {
   generateBookingEventClasses
 } from '../../utils/bookingUtils';
 
-const CustomWeeklyView = ({ currentDate, selectedEmployees, bookings, leaveRequests = [], businessHours, onTimeSlotClick, onEventClick, onDateChange }) => {
+const CustomWeeklyView = ({ currentDate, selectedEmployees, bookings, leaveRequests = [], bookingAlerts = [], businessHours, onTimeSlotClick, onEventClick, onDateChange }) => {
   const [weekStart, setWeekStart] = useState(null);
   const [timeSlots, setTimeSlots] = useState([]);
   const weeklyViewRef = useRef(null);
@@ -287,15 +289,17 @@ const CustomWeeklyView = ({ currentDate, selectedEmployees, bookings, leaveReque
                   <div key={dayIndex} className="day-column">
                     <div className="day-staff-columns">
                       {selectedEmployees.map((staff, staffIndex) => {
-                        const event = getEventAtTimeSlot(bookings, leaveRequests, staff.id, day, timeSlot);
-                        const isBooking = event && !event.extendedProps?.type;
+                        const event = getEventAtTimeSlot(bookings, leaveRequests, bookingAlerts, staff.id, day, timeSlot);
+                        const isBooking = event && event.extendedProps?.type !== 'leave-request' && event.extendedProps?.type !== 'booking-alert';
                         const isLeaveRequest = event && event.extendedProps?.type === 'leave-request';
+                        const isBookingAlert = event && event.extendedProps?.type === 'booking-alert';
                         const isWorking = isStaffWorking(staff, timeSlot, businessHours);
                         
-                        // For bookings, calculate position; for leave requests, always show as start
+
+                        // Calculate position for bookings, leave requests, and booking alerts
                         const eventPosition = isBooking ? 
                           getBookingPosition(bookings, staff.id, day, timeSlots, timeIndex, event) :
-                          (isLeaveRequest ? 'booking-start' : '');
+                          (isLeaveRequest || isBookingAlert ? (timeIndex === 0 ? 'booking-start' : '') : '');
                         
                         const eventDisplayData = getEventDisplayData(event);
                         
@@ -351,82 +355,109 @@ const CustomWeeklyView = ({ currentDate, selectedEmployees, bookings, leaveReque
                                       opacity: 0.9
                                     }}
                                     onClick={(e) => {
-                                      e.stopPropagation();
-                                      if (onEventClick) onEventClick({ event });
-                                    }}
-                                  >
-                                    {eventDisplayData && (
-                                      <>
-                                        <div className="leave-title" style={{ fontSize: '12px', marginBottom: '2px' }}>
-                                          {eventDisplayData.title}
-                                        </div>
-                                        <div className="leave-reason" style={{ fontSize: '10px', fontStyle: 'italic' }}>
-                                          {eventDisplayData.reason}
-                                        </div>
-                                      </>
-                                    )}
-                                  </div>
-                                );
-                              } else {
-                                // Regular booking logic
-                                const bookingSlots = timeSlots.filter((slot, idx) => {
-                                  const slotBooking = getBookingAtTimeSlot(bookings, staff.id, day, slot);
-                                  return slotBooking && slotBooking.id === event.id;
-                                }).length;
-                                
-                                const slotHeight = 60;
-                                const totalHeight = bookingSlots * slotHeight;
-                                
-                                return (
-                                  <div 
-                                    className={`booking-event booking-continuous`}
-                                    data-booking-color={eventDisplayData?.backgroundColor}
-                                    style={{
-                                      position: 'absolute',
-                                      top: 0,
-                                      left: 0,
-                                      right: 0,
-                                      height: `${totalHeight}px`,
-                                      backgroundColor: eventDisplayData?.backgroundColor,
-                                      color: eventDisplayData?.textColor,
-                                      fontWeight: 'bold',
-                                      border: '2px solid rgba(0, 0, 0, 0.8)',
-                                      borderRadius: '4px',
-                                      padding: '4px',
-                                      zIndex: 10,
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      justifyContent: 'flex-start'
-                                    }}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      if (onEventClick) onEventClick({ event });
-                                    }}
-                                  >
-                                    <div className="booking-title">{eventDisplayData?.title}</div>
-                                    <div className="booking-client">{eventDisplayData?.clientName}</div>
-                                    <div className="booking-time">{eventDisplayData?.timeDisplay}</div>
-                                    <div className="booking-service">{eventDisplayData?.serviceName}</div>
-                                    <div className="service-color-indicator">
-                                      <div
-                                        className="service-color-circle"
-                                        style={{
-                                          backgroundColor: eventDisplayData?.backgroundColor,
-                                          width: '24px',
-                                          height: '24px',
-                                          borderRadius: '50%',
-                                          margin: '4px auto',
-                                          border: '1px solid rgba(255,255,255,0.8)',
-                                          boxShadow: '0 1px 3px rgba(0,0,0,0.3)'
-                                        }}
-                                      ></div>
+                                       e.stopPropagation();
+                                       if (onEventClick) onEventClick({ event });
+                                     }}
+                                   >
+                                     {eventDisplayData && (
+                                       <>
+                                         <div className="leave-title" style={{ fontSize: '12px', marginBottom: '2px' }}>
+                                           {eventDisplayData.title}
+                                         </div>
+                                         <div className="leave-reason" style={{ fontSize: '10px', fontStyle: 'italic' }}>
+                                           {eventDisplayData.reason}
+                                         </div>
+                                       </>
+                                     )}
+                                   </div>
+                                 );
+                               } else {
+                                 // Regular booking logic
+                                 const bookingSlots = timeSlots.filter((slot, idx) => {
+                                   const slotBooking = getBookingAtTimeSlot(bookings, staff.id, day, slot);
+                                   return slotBooking && slotBooking.id === event.id;
+                                 }).length;
+                                 
+                                 const slotHeight = 60;
+                                 const totalHeight = bookingSlots * slotHeight;
+                                 
+                                 return (
+                                   <div 
+                                     className={`booking-event booking-continuous`}
+                                     data-booking-color={eventDisplayData?.backgroundColor}
+                                     style={{
+                                       position: 'absolute',
+                                       top: 0,
+                                       left: 0,
+                                       right: 0,
+                                       height: `${totalHeight}px`,
+                                       backgroundColor: eventDisplayData?.backgroundColor,
+                                       color: eventDisplayData?.textColor,
+                                       fontWeight: 'bold',
+                                       border: '2px solid rgba(0, 0, 0, 0.8)',
+                                       borderRadius: '4px',
+                                       padding: '4px',
+                                       zIndex: 10,
+                                       display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'flex-start',
+                                        overflow: 'hidden'
+                                      }}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (onEventClick) onEventClick({ event });
+                                      }}
+                                    >
+                                      {eventDisplayData && (
+                                        <>
+                                          <div className="booking-title" style={{ fontSize: '12px', marginBottom: '2px' }}>
+                                            {eventDisplayData.title}
+                                          </div>
+                                          <div className="booking-time" style={{ fontSize: '10px' }}>
+                                            {eventDisplayData.time}
+                                          </div>
+                                        </>
+                                      )}
                                     </div>
-                                  </div>
-                                );
-                              }
-                            })()}
-                            {event && eventPosition !== 'booking-start' && eventPosition !== '' && !isLeaveRequest && (
-                              <div style={{ height: '100%', minHeight: '60px' }} />
+                                  );
+                                }
+                               })()}
+                            {event && eventPosition === 'booking-middle' && isBooking && (
+                              <div 
+                                className="booking-event booking-middle"
+                                style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  height: '100%',
+                                  minHeight: '60px',
+                                  backgroundColor: eventDisplayData?.backgroundColor || '#28a745',
+                                  border: '2px solid rgba(0, 0, 0, 0.8)',
+                                  borderTop: 'none',
+                                  borderBottom: 'none',
+                                  borderRadius: '0',
+                                  zIndex: 5
+                                }}
+                              />
+                            )}
+                            {event && eventPosition === 'booking-end' && isBooking && (
+                              <div 
+                                className="booking-event booking-end"
+                                style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  height: '100%',
+                                  minHeight: '60px',
+                                  backgroundColor: eventDisplayData?.backgroundColor || '#28a745',
+                                  border: '2px solid rgba(0, 0, 0, 0.8)',
+                                  borderTop: 'none',
+                                  borderRadius: '0 0 6px 6px',
+                                  zIndex: 5
+                                }}
+                              />
                             )}
                           </div>
                         );

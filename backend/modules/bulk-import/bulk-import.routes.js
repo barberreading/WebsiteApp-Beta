@@ -4,6 +4,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const { protect, authorize } = require('../../middleware/auth');
+const { validateObjectId } = require('../../middleware/validation');
 const { getTemplates, uploadClients, uploadUsers } = require('./bulk-import.controllers');
 
 // Configure multer for file uploads
@@ -34,7 +35,7 @@ const upload = multer({
   }
 });
 
-router.route('/templates/:type').get(protect, getTemplates);
+router.route('/templates/:type').get(protect, validateObjectId('type'), getTemplates);
 router.route('/clients').post(protect, authorize(['manager', 'superuser']), upload.single('file'), uploadClients);
 router.route('/users').post(protect, authorize(['superuser']), upload.single('file'), uploadUsers);
 

@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const User = require('../../models/User');
+const TokenBlacklist = require('../../models/TokenBlacklist');
 
 /**
  * Registers a new user.
@@ -40,17 +41,84 @@ const register = async (userData) => {
   return {
     token,
     isTemporaryPassword: user.isTemporaryPassword,
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    }
   };
+};
+
+/**
+ * Logs out a user by blacklisting their token.
+ * @param {string} token - The JWT token to blacklist.
+ * @param {string} userId - The user's ID.
+ * @returns {Promise<object>} Success status.
+ */
+const logout = async (token, userId) => {
+  try {
+    await TokenBlacklist.blacklistToken(token, userId, 'logout');
+    return { success: true, msg: 'Logged out successfully' };
+  } catch (error) {
+    console.error('Logout error:', error);
+    return { success: false, msg: 'Logout failed' };
+  }
+};
+
+/**
+ * Changes user password and blacklists current token.
+ * @param {string} userId - The user's ID.
+ * @param {string} currentPassword - The current password.
+ * @param {string} newPassword - The new password.
+ * @param {string} currentToken - The current JWT token to blacklist.
+ * @returns {Promise<object>} Result with new token or error.
+ */
+const changePassword = async (userId, currentPassword, newPassword, currentToken) => {
+  try {
+    const user = await User.findById(userId).select('+password');
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Verify current password
+    const isMatch = await user.matchPassword(currentPassword);
+    if (!isMatch) {
+      throw new Error('Current password is incorrect');
+    }
+
+    // Update password
+    user.password = newPassword;
+    user.isTemporaryPassword = false;
+    await user.save();
+
+    // Blacklist current token
+    if (currentToken) {
+      await TokenBlacklist.blacklistToken(currentToken, userId, 'password_change');
+    }
+
+    // Generate new token
+    const newToken = user.getSignedJwtToken();
+
+    return {
+      success: true,
+      token: newToken,
+      msg: 'Password changed successfully'
+    };
+  } catch (error) {
+    throw new Error(error.message || 'Failed to change password');
+  }
 };
 
 /**
  * Logs in a user.
  * @param {string} email - The user's email.
  * @param {string} password - The user's password.
+ * @param {boolean} rememberMe - Whether to create a long-lasting token.
  * @returns {Promise<object>} An object containing the JWT token, a flag indicating if the password is temporary, and user information.
  * @throws {Error} If the credentials are invalid.
  */
-const login = async (email, password) => {
+const login = async (email, password, rememberMe = false) => {
   // Find user by email
   const user = await User.findOne({ email }).select('+password');
   if (!user) {
@@ -63,7 +131,7 @@ const login = async (email, password) => {
     throw new Error('Invalid credentials');
   }
 
-  const token = user.getSignedJwtToken();
+  const token = user.getSignedJwtToken(rememberMe);
 
   return {
     token,
@@ -77,15 +145,8 @@ const login = async (email, password) => {
  * @returns {Promise<object>} The user object.
  */
 const getMe = async (userId) => {
-  // Provide a mock user in development for testing purposes
-  if (process.env.NODE_ENV === 'development' && userId === 'dev_user_id') {
-    return {
-      _id: 'dev_user_id',
-      name: 'Development User',
-      email: 'dev@example.com',
-      role: 'superuser',
-    };
-  }
+  // SECURITY: Removed development backdoor for production security
+  // All users must authenticate through proper channels
   return await User.findById(userId).select('-password');
 };
 
@@ -163,13 +224,13 @@ const updateEmail = async (userId, email, password) => {
 };
 
 /**
- * Changes a user's password.
+ * Changes a user's password (legacy version).
  * @param {string} userId - The ID of the user.
  * @param {string} currentPassword - The user's current password.
  * @param {string} newPassword - The new password.
  * @throws {Error} If the current password is incorrect.
  */
-const changePassword = async (userId, currentPassword, newPassword) => {
+const changePasswordOld = async (userId, currentPassword, newPassword) => {
   const user = await User.findById(userId).select('+password');
 
   const isMatch = await user.matchPassword(currentPassword);
@@ -185,6 +246,7 @@ const changePassword = async (userId, currentPassword, newPassword) => {
 module.exports = {
   register,
   login,
+  logout,
   getMe,
   forgotPassword,
   resetPassword,

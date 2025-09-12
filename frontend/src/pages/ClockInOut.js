@@ -28,7 +28,7 @@ const ClockInOut = () => {
       setError(''); // Clear any previous errors
       
       // Fetch current clock status
-      const statusRes = await axiosInstance.get('api/timesheets/current-status');
+      const statusRes = await axiosInstance.get('/timesheets/current-status');
       console.log('Status response:', statusRes.data);
       
       if (statusRes.data && statusRes.data.clockedIn) {
@@ -77,7 +77,7 @@ const ClockInOut = () => {
       
       // Simplify the payload to minimum required data
       const minimalPayload = { clientId: payload.clientId };
-      const res = await axiosInstance.post('api/timesheets/clock-in', minimalPayload);
+      const res = await axiosInstance.post('/timesheets/clock-in', minimalPayload);
       
       setClockStatus('in');
       setCurrentShift(res.data);
@@ -136,7 +136,7 @@ const ClockInOut = () => {
       });
       
       // Simplify the payload to minimum required data
-      const res = await axiosInstance.post('api/timesheets/clock-out', {
+      const res = await axiosInstance.post('/timesheets/clock-out', {
         clockOutTime,
         breaks: processedBreaks.length > 0 ? processedBreaks : []
       });

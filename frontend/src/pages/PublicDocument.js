@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Card, Button, Alert, Spinner } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 import { FaDownload, FaFilePdf } from 'react-icons/fa';
 import moment from 'moment';
 
@@ -15,7 +15,7 @@ const PublicDocument = () => {
     const fetchDocument = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`/staff-documents/public/${accessKey}`);
+        const res = await axiosInstance.get(`/staff-documents/public/${accessKey}`);
         setDocument(res.data);
         setLoading(false);
       } catch (err) {
@@ -31,7 +31,7 @@ const PublicDocument = () => {
 
   const downloadDocument = async () => {
     try {
-      const res = await axios.get(`/staff-documents/public/download/${accessKey}`, {
+      const res = await axiosInstance.get(`/staff-documents/public/download/${accessKey}`, {
         responseType: 'blob'
       });
       

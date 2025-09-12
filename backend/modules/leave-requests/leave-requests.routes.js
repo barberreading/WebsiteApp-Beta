@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../../middleware/auth');
+const { createModifyLimiter } = require('../../middleware/rateLimiter');
 const {
   getLeaveRequests,
   getLeaveRequest,
@@ -12,18 +13,18 @@ const {
 
 router.route('/')
   .get(protect, getLeaveRequests)
-  .post(protect, authorize('staff'), createLeaveRequest);
+  .post(protect, authorize('staff'), createModifyLimiter, createLeaveRequest);
 
 router.route('/:id')
   .get(protect, getLeaveRequest);
 
 router.route('/:id/approve')
-  .put(protect, authorize('manager', 'superuser'), approveLeaveRequest);
+  .put(protect, authorize('manager', 'superuser'), createModifyLimiter, approveLeaveRequest);
 
 router.route('/:id/deny')
-  .put(protect, authorize('manager', 'superuser'), denyLeaveRequest);
+  .put(protect, authorize('manager', 'superuser'), createModifyLimiter, denyLeaveRequest);
 
 router.route('/:id/withdraw')
-  .put(protect, authorize('staff'), withdrawLeaveRequest);
+  .put(protect, authorize('staff'), createModifyLimiter, withdrawLeaveRequest);
 
 module.exports = router;

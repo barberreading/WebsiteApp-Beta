@@ -23,13 +23,13 @@ const register = asyncHandler(async (req, res, next) => {
  * @access  Public
  */
 const login = asyncHandler(async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, rememberMe = false } = req.body;
   
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required' });
   }
   
-  const result = await authService.login(email, password);
+  const result = await authService.login(email, password, rememberMe);
   res.json(result);
 });
 
@@ -41,6 +41,17 @@ const login = asyncHandler(async (req, res, next) => {
 const getMe = asyncHandler(async (req, res, next) => {
   const user = await authService.getMe(req.user.id);
   res.json(user);
+});
+
+/**
+ * @desc    Logout user
+ * @route   POST /api/v1/auth/logout
+ * @access  Private
+ */
+const logout = asyncHandler(async (req, res, next) => {
+  const token = req.header('x-auth-token') || req.header('Authorization')?.replace('Bearer ', '');
+  const result = await authService.logout(token, req.user.id);
+  res.json(result);
 });
 
 /**
@@ -87,13 +98,15 @@ const updateEmail = asyncHandler(async (req, res, next) => {
  */
 const changePassword = asyncHandler(async (req, res, next) => {
   const { currentPassword, newPassword } = req.body;
-  await authService.changePassword(req.user.id, currentPassword, newPassword);
-  res.json({ success: true, msg: 'Password updated successfully' });
+  const token = req.header('x-auth-token') || req.header('Authorization')?.replace('Bearer ', '');
+  const result = await authService.changePassword(req.user.id, currentPassword, newPassword, token);
+  res.json(result);
 });
 
 module.exports = {
   register,
   login,
+  logout,
   getMe,
   forgotPassword,
   resetPassword,

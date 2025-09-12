@@ -283,7 +283,7 @@
   display: flex;
   align-items: stretch;
   justify-content: stretch;
-  /* background: #fff; - Removed to allow booking colors to show */
+  background: #fff;
   width: var(--staff-column-width);
   min-width: var(--staff-column-width);
   max-width: var(--staff-column-width);
@@ -302,21 +302,23 @@
 }
 
 .staff-time-slot.has-booking {
-  /* background and border removed to allow service colors to show */
+  background: transparent !important;
+  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent;
 }
 
 /* Hide cell borders for continuous bookings */
 .staff-time-slot.has-booking.booking-start {
-  border-bottom: none;
+  border-bottom: 1px solid transparent;
 }
 
 .staff-time-slot.has-booking.booking-middle {
-  border-top: none;
-  border-bottom: none;
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
 }
 
 .staff-time-slot.has-booking.booking-end {
-  border-top: none;
+  border-top: 1px solid transparent;
 }
 
 /* Special styling for middle segments of multi-slot bookings */
@@ -442,6 +444,12 @@
   justify-content: flex-start;
   overflow: hidden;
   border: 2px solid rgba(0, 0, 0, 0.8);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 5;
 }
 
 /* Booking event hover effects */
@@ -670,4 +678,61 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
   z-index: 25;
+}
+
+/* All-Day Events Section Styles */
+.all-day-events-section {
+  display: flex;
+  background: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 60px; /* Position below date headers */
+  z-index: 10;
+  min-height: 40px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.all-day-label {
+  width: var(--time-column-width);
+  min-width: var(--time-column-width);
+  background: #e9ecef;
+  border-right: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 12px;
+  color: #495057;
+  padding: 8px 4px;
+  flex-shrink: 0;
+}
+
+.all-day-events-grid {
+  display: flex;
+  width: calc((var(--staff-column-width) * var(--staff-count, 1)) * 7);
+  min-width: calc((var(--staff-column-width) * var(--staff-count, 1)) * 7);
+  flex-shrink: 0;
+}
+
+.all-day-events-cell {
+  width: calc((var(--staff-column-width) * var(--staff-count, 1)));
+  min-width: calc((var(--staff-column-width) * var(--staff-count, 1)));
+  border-right: 1px solid #ddd;
+  padding: 4px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 32px;
+}
+
+.all-day-leave-event {
+  transition: all 0.2s ease;
+}
+
+.all-day-leave-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 20;
 }

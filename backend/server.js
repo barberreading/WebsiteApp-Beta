@@ -9,11 +9,13 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const winston = require('winston');
 const logManager = require('./modules/logging/logging.services.js');
+const { generalLimiter, authLimiter, passwordResetLimiter, uploadLimiter, createLimiter } = require('./middleware/rateLimiter');
 
 const loadRoutes = require('./routes');
 
 const { initSchedulers } = require('./utils/initSchedulers');
 const { initEmailSystem } = require('./utils/initEmailSystem');
+const { startTokenCleanupScheduler } = require('./utils/tokenCleanup');
 
 const app = express();
 
@@ -64,6 +66,9 @@ app.use(express.json({ limit: '500mb' })); // Parse JSON bodies with greatly inc
 app.use(express.urlencoded({ limit: '500mb', extended: true })); // Parse URL-encoded bodies with greatly increased size limit
 app.use(morgan('combined')); // HTTP request logger
 
+// Apply general rate limiting to all routes
+app.use(generalLimiter);
+
 // Add request timeout and connection limits
 app.use((req, res, next) => {
   // Set a timeout for all requests
@@ -76,6 +81,7 @@ app.use((req, res, next) => {
 
 // Custom middleware to prevent circular JSON errors
 const jsonSafeResponse = require('./middleware/jsonSafeResponse');
+const { errorHandler, notFound } = require('./middleware/errorHandler');
 app.use(jsonSafeResponse); // Apply globally to all routes
 
 // API routes
@@ -121,26 +127,20 @@ app.use('/api/health', healthRoutes);
 
 app.use('/api/email', emailRoutes);
 app.use('/api/error-logging', errorLoggingRoutes);
-app.use('/api/image-upload', imageUploadRoutes);
-app.use('/api/password-reset', passwordResetRoutes);
+app.use('/api/image-upload', uploadLimiter, imageUploadRoutes);
+app.use('/api/password-reset', passwordResetLimiter, passwordResetRoutes);
 app.use('/api/calendar-integration', calendarIntegrationRoutes);
 app.use('/api/document-reminders', documentRemindersRoutes);
 app.use('/api/logging', loggingRoutes);
 
 // Add a root endpoint for basic connectivity checks
 app.get('/', (req, res) => {
-  res.status(200).json({ message: 'Server is running' });
+  res.json({ message: 'Staff Management API is running', timestamp: new Date().toISOString() });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-  
-  res.status(err.status || 500).json({
-    message: err.message || 'Internal Server Error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
-  });
-});
+// Error handling middleware (must be last)
+app.use(notFound); // Handle 404 errors
+app.use(errorHandler); // Handle all other errors
 
 // Connect to MongoDB with support for both Atlas and Synology
 const connectDB = async () => {
@@ -200,6 +200,9 @@ if (process.env.NODE_ENV !== 'test') {
             // Initialize schedulers and email system
             // initSchedulers();
             // initEmailSystem();
+            
+            // Start token cleanup scheduler
+            startTokenCleanupScheduler();
         });
     });
 }

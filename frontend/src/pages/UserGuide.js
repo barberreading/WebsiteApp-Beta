@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 import { Container, Card } from 'react-bootstrap';
 
 const UserGuide = () => {
@@ -9,7 +9,7 @@ const UserGuide = () => {
   useEffect(() => {
     const fetchGuide = async () => {
       try {
-        const { data } = await axios.get('/user-guide');
+        const { data } = await axiosInstance.get('/user-guide');
         setGuideContent(data.content);
       } catch (err) {
         setError('Failed to load user guide. Please try again later.');

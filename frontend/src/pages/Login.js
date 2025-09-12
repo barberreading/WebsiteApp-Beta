@@ -6,6 +6,11 @@ import { useAuth } from '../context/AuthContext';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(() => {
+    // Load rememberMe preference from localStorage
+    const saved = localStorage.getItem('rememberMe');
+    return saved ? JSON.parse(saved) : false;
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
@@ -18,7 +23,7 @@ const Login = () => {
     setLoading(true);
     
     try {
-      const result = await login(email, password);
+      const result = await login(email, password, rememberMe);
       
       if (result?.isTemporaryPassword) {
         navigate('/change-password');
@@ -61,6 +66,21 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                  />
+                </Form.Group>
+                
+                <Form.Group className="mb-3">
+                  <Form.Check
+                    type="checkbox"
+                    id="rememberMe"
+                    label="Remember me for 30 days"
+                    checked={rememberMe}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setRememberMe(checked);
+                      // Persist rememberMe preference to localStorage
+                      localStorage.setItem('rememberMe', JSON.stringify(checked));
+                    }}
                   />
                 </Form.Group>
                 

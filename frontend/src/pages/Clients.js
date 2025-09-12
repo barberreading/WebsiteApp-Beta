@@ -116,7 +116,7 @@ const Clients = () => {
         console.log('Submitting client data:', clientData);
         
         // Submit the client data directly to the API
-        const response = await axiosInstance.post('api/clients', clientData);
+        const response = await axiosInstance.post('/clients', clientData);
         
         console.log('Client creation response:', response.data);
         
@@ -726,7 +726,7 @@ const Clients = () => {
                     console.log('Creating client with form data:', clientData);
                     
                     // Use axios instance for consistent headers
-                    axiosInstance.post('api/clients', clientData)
+                    axiosInstance.post('/clients', clientData)
                     .then(response => {
                       console.log('Client created successfully:', response.data);
                       toast.success('Client added successfully!');

@@ -16,7 +16,7 @@ const ClientManagement = () => {
   const [selectedClient, setSelectedClient] = useState(null);
   const [activeTab, setActiveTab] = useState('clients');
   const [locationAreas, setLocationAreas] = useState([]);
-  const [statusFilter, setStatusFilter] = useState('active');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   // New client form state
   const [newClient, setNewClient] = useState({
@@ -43,7 +43,8 @@ const ClientManagement = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axiosInstance.get(`/clients?status=${statusFilter}`);
+      const url = statusFilter === 'all' ? '/clients' : `/clients?status=${statusFilter}`;
+      const response = await axiosInstance.get(url);
       setClients(response.data);
     } catch (err) {
       console.error('Error fetching clients:', err);
@@ -220,10 +221,22 @@ const ClientManagement = () => {
                 <Col md={6} className="d-flex justify-content-end align-items-center">
                   <ButtonGroup className="me-3">
                     <Button 
-                      variant={statusFilter === 'active' ? 'primary' : 'outline-secondary'}
+                      variant={statusFilter === 'all' ? 'primary' : 'outline-secondary'}
+                      onClick={() => setStatusFilter('all')}
+                    >
+                      All
+                    </Button>
+                    <Button 
+                      variant={statusFilter === 'active' ? 'success' : 'outline-secondary'}
                       onClick={() => setStatusFilter('active')}
                     >
                       Active
+                    </Button>
+                    <Button 
+                      variant={statusFilter === 'pending' ? 'warning' : 'outline-secondary'}
+                      onClick={() => setStatusFilter('pending')}
+                    >
+                      Pending
                     </Button>
                     <Button 
                       variant={statusFilter === 'inactive' ? 'danger' : 'outline-secondary'}

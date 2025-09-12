@@ -22,10 +22,13 @@ const createSuperuser = async () => {
     }
 
     // Create superuser
+    const adminPassword = process.env.ADMIN_PASSWORD || 'changeMe123!';
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+    
     const superuser = new User({
       name: 'Admin',
-      email: 'admin@example.com',
-      password: 'admin123',
+      email: adminEmail,
+      password: adminPassword,
       role: 'superuser',
       consentGiven: true
     });

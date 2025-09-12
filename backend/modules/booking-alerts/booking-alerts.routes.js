@@ -13,6 +13,11 @@ const {
 const BookingAlert = require('../../models/BookingAlert');
 const advancedResults = require('../../middleware/advancedResults');
 const { protect, authorize } = require('../../middleware/auth');
+const {
+    sanitizeBody,
+    validateBookingAlert,
+    validateObjectId
+} = require('../../middleware/validation');
 
 const router = express.Router();
 
@@ -28,7 +33,7 @@ router
     ]),
     getBookingAlerts
   )
-  .post(protect, authorize('admin', 'superuser', 'manager'), createBookingAlert);
+  .post(protect, authorize('admin', 'superuser', 'manager'), sanitizeBody, validateBookingAlert, createBookingAlert);
 
 router
   .route('/available')
@@ -36,17 +41,17 @@ router
 
 router
   .route('/:id')
-  .get(protect, getBookingAlert)
-  .put(protect, authorize('admin', 'superuser', 'manager'), cancelBookingAlert);
+  .get(protect, validateObjectId('id'), getBookingAlert)
+  .put(protect, authorize('admin', 'superuser', 'manager'), validateObjectId('id'), cancelBookingAlert);
 
 router
   .route('/:id/confirm')
-  .put(protect, authorize('manager', 'superuser', 'admin'), confirmBookingAlert);
+  .put(protect, authorize('manager', 'superuser', 'admin'), validateObjectId('id'), confirmBookingAlert);
 
 router
   .route('/:id/reject')
-  .put(protect, authorize('manager', 'superuser', 'admin'), rejectBookingAlert);
+  .put(protect, authorize('manager', 'superuser', 'admin'), validateObjectId('id'), rejectBookingAlert);
 
-router.route('/:id/claim').put(protect, authorize('staff'), claimBookingAlert);
+router.route('/:id/claim').put(protect, authorize('staff'), validateObjectId('id'), claimBookingAlert);
 
 module.exports = router;

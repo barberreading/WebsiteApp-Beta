@@ -371,8 +371,8 @@ const BookingAlertForm = () => {
       
       // Log authentication state before request
       console.log('\n=== FRONTEND: BEFORE POST REQUEST ===');
-      console.log('Current user before request:', currentUser);
-      console.log('Auth token exists:', !!tokenBeforeRequest);
+      console.log('User authenticated:', !!currentUser);
+      console.log('Session active:', !!tokenBeforeRequest);
       console.log('Timestamp:', new Date().toISOString());
       
       // Store original authentication state to compare after request
@@ -391,16 +391,15 @@ const BookingAlertForm = () => {
       // Log authentication state after request
       console.log('\n=== FRONTEND: AFTER POST REQUEST ===');
       console.log('Response status:', response.status);
-      console.log('Current user after request:', currentUser);
-      console.log('Auth token still exists:', !!tokenAfterRequest);
+      console.log('User still authenticated:', !!currentUser);
+      console.log('Session still active:', !!tokenAfterRequest);
       console.log('Auth state changed:', authStateChanged);
-      console.log('Response from server:', response);
+      console.log('Request completed successfully');
       
       // If authentication state changed unexpectedly, warn user but don't fail
       if (authStateChanged) {
         console.warn('⚠️ Authentication state changed during request!');
-        console.warn('Original token:', originalAuthState.token?.substring(0, 20) + '...');
-        console.warn('Current token:', tokenAfterRequest?.substring(0, 20) + '...');
+        console.warn('Session state may have been refreshed during request');
       }
       
       if (response.status === 201) {
@@ -430,11 +429,10 @@ const BookingAlertForm = () => {
       }
     } catch (err) {
         console.log('\n=== FRONTEND: ERROR OCCURRED ===');
-        console.error('Error creating booking alert:', err);
+        console.error('Error creating booking alert:', err.message);
         console.log('Error status:', err.response?.status);
-        console.log('Error data:', err.response?.data);
-        console.log('Current user during error:', currentUser);
-        console.log('Auth token during error:', !!localStorage.getItem('token'));
+        console.log('User authenticated during error:', !!currentUser);
+        console.log('Session active during error:', !!localStorage.getItem('token'));
         console.log('Is this a 401 error?', err.response?.status === 401);
         
         // Handle authentication errors without triggering logout
@@ -473,7 +471,7 @@ const BookingAlertForm = () => {
           // Attempt to restore the token if it was lost
           if (preservedAuthState.token) {
             localStorage.setItem('token', preservedAuthState.token);
-            console.log('✅ Authentication token restored from preserved state');
+            console.log('✅ Authentication session restored from preserved state');
             
             // Show warning to user about potential session issue
             setError('Session temporarily interrupted but recovered. Your booking alert submission may need to be retried.');

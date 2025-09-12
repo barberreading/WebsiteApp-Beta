@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 import { useAuth } from './AuthContext';
 
 const UserTemplateContext = createContext();
@@ -16,9 +16,7 @@ export const UserTemplateProvider = ({ children }) => {
     
     try {
       setLoading(true);
-      const res = await axios.get('/user-templates', {
-        headers: { 'x-auth-token': token }
-      });
+      const res = await axiosInstance.get('/user-templates');
       setTemplates(res.data);
       setError(null);
     } catch (err) {
@@ -32,9 +30,7 @@ export const UserTemplateProvider = ({ children }) => {
   // Create template
   const createTemplate = async (templateData) => {
     try {
-      const res = await axios.post('/user-templates', templateData, {
-        headers: { 'x-auth-token': token }
-      });
+      const res = await axiosInstance.post('/user-templates', templateData);
       setTemplates([res.data, ...templates]);
       return { success: true, data: res.data };
     } catch (err) {
@@ -47,9 +43,7 @@ export const UserTemplateProvider = ({ children }) => {
   // Update template
   const updateTemplate = async (id, templateData) => {
     try {
-      const res = await axios.put(`/user-templates/${id}`, templateData, {
-        headers: { 'x-auth-token': token }
-      });
+      const res = await axiosInstance.put(`/user-templates/${id}`, templateData);
       setTemplates(templates.map(template => 
         template._id === id ? res.data : template
       ));
@@ -64,9 +58,7 @@ export const UserTemplateProvider = ({ children }) => {
   // Delete template
   const deleteTemplate = async (id) => {
     try {
-      await axios.delete(`/user-templates/${id}`, {
-        headers: { 'x-auth-token': token }
-      });
+      await axiosInstance.delete(`/user-templates/${id}`);
       setTemplates(templates.filter(template => template._id !== id));
       return { success: true };
     } catch (err) {

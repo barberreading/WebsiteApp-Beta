@@ -8,6 +8,7 @@ import {
   getBookingAtTimeSlot,
   getLeaveRequestAtTimeSlot,
   getEventAtTimeSlot,
+  getBookingAlertAtTimeSlot,
   getBookingPosition,
   formatDisplayTime,
   getBookingDisplayData,
@@ -23,6 +24,7 @@ const CustomDayView = ({
   selectedEmployees,
   bookings,
   leaveRequests = [],
+  bookingAlerts = [],
   businessHours,
   onTimeSlotClick,
   onEventClick,
@@ -263,15 +265,16 @@ const CustomDayView = ({
               <div className="time-label">{timeSlot}</div>
               <div className="staff-columns">
                 {selectedEmployees.map((staff, staffIndex) => {
-                  const event = getEventAtTimeSlot(bookings, leaveRequests, staff.id, currentDate, timeSlot);
+                  const event = getEventAtTimeSlot(bookings, leaveRequests, bookingAlerts, staff.id, currentDate, timeSlot);
                   const isBooking = event && !event.extendedProps?.type;
                   const isLeaveRequest = event && event.extendedProps?.type === 'leave-request';
+                  const isBookingAlert = event && event.extendedProps?.type === 'booking-alert';
                   const isWorking = isStaffWorking(staff, timeSlot, businessHours);
                   
-                  // For bookings, calculate position; for leave requests, always show as start
+                  // For bookings, calculate position; for leave requests and booking alerts, only show at first time slot
                   const eventPosition = isBooking ? 
                     getBookingPosition(bookings, staff.id, currentDate, timeSlots, timeIndex, event) :
-                    (isLeaveRequest ? 'booking-start' : '');
+                    (isLeaveRequest || isBookingAlert ? (timeIndex === 0 ? 'booking-start' : '') : '');
                   
                   const eventDisplayData = getEventDisplayData(event);
                   const slotClasses = generateSlotClasses({
@@ -286,14 +289,14 @@ const CustomDayView = ({
                       className={slotClasses}
                       onClick={() => handleTimeSlotClick(staff.id, timeSlot)}
                     >
-                      {event && (eventPosition === 'booking-start' || eventPosition === '') && (() => {
+                      {event && (eventPosition === 'booking-start' || (eventPosition === '' && !isLeaveRequest)) && (() => {
                         if (isLeaveRequest) {
                           // Leave requests span the entire day
                           const totalHeight = timeSlots.length * 60; // All time slots
                           
                           return (
                             <div 
-                              className={`leave-request-event`}
+                              className={`booking-event booking-continuous`}
                               style={{
                                 position: 'absolute',
                                 top: 0,
@@ -302,17 +305,17 @@ const CustomDayView = ({
                                 height: `${totalHeight}px`,
                                 backgroundColor: eventDisplayData?.backgroundColor || '#FFF3CD',
                                 color: eventDisplayData?.textColor || '#856404',
-                                fontWeight: 'bold',
-                                border: '2px solid rgba(0, 0, 0, 0.2)',
-                                borderRadius: '4px',
-                                padding: '8px 4px',
+                                border: '2px solid rgba(0, 0, 0, 0.8)',
+                                borderRadius: '6px',
+                                padding: '6px 8px',
                                 zIndex: 5,
                                 display: 'flex',
                                 flexDirection: 'column',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                textAlign: 'center',
-                                opacity: 0.9
+                                justifyContent: 'flex-start',
+                                overflow: 'hidden',
+                                cursor: 'pointer',
+                                transition: 'transform 0.2s, box-shadow 0.2s',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
                               }}
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -321,11 +324,27 @@ const CustomDayView = ({
                             >
                               {eventDisplayData && (
                                 <>
-                                  <div className="leave-title" style={{ fontSize: '14px', marginBottom: '4px' }}>
+                                  <div className="booking-title" style={{ 
+                                    fontWeight: '600',
+                                    marginBottom: '2px',
+                                    fontSize: '11px',
+                                    lineHeight: '1.2',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
+                                  }}>
                                     {eventDisplayData.title}
                                   </div>
-                                  <div className="leave-reason" style={{ fontSize: '12px', fontStyle: 'italic' }}>
-                                    {eventDisplayData.reason}
+                                  <div className="booking-client" style={{ 
+                                    fontSize: '10px',
+                                    opacity: '0.9',
+                                    lineHeight: '1.2',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    marginBottom: '2px'
+                                  }}>
+                                    {eventDisplayData.client}
                                   </div>
                                 </>
                               )}
@@ -338,8 +357,11 @@ const CustomDayView = ({
                              return slotBooking && slotBooking.id === event.id;
                            }).length;
                           
+                          // Limit height to remaining slots to prevent running off calendar
+                          const remainingSlots = timeSlots.length - timeIndex;
                           const slotHeight = 60;
-                          const totalHeight = bookingSlots * slotHeight;
+                          const maxHeight = remainingSlots * slotHeight;
+                          const totalHeight = Math.min(bookingSlots * slotHeight, maxHeight);
                           
                           return (
                             <div 
@@ -394,10 +416,40 @@ const CustomDayView = ({
                         }
                       })()}
                       {event && eventPosition === 'booking-middle' && !isLeaveRequest && (
-                        <div style={{ height: '100%', minHeight: '60px', backgroundColor: 'transparent' }} />
+                        <div 
+                          className="booking-event booking-middle"
+                          style={{ 
+                            height: '100%', 
+                            minHeight: '60px', 
+                            backgroundColor: eventDisplayData?.backgroundColor || event.backgroundColor || '#FF4444',
+                            border: '2px solid rgba(0, 0, 0, 0.8)',
+                            borderTop: 'none',
+                            borderBottom: 'none',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            zIndex: 10
+                          }} 
+                        />
                       )}
                       {event && eventPosition === 'booking-end' && !isLeaveRequest && (
-                        <div style={{ height: '100%', minHeight: '60px', backgroundColor: 'transparent' }} />
+                        <div 
+                          className="booking-event booking-end"
+                          style={{ 
+                            height: '100%', 
+                            minHeight: '60px', 
+                            backgroundColor: eventDisplayData?.backgroundColor || event.backgroundColor || '#FF4444',
+                            border: '2px solid rgba(0, 0, 0, 0.8)',
+                            borderTop: 'none',
+                            borderRadius: '0 0 6px 6px',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            zIndex: 10
+                          }} 
+                        />
                       )}
                     </div>
                   );

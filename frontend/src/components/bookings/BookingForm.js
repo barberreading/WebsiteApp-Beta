@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
@@ -27,6 +26,7 @@ import axiosInstance from '../../utils/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import { handleApiError, validateToken } from '../../utils/errorHandler';
+import { validateForm, sanitizeText } from '../../utils/validation';
 
 const BookingForm = () => {
   // eslint-disable-next-line no-unused-vars
@@ -91,6 +91,7 @@ const BookingForm = () => {
   const [initialLoading, setInitialLoading] = useState(isEditMode);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
   
   // Fetch booking categories and keys
   useEffect(() => {
@@ -127,7 +128,7 @@ const BookingForm = () => {
       setInitialLoading(true);
       try {
         if (!validateToken()) {
-          console.log('Token validation failed');
+          console.log('Authentication validation failed');
           setError('Authentication failed. Please log in again.');
           setInitialLoading(false);
           return;
@@ -192,13 +193,7 @@ const BookingForm = () => {
       }
 
       try {
-        const token = localStorage.getItem('token');
-        const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        };
-        const response = await axios.get(`/available-staff`, {
-          headers,
+        const response = await axiosInstance.get(`/available-staff`, {
           params: {
             startTime: startDate.toISOString(),
             endTime: endDate.toISOString()
@@ -274,24 +269,52 @@ const BookingForm = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setValidationErrors({});
     
     try {
-      // Validate required fields
-      if (!formData.client) {
-        throw new Error('Please select a client');
+      // Sanitize text inputs
+      const sanitizedData = {
+        ...formData,
+        title: sanitizeText(formData.title || ''),
+        description: sanitizeText(formData.description || ''),
+        location: {
+          ...formData.location,
+          address: sanitizeText(formData.location?.address || ''),
+          city: sanitizeText(formData.location?.city || ''),
+          postcode: sanitizeText(formData.location?.postcode || '')
+        }
+      };
+      
+      // Define validation rules
+      const validationRules = {
+        client: { required: true },
+        staff: { required: true },
+        service: { required: true },
+        startTime: { required: true, type: 'date' },
+        endTime: { required: true, type: 'date' },
+        description: { maxLength: 1000 },
+        title: { maxLength: 200 }
+      };
+      
+      // Validate form data
+      const validation = validateForm(sanitizedData, validationRules);
+      
+      if (!validation.isValid) {
+        setValidationErrors(validation.errors);
+        throw new Error('Please fix the validation errors before submitting.');
       }
-      if (!formData.staff) {
-        throw new Error('Please select a staff member');
+      
+      // Additional business logic validations
+      if (new Date(sanitizedData.startTime) >= new Date(sanitizedData.endTime)) {
+        throw new Error('End time must be after start time');
       }
-      if (!formData.service) {
-        throw new Error('Please select a service');
+      
+      if (new Date(sanitizedData.startTime) < new Date()) {
+        throw new Error('Start time cannot be in the past');
       }
-      if (!formData.startTime) {
-        throw new Error('Please select a start time');
-      }
-      if (!formData.endTime) {
-        throw new Error('Please select an end time');
-      }
+      
+      // Update form data with sanitized values
+      setFormData(sanitizedData);
       
       // Create a copy of form data for submission
       const bookingData = { ...formData };
@@ -355,15 +378,15 @@ const BookingForm = () => {
             if (isEditMode) {
               // Only update the master booking in edit mode
               if (i === 0) {
-                const response = await axios.put(`/bookings/${id}`, dailyBooking);
+                const response = await axiosInstance.put(`/bookings/${id}`, dailyBooking);
                 console.log('Updated booking response:', response.data);
               } else {
                 // Create additional bookings if they don't exist
-                const response = await axios.post('/bookings', dailyBooking);
+                const response = await axiosInstance.post('/bookings', dailyBooking);
                 console.log('Created additional booking response:', response.data);
               }
             } else {
-              const response = await axios.post('/bookings', dailyBooking);
+              const response = await axiosInstance.post('/bookings', dailyBooking);
               console.log('Created booking response:', response.data);
             }
           } catch (bookingError) {
@@ -425,10 +448,10 @@ const BookingForm = () => {
           const booking = bookings[i];
           try {
             if (isEditMode && booking.recurrenceMaster) {
-              const response = await axios.put(`/bookings/${id}`, booking);
+              const response = await axiosInstance.put(`/bookings/${id}`, booking);
               console.log('Updated recurring booking response:', response.data);
             } else {
-              const response = await axios.post('/bookings', booking);
+              const response = await axiosInstance.post('/bookings', booking);
               console.log('Created recurring booking response:', response.data);
             }
           } catch (bookingError) {
@@ -452,10 +475,10 @@ const BookingForm = () => {
         console.log('Final booking data being sent:', bookingData);
         
         if (isEditMode) {
-          const response = await axios.put(`/bookings/${id}`, bookingData);
+          const response = await axiosInstance.put(`/bookings/${id}`, bookingData);
           console.log('Updated regular booking response:', response.data);
         } else {
-          const response = await axios.post('/bookings', bookingData);
+          const response = await axiosInstance.post('/bookings', bookingData);
           console.log('Created regular booking response:', response.data);
         }
       } catch (bookingError) {

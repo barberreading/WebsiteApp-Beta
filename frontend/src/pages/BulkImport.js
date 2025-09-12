@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert, Tabs, Tab, Table, Badge } from 'react-bootstrap';
 import { FaDownload, FaUpload, FaCheck, FaTimes } from 'react-icons/fa';
-import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 
 const BulkImport = () => {
@@ -19,11 +19,8 @@ const BulkImport = () => {
 
   const downloadTemplate = async () => {
     try {
-      const response = await axios.get(`/bulk-import/templates/${importType}`, {
-        responseType: 'blob',
-        headers: {
-          'x-auth-token': localStorage.getItem('token')
-        }
+      const response = await axiosInstance.get(`/bulk-import/templates/${importType}`, {
+        responseType: 'blob'
       });
       
       // Create a download link
@@ -61,10 +58,9 @@ const BulkImport = () => {
     formData.append('file', file);
     
     try {
-      const response = await axios.post(`/bulk-import/${importType}`, formData, {
+      const response = await axiosInstance.post(`/bulk-import/${importType}`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          'x-auth-token': localStorage.getItem('token')
+          'Content-Type': 'multipart/form-data'
         }
       });
       

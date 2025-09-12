@@ -1,11 +1,18 @@
 const axios = require('axios');
 
 async function testAPI() {
+  const adminEmail = process.env.ADMIN_EMAIL || 'barberreading@hotmail.co.uk';
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  
+  if (!adminPassword) {
+    throw new Error('ADMIN_PASSWORD environment variable is required for authentication');
+  }
+  
   try {
     // Login first
     const loginResponse = await axios.post('http://localhost:3002/api/auth/login', {
-      email: 'barberreading@hotmail.co.uk',
-      password: 'admin123'
+      email: adminEmail,
+      password: adminPassword
     });
     
     const token = loginResponse.data.token;

@@ -1,6 +1,6 @@
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react';
 import axiosInstance from '../utils/axiosInstance';
-import jwt_decode from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 
 const AuthContext = createContext();
 
@@ -8,6 +8,13 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUserState] = useState(null);
+  
+  // Mutex for preventing concurrent auth operations
+  const authMutex = useRef(false);
+  const pendingRequests = useRef(new Map());
+  
+  // Debounce helper for auth operations
+  const debounceTimeout = useRef(null);
   
   // Wrapper to debug setCurrentUser calls
   const setCurrentUser = (user) => {
@@ -39,50 +46,61 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Load user from token
+  // Load user from token with mutex protection
   const loadUser = async () => {
-    const tokenFromStorage = localStorage.getItem('token');
-    if (tokenFromStorage) {
-      setAuthToken(tokenFromStorage);
-      try {
-        // Set timeout to prevent hanging on API calls
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
-        
-        try {
-          const res = await axiosInstance.get('/auth/me', {
-        signal: controller.signal
-      });
-          
-          clearTimeout(timeoutId);
-          setCurrentUser(res.data);
-          setIsAuthenticated(true);
-          setIsUserLoaded(true); // Set user loaded
-        } catch (apiErr) {
-          clearTimeout(timeoutId);
-          throw apiErr; // Re-throw to be caught by outer catch
-        }
-      } catch (err) {
-        console.error('Error loading user:', err);
-        
-        // DISABLED: Emergency fallback - using normal authentication
-        // console.log('Backend connection failed - activating emergency access');
-        // const emergencyUser = {
-        //   _id: 'emergency_fallback_id',
-        //   id: 'emergency_fallback_id', 
-        //   name: 'Emergency Access',
-        //   email: 'admin@example.com',
-        //   role: 'admin'
-        // };
-        // setCurrentUser(emergencyUser);
-        // setIsAuthenticated(true);
-        
-        // Clear authentication on error
-        logout();
-      }
+    // Prevent concurrent loadUser calls
+    if (authMutex.current) {
+      return;
     }
-    setIsUserLoaded(true); // Also set loaded here for cases with no token
-    setLoading(false);
+    
+    authMutex.current = true;
+    
+    try {
+      const tokenFromStorage = localStorage.getItem('token');
+      if (tokenFromStorage) {
+        setAuthToken(tokenFromStorage);
+        try {
+          // Set timeout to prevent hanging on API calls
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          
+          try {
+            const res = await axiosInstance.get('/auth/me', {
+          signal: controller.signal
+        });
+            
+            clearTimeout(timeoutId);
+            setCurrentUser(res.data);
+            setIsAuthenticated(true);
+            setIsUserLoaded(true); // Set user loaded
+          } catch (apiErr) {
+            clearTimeout(timeoutId);
+            throw apiErr; // Re-throw to be caught by outer catch
+          }
+        } catch (err) {
+          console.error('Error loading user:', err);
+          
+          // DISABLED: Emergency fallback - using normal authentication
+          // console.log('Backend connection failed - activating emergency access');
+          // const emergencyUser = {
+          //   _id: 'emergency_fallback_id',
+          //   id: 'emergency_fallback_id', 
+          //   name: 'Emergency Access',
+          //   email: 'admin@example.com',
+          //   role: 'admin'
+          // };
+          // setCurrentUser(emergencyUser);
+          // setIsAuthenticated(true);
+          
+          // Clear authentication on error
+          logout();
+        }
+      }
+      setIsUserLoaded(true); // Also set loaded here for cases with no token
+      setLoading(false);
+    } finally {
+      authMutex.current = false;
+    }
   };
 
   // Register user
@@ -103,74 +121,117 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Login user
-  const login = async (email, password) => {
-    setLoading(true);
+  // Login user with mutex protection and debouncing
+  const login = async (email, password, rememberMe = false) => {
+    // Prevent concurrent login calls
+    if (authMutex.current) {
+      return { success: false, error: 'Login already in progress' };
+    }
+    
+    // Clear any pending debounced operations
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+    
+    authMutex.current = true;
     
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      setLoading(true);
       
       try {
-        const res = await axiosInstance.post('/auth/login', { email, password }, {
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
         
-        if (res.data.token) {
-          setToken(res.data.token);
-          setAuthToken(res.data.token);
+        try {
+          const res = await axiosInstance.post('/auth/login', { email, password, rememberMe }, {
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
           
-          // If user data is returned directly, set it to prevent UI lag
-          if (res.data.user) {
-            setCurrentUser(res.data.user);
-            setIsAuthenticated(true);
-            setIsUserLoaded(true);
+          if (res.data.token) {
+            setToken(res.data.token);
+            setAuthToken(res.data.token);
+            
+            // If user data is returned directly, set it to prevent UI lag
+            if (res.data.user) {
+              setCurrentUser(res.data.user);
+              setIsAuthenticated(true);
+              setIsUserLoaded(true);
+            }
+            
+            // Always load user to ensure data is fresh and complete
+            await loadUser();
+            
+            setLoading(false);
+            return { 
+              success: true,
+              isTemporaryPassword: res.data.isTemporaryPassword 
+            };
+          } else {
+            setLoading(false);
+            return {
+              success: false,
+              error: 'Invalid login response'
+            };
           }
-          
-          // Always load user to ensure data is fresh and complete
-          await loadUser();
-          
-          setLoading(false);
-          return { 
-            success: true,
-            isTemporaryPassword: res.data.isTemporaryPassword 
-          };
-        } else {
-          setLoading(false);
-          return {
-            success: false,
-            error: 'Invalid login response'
-          };
+        } catch (apiErr) {
+          clearTimeout(timeoutId);
+          throw apiErr; // Re-throw to be caught by outer catch
         }
-      } catch (apiErr) {
-        clearTimeout(timeoutId);
-        throw apiErr; // Re-throw to be caught by outer catch
+      } catch (err) {
+        setLoading(false);
+        return {
+          success: false,
+          error: err.response?.data?.msg || 'Invalid credentials'
+        };
       }
-    } catch (err) {
-      setLoading(false);
-      return {
-        success: false,
-        error: err.response?.data?.msg || 'Invalid credentials'
-      };
+    } finally {
+      authMutex.current = false;
     }
   };
 
-  // Logout user
-  const logout = () => {
-    // Clear user state
-    setCurrentUser(null);
-    setIsAuthenticated(false);
-    setAuthToken(null);
-    setToken(null);
-    setIsUserLoaded(false);
-    setLoading(false);
-    
-    // Clear localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('selectedEmployees');
-  };
+  // Logout user with mutex protection and token blacklisting
+   const logout = async () => {
+     // Prevent concurrent logout calls
+     if (authMutex.current) {
+       return;
+     }
+     
+     // Clear any pending debounced operations
+     if (debounceTimeout.current) {
+       clearTimeout(debounceTimeout.current);
+     }
+     
+     authMutex.current = true;
+     
+     try {
+       // Call backend logout to blacklist token
+       const token = localStorage.getItem('token');
+       if (token) {
+         try {
+           await axiosInstance.post('/auth/logout');
+         } catch (err) {
+           console.error('Error during logout:', err);
+           // Continue with local logout even if backend call fails
+         }
+       }
+       
+       // Clear user state
+       setCurrentUser(null);
+       setIsAuthenticated(false);
+       setAuthToken(null);
+       setToken(null);
+       setIsUserLoaded(false);
+       setLoading(false);
+       
+       // Clear localStorage
+       localStorage.removeItem('token');
+       localStorage.removeItem('user');
+       localStorage.removeItem('selectedEmployees');
+     } finally {
+       authMutex.current = false;
+     }
+   };
 
   // Check if user has specific role
   const hasRole = useCallback((roles) => {
@@ -213,20 +274,48 @@ export const AuthProvider = ({ children }) => {
     if (!token) return true;
     
     try {
-      const decoded = jwt_decode(token);
+      const decoded = jwtDecode(token);
       return decoded.exp < Date.now() / 1000;
     } catch (err) {
       return true;
     }
   };
   
-  // Change password
+  // Cross-tab synchronization handler
+  const handleStorageChange = useCallback((e) => {
+    if (e.key === 'token') {
+      if (e.newValue === null) {
+        // Token was removed in another tab - logout
+        if (currentUser) {
+          console.log('Authentication session ended in another tab - logging out');
+          logout();
+        }
+      } else if (e.newValue !== localStorage.getItem('token')) {
+        // Token was updated in another tab - reload user
+        console.log('Authentication session updated in another tab - reloading user');
+        debounceTimeout.current = setTimeout(() => {
+          loadUser();
+        }, 100); // Small delay to prevent race conditions
+      }
+    }
+  }, [currentUser]);
+  
+  // Change password with token blacklisting
   const changePassword = async (currentPassword, newPassword) => {
     try {
       const res = await axiosInstance.post('/auth/change-password', { 
         currentPassword, 
         newPassword 
       });
+      
+      // If a new token is returned, update it
+      if (res.data.token) {
+        setToken(res.data.token);
+        setAuthToken(res.data.token);
+        // Reload user data with new token
+        await loadUser();
+      }
+      
       return { success: true, msg: res.data.msg };
     } catch (err) {
       return {
@@ -300,14 +389,19 @@ export const AuthProvider = ({ children }) => {
     // Make debug function globally available
     window.getLogoutDebugInfo = getLogoutDebugInfo;
     
-    // Add event listener for when window is closed or refreshed
+    // Add storage event listener for cross-tab synchronization
+    window.addEventListener('storage', handleStorageChange);
     
     // Cleanup event listener on component unmount
     return () => {
       delete window.getLogoutDebugInfo;
+      window.removeEventListener('storage', handleStorageChange);
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current);
+      }
     };
     // eslint-disable-next-line
-  }, [getLogoutDebugInfo]);
+  }, [getLogoutDebugInfo, handleStorageChange]);
   
   // Impersonate user (for superuser only)
   const impersonateUser = (userRole) => {

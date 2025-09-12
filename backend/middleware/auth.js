@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const TokenBlacklist = require('../models/TokenBlacklist');
 
 // Protect routes
 exports.protect = async function(req, res, next) {
@@ -34,8 +35,19 @@ exports.protect = async function(req, res, next) {
   }
 
   try {
+    // First check if token is blacklisted
+    const isBlacklisted = await TokenBlacklist.isTokenBlacklisted(token);
+    if (isBlacklisted) {
+      return res.status(401).json({ msg: 'Token has been revoked' });
+    }
+    
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Check if token is expired (additional validation)
+    if (decoded.exp && decoded.exp < Date.now() / 1000) {
+      return res.status(401).json({ msg: 'Token has expired' });
+    }
     
     if (req.path.includes('booking-alerts')) {
       console.log('Token decoded successfully');

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const User = require('./models/User');
+const User = require('../models/User');
 require('dotenv').config();
 
 // Connect to MongoDB
@@ -13,8 +13,12 @@ mongoose.connect(process.env.MONGO_URI, {
   
   try {
     // Find admin user
-    const adminEmail = 'admin@example.com';
-    const plainPassword = 'admin123';
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+    const plainPassword = process.env.ADMIN_PASSWORD || (() => {
+      console.error('ERROR: ADMIN_PASSWORD environment variable not set');
+      console.log('Please set ADMIN_PASSWORD environment variable before running this script');
+      process.exit(1);
+    })();
     
     // Hash the password
     const salt = await bcrypt.genSalt(10);
