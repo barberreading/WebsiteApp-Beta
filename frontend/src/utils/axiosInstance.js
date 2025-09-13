@@ -1,19 +1,20 @@
 import axios from 'axios';
+import { API_URL } from '../config';
 
 // IMPORTANT NOTE for future developers:
-// The 'proxy' setting in package.json (set to http://localhost:3002) automatically
-// prefixes all API requests with the backend server's address.
+// In Electron environment, the proxy setting in package.json doesn't work.
+// We need to use the full API URL from config.js instead of relying on proxy.
 // 
-// ⚠️  CRITICAL: This axiosInstance has baseURL: '/api' configured below.
+// ⚠️  CRITICAL: This axiosInstance now uses full API URL + '/api' as baseURL.
 // ⚠️  ALWAYS use paths starting with '/' (e.g., '/users', '/bookings', '/clients')
 // ⚠️  NEVER use paths starting with 'api/' (e.g., 'api/users') as this creates double prefix '/api/api/users'
 // 
-// ✅ CORRECT: axiosInstance.get('/users') → makes request to '/api/users'
-// ❌ WRONG:   axiosInstance.get('api/users') → makes request to '/api/api/users' (404 error)
+// ✅ CORRECT: axiosInstance.get('/users') → makes request to 'http://localhost:3002/api/users'
+// ❌ WRONG:   axiosInstance.get('api/users') → makes request to 'http://localhost:3002/api/api/users' (404 error)
 // 
-// This double prefix issue has been fixed multiple times. Please follow this pattern consistently.
+// This configuration works in both development and Electron environments.
 const axiosInstance = axios.create({
-  baseURL: '/api',
+  baseURL: `${API_URL}/api`,
 });
 
 export const setAuthToken = (token) => {

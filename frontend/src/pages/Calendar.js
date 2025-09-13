@@ -655,9 +655,9 @@ const Calendar = () => {
             leaveRequestId: request._id,
             staff: request.staff,
             staffName: staffName,
-            reason: request.reason,
-            status: request.status,
-            denialReason: request.denialReason,
+            reason: request.reason || 'No reason provided',
+            status: request.status || 'pending',
+            denialReason: request.denialReason || '',
             reviewedBy: request.reviewedBy,
             reviewedAt: request.reviewedAt,
             originalEndDate: originalEndDate // Store original end date for conflict detection
@@ -744,7 +744,7 @@ const Calendar = () => {
       const serviceColor = service?.color; // Use actual service color without default
       
       // Use service color directly since we now have pastel colors
-      const backgroundColor = serviceColor || '#FFE5E5'; // Use service color or default light pink
+      const backgroundColor = serviceColor || '#E3F2FD'; // Use service color or default light blue
       
       // Find client details if available
       const client = booking.client || {};
@@ -779,21 +779,22 @@ const Calendar = () => {
       end: endTime,
       allDay: false,
       extendedProps: {
-        description: booking.description,
+        description: booking.description || '',
         staff: booking.staff?._id || booking.staff,
         staffName: staffName,
         client: booking.client,
         clientName: clientName,
         clientAddress: clientAddress,
-        location: booking.location,
-        status: booking.status,
+        location: booking.location || '',
+        status: booking.status || 'scheduled',
         service: booking.service,
-        serviceName: service?.name || 'Unknown Service'
+        serviceName: service?.name || 'Unknown Service',
+        type: 'booking'
       },
       backgroundColor: backgroundColor,
-      borderColor: getStatusColor(booking.status),
-      textColor: getContrastColor(serviceColor),
-      classNames: ['booking-event'] // Add a class for styling
+      borderColor: getStatusColor(booking.status || 'scheduled'),
+      textColor: getContrastColor(backgroundColor),
+      classNames: ['booking-event', `status-${booking.status || 'scheduled'}`]
         };
     } catch (mapError) {
       console.error('Error processing booking:', booking, mapError);
@@ -1378,10 +1379,14 @@ const Calendar = () => {
     // Default to black if no color provided
     if (!hexColor) return '#000000';
     
+    // Remove # if present and ensure we have a valid hex color
+    const cleanHex = hexColor.replace('#', '');
+    if (cleanHex.length !== 6) return '#000000';
+    
     // Convert hex to RGB
-    const r = parseInt(hexColor.substr(1, 2), 16);
-    const g = parseInt(hexColor.substr(3, 2), 16);
-    const b = parseInt(hexColor.substr(5, 2), 16);
+    const r = parseInt(cleanHex.substr(0, 2), 16);
+    const g = parseInt(cleanHex.substr(2, 2), 16);
+    const b = parseInt(cleanHex.substr(4, 2), 16);
     
     // Calculate luminance - brighter colors have higher values
     const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;

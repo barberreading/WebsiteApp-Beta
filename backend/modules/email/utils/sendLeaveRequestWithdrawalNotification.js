@@ -1,7 +1,7 @@
 const { getEmailTransporter, getSenderInfo } = require('../email.config');
 const { wrapEmailContent } = require('../email.template.helper');
 const User = require('../../../models/User');
-const { sendEmail } = require('../email.services');
+const sendEmail = require('./sendEmail');
 
 const sendLeaveRequestWithdrawalNotification = async (leaveRequest, staff) => {
   try {
@@ -31,11 +31,11 @@ const sendLeaveRequestWithdrawalNotification = async (leaveRequest, staff) => {
 
     // Send email to each manager and admin
     for (const recipient of managersAndAdmins) {
-      await sendEmail({
-        to: recipient.email,
-        subject: `Leave Request Withdrawn - ${staff.name}`,
-        html: wrapEmailContent(emailContent),
-      });
+      await sendEmail(
+        recipient.email,
+        `Leave Request Withdrawn - ${staff.name}`,
+        wrapEmailContent(emailContent)
+      );
     }
 
     return true;

@@ -1,7 +1,7 @@
 const { getEmailTransporter, getSenderInfo } = require('../email.config');
 const { getEmailTemplate } = require('../email.templates');
 const { wrapEmailContent } = require('../email.template.helper');
-const { sendEmail } = require('../email.services');
+const sendEmail = require('./sendEmail');
 
 const sendLeaveRequestStatusNotification = async (leaveRequest, staff, status) => {
   try {
@@ -27,11 +27,11 @@ const sendLeaveRequestStatusNotification = async (leaveRequest, staff, status) =
     }
 
     // 4. Send the email
-    await sendEmail({
-      to: staff.email,
-      subject: `Leave Request ${status.charAt(0).toUpperCase() + status.slice(1)}`,
-      html: wrapEmailContent(htmlContent),
-    });
+    await sendEmail(
+      staff.email,
+      `Leave Request ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+      wrapEmailContent(htmlContent)
+    );
 
     return true;
   } catch (error) {

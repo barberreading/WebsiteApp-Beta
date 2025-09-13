@@ -1,5 +1,5 @@
 const User = require('../../models/User');
-const { sendNewUserPasswordEmail } = require('../email/email.services.js');
+// const { sendNewUserEmail } = require('../email/email.services'); // Removed due to circular dependency
 const path = require('path');
 const ErrorResponse = require('../../utils/errorResponse');
 
@@ -57,7 +57,8 @@ const getUserById = async (userId) => {
 const createUser = async (userData) => {
     const user = new User(userData);
     await user.save();
-    await sendNewUserPasswordEmail(user, userData.password);
+    // TODO: Re-implement sendNewUserEmail without circular dependency
+    // await sendNewUserEmail(user, userData.password);
     return user;
 };
 

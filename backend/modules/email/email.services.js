@@ -7,7 +7,7 @@ const sendInvoice = require('./utils/sendInvoice');
 const sendPaymentConfirmation = require('./utils/sendPaymentConfirmation');
 const sendPasswordResetEmail = require('../password-reset/password-reset.services');
 const sendTimesheetSubmissionReminder = require('./utils/sendTimesheetSubmissionReminder');
-const sendNewUserEmail = require('../users/users.services');
+// Removed circular dependency - sendNewUserEmail should be defined locally
 const sendTimesheetReminder = require('./utils/sendTimesheetReminder');
 const sendTimesheetStatusNotification = require('./utils/sendTimesheetStatusNotification');
 const sendTestEmail = require('./utils/sendTestEmail');
@@ -16,7 +16,7 @@ const sendBookingCancellationNotification = require('./utils/sendBookingCancella
 const sendLeaveRequestSubmissionNotification = require('./utils/sendLeaveRequestSubmissionNotification');
 const sendLeaveRequestStatusNotification = require('./utils/sendLeaveRequestStatusNotification');
 const sendLeaveRequestWithdrawalNotification = require('./utils/sendLeaveRequestWithdrawalNotification');
-const { sendEmail } = require('./utils/sendEmail');
+// sendEmail removed to prevent circular dependency - import directly from utils/sendEmail
 
 module.exports = {
     getEmailTransporter,
@@ -29,7 +29,7 @@ module.exports = {
     sendPaymentConfirmation,
     sendPasswordResetEmail,
     sendTimesheetSubmissionReminder,
-    sendNewUserEmail,
+    // sendNewUserEmail removed due to circular dependency
     sendTimesheetReminder,
     sendTimesheetStatusNotification,
     sendTestEmail,
@@ -37,6 +37,5 @@ module.exports = {
     sendBookingCancellationNotification,
     sendLeaveRequestSubmissionNotification,
     sendLeaveRequestStatusNotification,
-    sendLeaveRequestWithdrawalNotification,
-    sendEmail
+    sendLeaveRequestWithdrawalNotification
 };

@@ -1,219 +1,309 @@
-# Staff Management Application
+# Staff Management Desktop Application
 
-A comprehensive staff management application with calendar booking, timesheet tracking, and GDPR compliance for remote workers in the UK.
+[![Security Status](https://img.shields.io/badge/Security-Audited-green.svg)](./DESKTOP_AUDIT_REPORT.md)
+[![License](https://img.shields.io/badge/License-Private-red.svg)](#)
+[![Electron](https://img.shields.io/badge/Electron-20.3.12-blue.svg)](https://electronjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-## Features
+A comprehensive desktop application for staff management built with Electron, React, and Node.js. This application provides a complete solution for managing staff, bookings, clients, and administrative tasks with robust security features and GDPR compliance.
 
-- **User Authentication and Roles**: Secure login with role-based access (Superuser, Manager, Staff, Client)
-- **Calendar Interface**: Timify-like calendar for booking management with customizable settings
-- **Booking Management**: Create, view, and manage bookings
-- **Service Management**: Create and manage services with duration and category
-- **Client Management**: Maintain a database of clients with contact information
-- **Email Notifications**: Automatic booking confirmations and 24-hour reminders
-- **Clock In/Out**: Track staff working hours
-- **Timesheet Generation**: Generate and review timesheets
-- **GDPR Compliance**: Data protection features and consent management
-- **Weekly Reports**: Generate reports for invoicing
-- **Proximity-Based Booking**: Find staff closest to clients
-- **Shift Requests**: Allow clients to request shifts
+## 🚀 Features
 
-## Tech Stack
+### Core Functionality
+- **Staff Management**: Complete employee lifecycle management
+- **Booking System**: Advanced scheduling and booking management
+- **Client Management**: Customer relationship management
+- **Document Management**: Secure document storage and access
+- **Timesheet Management**: Time tracking and reporting
+- **Leave Request System**: Automated leave management
+- **Audit Trail**: Comprehensive activity logging
 
-- **Frontend**: React, Bootstrap, FullCalendar
-- **Backend**: Node.js, Express
-- **Database**: MongoDB
-- **Authentication**: JWT
+### Security Features
+- **JWT Authentication**: Secure token-based authentication
+- **Role-based Access Control**: Granular permission management
+- **Rate Limiting**: Protection against abuse and attacks
+- **Input Validation**: Comprehensive data sanitization
+- **GDPR Compliance**: Data protection and privacy features
+- **Secure File Upload**: Protected document handling
 
-## Setup Instructions
+### Desktop Features
+- **Cross-platform**: Windows, macOS, and Linux support
+- **Single Instance**: Prevents multiple application instances
+- **Graceful Shutdown**: Proper cleanup of all processes
+- **Auto-updater Ready**: Built-in update mechanism support
 
-### Prerequisites
+## 📋 Prerequisites
 
-- Node.js (v14 or higher)
-- MongoDB (local or Atlas)
+- **Node.js**: Version 18 or higher
+- **npm**: Version 8 or higher
+- **MongoDB**: Local installation or cloud instance
+- **Git**: For version control
 
-### Backend Setup
+## 🛠️ Installation
 
-1. Navigate to the backend directory:
-   ```
-   cd backend
-   ```
+### 1. Clone the Repository
+```bash
+git clone <repository-url>
+cd WebsiteApp
+```
 
-2. Install dependencies:
-   ```
-   npm install
-   ```
+### 2. Install Dependencies
+```bash
+# Install root dependencies
+npm install
 
-3. Create a `.env` file with the following variables:
-   ```
-   PORT=5000
-   MONGO_URI=mongodb://localhost:27017/staff-management
-   JWT_SECRET=your_jwt_secret_key_here
-   JWT_EXPIRE=30d
-   EMAIL_SERVICE=gmail
-   EMAIL_USERNAME=your_email@gmail.com
-   EMAIL_PASSWORD=your_email_password
-   EMAIL_FROM=noreply@staffmanagement.com
-   NODE_ENV=development
-   ```
+# Install backend dependencies
+cd backend
+npm install
 
-4. Start the backend server:
-   ```
-   npm run dev
-   ```
+# Install frontend dependencies
+cd ../frontend
+npm install
 
-### Frontend Setup
+# Return to root directory
+cd ..
+```
 
-1. Navigate to the frontend directory:
-   ```
-   cd frontend
-   ```
+### 3. Environment Configuration
+```bash
+# Copy environment template
+cp backend/.env.example backend/.env
 
-2. Install dependencies:
-   ```
-   npm install
-   ```
+# Edit the .env file with your configuration
+# Required variables:
+# - MONGO_URI: Your MongoDB connection string
+# - JWT_SECRET: Strong secret key for JWT tokens
+# - ADMIN_EMAIL: Admin user email
+# - ADMIN_PASSWORD: Secure admin password
+```
 
-3. Start the frontend development server:
-   ```
-   npm start
-   ```
+### 4. Database Setup
+```bash
+# Create admin user (run from backend directory)
+cd backend
+node scripts/createSuperuser.js
+```
 
-4. Access the application at `http://localhost:3000`
+## 🚀 Running the Application
 
-## Initial Setup
+### Development Mode
+```bash
+# Start the desktop application
+npm run electron
 
-### Creating a Superuser Account
+# Or start in development mode
+npm run electron-dev
+```
 
-The application requires a superuser account to manage all aspects of the system. To create one:
+### Production Build
+```bash
+# Build for current platform
+npm run dist
 
-1. Make sure your MongoDB connection is set up correctly in the `.env` file
-2. Run the following commands:
-   ```
-   cd backend
-   npm run create-superuser
-   ```
-3. This will create a superuser with these credentials:
-   - Email: admin@example.com
-   - Password: admin123
-   - **Important**: Change this password immediately after first login!
+# Build for specific platforms
+npm run dist-win    # Windows
+npm run dist-mac    # macOS
+npm run dist-linux  # Linux
 
-4. Log in with these credentials at http://localhost:3000/login
+# Build for all platforms
+npm run build:all
+```
 
-## User Guide
+## 📁 Project Structure
 
-### User Management
+```
+WebsiteApp/
+├── backend/                 # Node.js backend server
+│   ├── config/             # Configuration files
+│   ├── middleware/         # Express middleware
+│   ├── models/            # MongoDB models
+│   ├── modules/           # Feature modules
+│   ├── routes.js          # API routes
+│   └── server.js          # Main server file
+├── frontend/               # React frontend application
+│   ├── public/            # Static assets
+│   ├── src/               # React source code
+│   └── package.json       # Frontend dependencies
+├── assets/                 # Application assets
+├── electron-desktop.js     # Main Electron process
+├── package.json           # Root dependencies
+└── README.md              # This file
+```
 
-As a superuser or manager, you can create and manage users with different roles:
-- **Superuser**: Full access to all features
-- **Manager**: Can manage staff, clients, services, and bookings
-- **Staff**: Can view their own bookings and clock in/out
-- **Client**: Can request bookings and view their appointments
+## 🔧 Configuration
 
-### Service Management
+### Environment Variables
 
-1. Navigate to the Services tab in the sidebar
-2. Click "Add Service" to create a new service
-3. Fill in the required fields:
-   - Name: The service name
-   - Category: The type of service
-   - Duration: Hours and minutes the service takes
-   - Description: Details about the service
-4. Click "Save" to create the service
-5. Existing services can be edited by clicking the edit button
+Create a `.env` file in the `backend` directory with the following variables:
 
-### Client Management
+```env
+# Server Configuration
+PORT=3002
+NODE_ENV=production
 
-1. Navigate to the Clients tab in the sidebar
-2. Click "Add Client" to create a new client
-3. Fill in the client details:
-   - Name: Client's full name
-   - Email: Contact email (used for booking confirmations)
-   - Phone: Contact phone number
-   - Address: Client's location
-4. Click "Save" to add the client
-5. Existing clients can be edited by clicking the edit button
+# Database
+MONGO_URI=mongodb://localhost:27017/staff-management
 
-### Calendar Customization
+# Authentication
+JWT_SECRET=your_super_secure_jwt_secret_here
+JWT_EXPIRE=30d
 
-1. On the Calendar page, click the "Calendar Settings" button
-2. Customize your calendar view:
-   - First Day of Week: Choose which day your week starts on
-   - Business Hours Start: Set when your business day begins
-   - Business Hours End: Set when your business day ends
-3. Click "Save Settings" to apply changes
-4. Settings are saved to your browser and will persist between sessions
+# Admin Credentials
+ADMIN_EMAIL=admin@yourcompany.com
+ADMIN_PASSWORD=your_secure_admin_password
 
-### Booking Management
+# Email Configuration (Optional)
+EMAIL_HOST=smtp.your-provider.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@yourdomain.com
+EMAIL_PASSWORD=your_email_password
+EMAIL_FROM=noreply@yourdomain.com
+EMAIL_ENABLED=true
+```
 
-1. Navigate to the Calendar page
-2. Click on an empty time slot to create a new booking
-3. Follow the booking workflow:
-   - Select a service
-   - Choose or create a client
-   - Select a staff member
-   - Set the date and time
-4. Click "Save" to create the booking
-5. The system will automatically send a confirmation email to the client
-6. 24 hours before the appointment, a reminder email will be sent
+### Security Configuration
 
-### Email Notifications
+The application includes comprehensive security measures:
 
-The system sends two types of automated emails:
-1. **Booking Confirmations**: Sent immediately when a booking is created
-2. **Appointment Reminders**: Sent 24 hours before scheduled appointments
+- **Rate Limiting**: Configurable limits for different endpoints
+- **CORS**: Cross-origin resource sharing configuration
+- **Helmet**: Security headers for protection
+- **Input Validation**: Request validation and sanitization
 
-To enable email notifications:
-1. Configure your email settings in the backend `.env` file:
-   ```
-   EMAIL_HOST=your_smtp_server
-   EMAIL_PORT=587
-   EMAIL_SECURE=false
-   EMAIL_USER=your_email@example.com
-   EMAIL_PASSWORD=your_email_password
-   EMAIL_ENABLED=true
-   ```
-2. Restart the backend server for changes to take effect
+## 🛡️ Security
 
-## Troubleshooting
+### Security Audit
+A comprehensive security audit has been conducted. See [DESKTOP_AUDIT_REPORT.md](./DESKTOP_AUDIT_REPORT.md) for detailed findings and recommendations.
 
-### Email System Issues
-- If emails are not being sent, check that `EMAIL_ENABLED=true` is set in your `.env` file
-- Verify your SMTP credentials are correct
-- Check the server logs for any email-related errors
+### Key Security Features
+- ✅ **Backend**: 0 vulnerabilities
+- ⚠️ **Frontend**: 10 vulnerabilities (mostly dev dependencies)
+- ⚠️ **Electron**: 8 vulnerabilities (requires updates)
 
-### Calendar Issues
-- If calendar settings are not saving, clear your browser cache
-- If bookings are not displaying, ensure you have the correct permissions for your user role
-- Calendar customization settings are stored in local storage; switching browsers will reset them
+### Security Best Practices
+1. **Never commit `.env` files** to version control
+2. **Use strong passwords** for admin accounts
+3. **Regularly update dependencies** to patch vulnerabilities
+4. **Monitor security advisories** for used packages
+5. **Implement proper backup strategies** for data protection
 
-### Booking Creation Problems
-- If you cannot create bookings, ensure you have services and clients created in the system
-- Managers need to have staff members available to assign to bookings
-- Check that the selected time slot doesn't conflict with existing bookings
+## 🧪 Testing
 
-### General Issues
-- If the application is not loading, ensure both frontend and backend servers are running
-- For database connection issues, verify your MongoDB connection string
-- For authentication problems, try clearing your browser cookies and logging in again
+```bash
+# Run backend tests
+cd backend
+npm test
 
-Once logged in as a superuser:
-1. Use the User Management page to create manager accounts
-2. Managers can then create staff and client accounts
-3. Each user type has different permissions:
-   - **Superuser**: Full system access
-   - **Manager**: Manage staff, bookings, and clients
-   - **Staff**: View and manage their own bookings and timesheets
-   - **Client**: Book staff and view their bookings
+# Run frontend tests
+cd frontend
+npm test
+```
 
-## GDPR Compliance
+## 📦 Building and Distribution
 
-This application includes features to comply with UK GDPR regulations:
+### Electron Builder Configuration
+The application uses Electron Builder for creating distributable packages:
 
-- User consent tracking
-- Data access and deletion requests
-- Secure data storage and transmission
-- Audit logs for user actions
+- **Windows**: `.exe` installer and portable version
+- **macOS**: `.dmg` disk image
+- **Linux**: `.AppImage` and `.deb` packages
 
-## License
+### Build Commands
+```bash
+# Development build
+npm run electron-dev
 
-[MIT License](LICENSE)
+# Production build
+npm run dist
+
+# Platform-specific builds
+npm run build:win
+npm run build:mac
+npm run build:linux
+```
+
+## 🔄 Updates and Maintenance
+
+### Dependency Updates
+```bash
+# Check for outdated packages
+npm outdated
+
+# Update dependencies
+npm update
+
+# Security audit
+npm audit
+npm audit fix
+```
+
+### Database Maintenance
+```bash
+# Run from backend directory
+node scripts/createSuperuser.js    # Create admin user
+node scripts/clear_logs.js          # Clear application logs
+node scripts/clear_errors.js        # Clear error logs
+```
+
+## 📚 Documentation
+
+- [Desktop App Instructions](./DESKTOP_APP_INSTRUCTIONS.md)
+- [Security Report](./SECURITY_REPORT.md)
+- [Desktop Audit Report](./DESKTOP_AUDIT_REPORT.md)
+- [Electron Troubleshooting](./ELECTRON_TROUBLESHOOTING.md)
+- [Backend Security README](./backend/SECURITY_README.md)
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **Port Already in Use**
+   - Check if another instance is running
+   - Kill existing Node.js processes
+   - Verify port configuration in `.env`
+
+2. **Database Connection Issues**
+   - Verify MongoDB is running
+   - Check connection string in `.env`
+   - Ensure database permissions are correct
+
+3. **Build Failures**
+   - Clear node_modules and reinstall
+   - Check Node.js version compatibility
+   - Verify all dependencies are installed
+
+### Logs and Debugging
+- Application logs: `electron-startup.log`
+- Backend logs: `backend/combined.log`
+- Error logs: `backend/error.log`
+
+## 🤝 Contributing
+
+1. **Security First**: All contributions must pass security review
+2. **Code Quality**: Follow existing code style and patterns
+3. **Testing**: Include tests for new features
+4. **Documentation**: Update documentation for changes
+
+## 📄 License
+
+This is proprietary software. All rights reserved.
+
+## 📞 Support
+
+For technical support or questions:
+- Review the troubleshooting documentation
+- Check the security audit report
+- Consult the API documentation
+
+---
+
+**⚠️ Important Security Notice**
+
+Before deploying to production:
+1. Update Electron to the latest version (38.1.0+)
+2. Resolve frontend dependency vulnerabilities
+3. Implement proper SSL/TLS certificates
+4. Configure proper backup and monitoring
+5. Review and test all security configurations
+
+See [DESKTOP_AUDIT_REPORT.md](./DESKTOP_AUDIT_REPORT.md) for detailed security recommendations.

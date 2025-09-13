@@ -2,7 +2,7 @@ const { getEmailTransporter, getSenderInfo } = require('../email.config');
 const { wrapEmailContent } = require('../email.template.helper');
 const User = require('../../../models/User');
 const Booking = require('../../../models/Booking');
-const { sendEmail } = require('../email.services');
+const sendEmail = require('./sendEmail');
 
 const sendLeaveRequestSubmissionNotification = async (leaveRequest, staff) => {
     try {
@@ -66,11 +66,11 @@ const sendLeaveRequestSubmissionNotification = async (leaveRequest, staff) => {
           <p>Please review this request in the staff management system.</p>
         `;
         
-        await sendEmail({
-          to: manager.email,
-          subject: `New Leave Request - ${staff.name}`,
-          html: wrapEmailContent(emailContent)
-        });
+        await sendEmail(
+          manager.email,
+          `New Leave Request - ${staff.name}`,
+          wrapEmailContent(emailContent)
+        );
       }
       
       return true;

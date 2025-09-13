@@ -91,16 +91,12 @@ const createBadRequestError = (message = 'Bad request') => {
   return createErrorResponse(message, 400);
 };
 
-module.exports = {
-  ErrorResponse,
-  createErrorResponse,
-  createValidationError,
-  createNotFoundError,
-  createUnauthorizedError,
-  createForbiddenError,
-  createServerError,
-  createBadRequestError
-};
-
-// Default export for backward compatibility
-module.exports.default = ErrorResponse;
+module.exports = ErrorResponse;
+module.exports.ErrorResponse = ErrorResponse;
+module.exports.createErrorResponse = createErrorResponse;
+module.exports.createValidationError = createValidationError;
+module.exports.createNotFoundError = createNotFoundError;
+module.exports.createUnauthorizedError = createUnauthorizedError;
+module.exports.createForbiddenError = createForbiddenError;
+module.exports.createServerError = createServerError;
+module.exports.createBadRequestError = createBadRequestError;

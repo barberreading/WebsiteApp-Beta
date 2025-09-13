@@ -84,6 +84,17 @@ const jsonSafeResponse = require('./middleware/jsonSafeResponse');
 const { errorHandler, notFound } = require('./middleware/errorHandler');
 app.use(jsonSafeResponse); // Apply globally to all routes
 
+// Serve static files from frontend build in production
+if (process.env.NODE_ENV === 'production' || process.pkg) {
+  const frontendBuildPath = path.join(__dirname, '..', 'frontend', 'build');
+  if (fs.existsSync(frontendBuildPath)) {
+    app.use(express.static(frontendBuildPath));
+    console.log('Serving static files from:', frontendBuildPath);
+  } else {
+    console.log('Frontend build path not found:', frontendBuildPath);
+  }
+}
+
 // API routes
 loadRoutes(app);
 
@@ -134,9 +145,63 @@ app.use('/api/document-reminders', documentRemindersRoutes);
 app.use('/api/logging', loggingRoutes);
 
 // Add a root endpoint for basic connectivity checks
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
   res.json({ message: 'Staff Management API is running', timestamp: new Date().toISOString() });
 });
+
+// Serve React app for all non-API routes in production
+if (process.env.NODE_ENV === 'production' || process.pkg) {
+  app.get('*', (req, res) => {
+    // In packaged app, frontend files are in the app.asar
+    let frontendBuildPath;
+    
+    if (process.pkg) {
+      // When packaged with pkg or electron, files are in app.asar
+      frontendBuildPath = path.join(__dirname, '..', 'frontend', 'build', 'index.html');
+    } else {
+      // In regular production mode
+      frontendBuildPath = path.join(__dirname, '..', 'frontend', 'build', 'index.html');
+    }
+    
+    console.log('Looking for frontend at:', frontendBuildPath);
+    console.log('File exists:', fs.existsSync(frontendBuildPath));
+    console.log('__dirname:', __dirname);
+    console.log('process.pkg:', !!process.pkg);
+    
+    if (fs.existsSync(frontendBuildPath)) {
+      res.sendFile(path.resolve(frontendBuildPath));
+    } else {
+      // Try alternative paths for packaged app
+      const alternativePaths = [
+        path.join(__dirname, 'frontend', 'build', 'index.html'),
+        path.join(process.cwd(), 'frontend', 'build', 'index.html'),
+        path.join(path.dirname(process.execPath), 'resources', 'app.asar', 'frontend', 'build', 'index.html')
+      ];
+      
+      let found = false;
+      for (const altPath of alternativePaths) {
+        console.log('Trying alternative path:', altPath);
+        if (fs.existsSync(altPath)) {
+          console.log('Found frontend at:', altPath);
+          res.sendFile(path.resolve(altPath));
+          found = true;
+          break;
+        }
+      }
+      
+      if (!found) {
+        console.log('Frontend not found in any path');
+        res.status(404).json({ 
+          message: 'Frontend not found', 
+          searchedPaths: [frontendBuildPath, ...alternativePaths],
+          __dirname,
+          execPath: process.execPath,
+          cwd: process.cwd()
+        });
+      }
+    }
+  });
+}
 
 // Error handling middleware (must be last)
 app.use(notFound); // Handle 404 errors
