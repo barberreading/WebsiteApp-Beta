@@ -1,0 +1,6 @@
+Database backup failed at 2025-09-13T10:27:22.475Z
+Error: Command failed: mongodump --uri="mongodb://localhost:27017/staff-management" --out="C:\Users\barbe\Desktop\WebsiteApp\backups\backup-2025-09-13T10-27-21-893Z\database"
+
+To manually backup database:
+1. Ensure MongoDB is running
+2. Run: mongodump --uri="your-mongo-uri" --out="./database-backup"

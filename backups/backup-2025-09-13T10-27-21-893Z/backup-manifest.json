@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-09-13T10-27-21-893Z",
+  "date": "2025-09-13T10:27:22.479Z",
+  "version": "1.0.0",
+  "contents": {
+    "applicationFiles": true,
+    "database": true,
+    "configurations": true
+  },
+  "instructions": {
+    "restore": "Run: node backup-restore.js restore <backup-path>",
+    "setup": "See config/SETUP_INSTRUCTIONS.md for environment setup"
+  }
+}

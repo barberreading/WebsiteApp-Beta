@@ -14,7 +14,7 @@ describe('Auth Service', () => {
 
   describe('register', () => {
     it('should register a new user and return a token', async () => {
-      const userData = { name: 'Test User', email: 'test@example.com', password: 'password123' };
+      const userData = { name: 'Test User', email: 'test@example.com', password: 'TestSecurePass123!' };
       User.findOne.mockResolvedValue(null);
       const userInstance = { ...userData, save: jest.fn().mockResolvedValue(true), getSignedJwtToken: jest.fn().mockReturnValue('test_token') };
       User.mockImplementation(() => userInstance);
@@ -28,7 +28,7 @@ describe('Auth Service', () => {
     });
 
     it('should throw an error if user already exists', async () => {
-        const userData = { name: 'Test User', email: 'test@example.com', password: 'password123' };
+        const userData = { name: 'Test User', email: 'test@example.com', password: 'TestSecurePass123!' };
         User.findOne.mockResolvedValue(true);
   
         await expect(authService.register(userData)).rejects.toThrow('User already exists');
@@ -38,7 +38,7 @@ describe('Auth Service', () => {
     describe('login', () => {
         it('should login a user and return a token', async () => {
           const email = 'test@example.com';
-          const password = 'password123';
+          const password = 'TestSecurePass123!';
           const user = {
             _id: '1',
             name: 'Test User',
@@ -64,7 +64,7 @@ describe('Auth Service', () => {
         it('should throw an error for invalid credentials if user not found', async () => {
             User.findOne.mockReturnValue({ select: jest.fn().mockResolvedValue(null) });
       
-            await expect(authService.login('wrong@example.com', 'password123')).rejects.toThrow('Invalid credentials');
+            await expect(authService.login('wrong@example.com', 'TestSecurePass123!')).rejects.toThrow('Invalid credentials');
           });
       
           it('should throw an error for invalid credentials if password does not match', async () => {

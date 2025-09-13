@@ -22,8 +22,16 @@ const createSuperuser = async () => {
     }
 
     // Create superuser
-    const adminPassword = process.env.ADMIN_PASSWORD || 'changeMe123!';
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminEmail || !adminPassword) {
+        console.error('❌ Error: ADMIN_EMAIL and ADMIN_PASSWORD environment variables are required');
+        console.log('Please set these environment variables before running this script:');
+        console.log('  ADMIN_EMAIL=your-admin@example.com');
+        console.log('  ADMIN_PASSWORD=your-secure-password');
+        process.exit(1);
+    }
     
     const superuser = new User({
       name: 'Admin',
@@ -35,9 +43,9 @@ const createSuperuser = async () => {
 
     await superuser.save();
 
-    console.log('Superuser created successfully:');
-    console.log('Email: admin@example.com');
-    console.log('Password: admin123');
+    console.log('✅ Superuser created successfully!');
+    console.log(`📧 Email: ${adminEmail}`);
+    console.log('🔑 Password: [Set via environment variable]');
     console.log('Please change this password after first login!');
 
     process.exit(0);

@@ -1,0 +1,171 @@
+:root {
+  --primary-color: #FF40B4;
+  --secondary-color: #00E1E1;
+  --accent-color: #6A2C94;
+  --light-bg: #f8f9fa;
+  --dark-text: #333333;
+  --light-text: #ffffff;
+}
+
+/* Apply branding colors to common elements */
+.btn-primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color) !important;
+  border-color: var(--secondary-color) !important;
+}
+
+.btn-accent {
+  background-color: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+  color: var(--light-text) !important;
+}
+
+/* Navbar styling */
+.navbar {
+  background-color: white !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.navbar-brand {
+  color: var(--accent-color) !important;
+  font-weight: 600;
+}
+
+.nav-link {
+  color: var(--accent-color) !important;
+}
+
+.nav-link:hover, .nav-link:focus {
+  color: var(--primary-color) !important;
+}
+
+.nav-link.active {
+  color: var(--primary-color) !important;
+  font-weight: 600;
+}
+
+/* Card styling */
+.card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: none;
+}
+
+.card-header {
+  background-color: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+/* Table styling */
+.table thead th {
+  background-color: var(--light-bg);
+  color: var(--accent-color);
+  font-weight: 600;
+  border-top: none;
+}
+
+/* Form controls */
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(255, 64, 180, 0.25);
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--accent-color);
+}
+
+/* Links */
+a {
+  color: var(--primary-color);
+}
+
+a:hover {
+  color: var(--accent-color);
+}
+
+/* Badges */
+.badge-primary {
+  background-color: var(--primary-color);
+}
+
+.badge-secondary {
+  background-color: var(--secondary-color);
+}
+
+.badge-accent {
+  background-color: var(--accent-color);
+}
+
+/* Custom background classes */
+.bg-primary-light {
+  background-color: rgba(255, 64, 180, 0.1);
+}
+
+.bg-secondary-light {
+  background-color: rgba(0, 225, 225, 0.1);
+}
+
+.bg-accent-light {
+  background-color: rgba(106, 44, 148, 0.1);
+}
+
+/* Footer styling */
+footer {
+  background-color: var(--light-bg);
+  color: var(--accent-color);
+  padding: 1.5rem 0;
+  margin-top: 2rem;
+}
+
+/* Alerts */
+.alert-primary {
+  background-color: rgba(255, 64, 180, 0.1);
+  border-color: rgba(255, 64, 180, 0.2);
+  color: var(--primary-color);
+}
+
+.alert-secondary {
+  background-color: rgba(0, 225, 225, 0.1);
+  border-color: rgba(0, 225, 225, 0.2);
+  color: var(--secondary-color);
+}
+
+/* MUI overrides */
+.MuiButton-containedPrimary {
+  background-color: var(--primary-color) !important;
+}
+
+.MuiButton-containedSecondary {
+  background-color: var(--secondary-color) !important;
+}
+
+.MuiSwitch-colorPrimary.Mui-checked {
+  color: var(--primary-color) !important;
+}
+
+.MuiSwitch-colorPrimary.Mui-checked + .MuiSwitch-track {
+  background-color: var(--primary-color) !important;
+}
+
+.MuiCheckbox-colorPrimary.Mui-checked {
+  color: var(--primary-color) !important;
+}
+
+.MuiRadio-colorPrimary.Mui-checked {
+  color: var(--primary-color) !important;
+}
+
+.MuiLinearProgress-colorPrimary {
+  background-color: rgba(255, 64, 180, 0.2) !important;
+}
+
+.MuiLinearProgress-barColorPrimary {
+  background-color: var(--primary-color) !important;
+}

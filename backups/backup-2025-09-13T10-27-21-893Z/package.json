@@ -1,0 +1,80 @@
+{
+  "name": "staff-management-desktop",
+  "version": "1.0.0",
+  "description": "Desktop application for Staff Management System",
+  "main": "electron-desktop.js",
+  "homepage": "./",
+  "workspaces": [
+    "backend"
+  ],
+  "devDependencies": {
+    "@electron-forge/cli": "^7.9.0",
+    "electron-builder": "^25.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.6"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "electron": "^32.2.5"
+  },
+  "scripts": {
+    "electron": "electron .",
+    "electron-dev": "electron . --dev",
+    "build-frontend": "cd frontend && npm run build",
+    "build-backend": "cd backend && npm install --production",
+    "prebuild": "npm run build-frontend && npm run build-backend",
+    "dist": "npm run prebuild && npx electron-builder",
+    "dist-win": "npm run prebuild && npx electron-builder --win",
+    "dist-mac": "npm run prebuild && npx electron-builder --mac",
+    "dist-linux": "npm run prebuild && npx electron-builder --linux",
+    "build:win": "npm run prebuild && npx electron-builder --win",
+    "build:mac": "npm run prebuild && npx electron-builder --mac",
+    "build:linux": "npm run prebuild && npx electron-builder --linux",
+    "build:all": "npm run prebuild && npx electron-builder --win --mac --linux"
+  },
+  "build": {
+    "appId": "com.staffmanagement.app",
+    "productName": "Staff Management System",
+    "directories": {
+      "output": "dist-portable"
+    },
+    "files": [
+      "electron-desktop.js",
+      "backend/**/*",
+      "frontend/build/**/*",
+      "assets/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "backend",
+        "to": "backend",
+        "filter": [
+          "!tests",
+          "!scripts"
+        ]
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "lint-staged": {
+    "backend/**/*.js": "npm test -w backend"
+  }
+}

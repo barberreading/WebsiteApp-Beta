@@ -1,0 +1,28 @@
+/**
+ * Initialize email system for the application
+ */
+const initEmailSystem = async () => {
+  try {
+    console.log('Initializing email system...');
+    
+    // Check if email settings are configured
+    const emailConfigured = process.env.EMAIL_HOST && process.env.EMAIL_USER;
+    
+    if (!emailConfigured) {
+      console.log('Email system not configured - EMAIL_HOST and EMAIL_USER environment variables required');
+      return false;
+    }
+    
+    // Initialize email transporter or other email-related setup
+    console.log('Email system initialized successfully');
+    return true;
+    
+  } catch (error) {
+    console.error('Error initializing email system:', error);
+    return false;
+  }
+};
+
+module.exports = {
+  initEmailSystem
+};

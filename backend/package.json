@@ -1,6 +1,6 @@
 {
   "name": "staff-management-backend",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Backend for staff management application with GDPR compliance",
   "main": "server.js",
   "scripts": {

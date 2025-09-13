@@ -1,0 +1,286 @@
+# Dependencies
+/node_modules
+/backend/node_modules
+/frontend/node_modules
+
+# Logs
+/logs
+/backend/logs
+/backend/combined.log
+/backend/error.log
+/backend/server.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+backend/.env
+frontend/.env.local
+
+# Build output
+/build
+/frontend/build
+/dist
+/dist-portable
+/build-output
+
+# Electron build artifacts
+/out
+/app-builds
+*.dmg
+*.exe
+*.deb
+*.rpm
+*.AppImage
+*.snap
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows specific
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Test files with sensitive data
+test_*.html
+test_*.js
+test_*.bat
+login_response.json
+token.txt
+set_*.html
+secure_*.html
+working_*.html
+direct_*.html
+debug_*.html
+debug_*.js
+
+# Backup and temporary files
+*.bak
+*.tmp
+*.temp
+*.old
+*.orig
+*.rej
+*.swp
+*.swo
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Application specific
+/restore_points
+/mongodb-database-tools.msi
+electron-startup.log
+
+# Restore points and backups
+restore_point_*/
+overwritten_files_backup/
+*.backup
+*.dump
+
+# Additional log files
+*.log
+backend/*.log
+frontend/*.log
+backend/server_output.log
+backend/test-output.log
+backend/output.log
+backend/npm-install*.log
+frontend/npm_install.log
+frontend/frontend.log
+electron-debug.log
+git_remote_v_output.log
+test-output.log
+
+# Temporary scripts and files
+create_working_restore_point.js
+create_full_restore_point.js
+create_db_backup.js
+electron-*.js
+desktop-launcher.js
+close_app.js
+install.js
+startup-debug.js
+test-node-npm.js
+electron-backup.js
+electron-clean.js
+electron-desktop-backup.js
+electron-forge.js
+electron-minimal.js
+electron-simple-test.js
+electron-test.js
+final_staff_verification.js
+
+# Test and debug directories
+electron-test/
+
+# Batch and PowerShell scripts (keep essential ones)
+*.bat
+*.ps1
+*.vbs
+!launch-desktop-app.bat
+!start_staff_management.bat
+
+# HTML test files
+check_*.html
+navigate_*.html
+timesheet_*.html
+login_*.html
+convert_*.html
+check_calendar_*.html
+
+# Documentation that might be outdated
+nas_testing_setup.md
+synology_*.md
+
+# Uploads directory (may contain sensitive files)
+/backend/uploads/*
+!/backend/uploads/.gitkeep
+
+# Security and audit files (keep these for reference)
+# DESKTOP_AUDIT_REPORT.md - Keep this
+# SECURITY_REPORT.md - Keep this
+# backend/SECURITY_README.md - Keep this
+
+# Package lock files (optional - uncomment if you want to exclude)
+# package-lock.json
+# yarn.lock
+
+# Husky
+.husky/_
+
+# Local development files
+.local
+.cache
+
+# Electron specific
+electron-builder.env
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Linux
+*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
