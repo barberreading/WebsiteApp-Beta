@@ -48,7 +48,7 @@ const EmailSettings = () => {
         });
       }
     } catch (error) {
-      console.error('Error fetching email settings:', error);
+      logger.error('Error fetching email settings:', error);
       showAlert('Failed to load email settings', 'error');
     } finally {
       setLoading(false);
@@ -102,7 +102,7 @@ const EmailSettings = () => {
         fetchSettings();
       }
     } catch (error) {
-      console.error('Error saving email settings:', error);
+      logger.error('Error saving email settings:', error);
       showAlert(error.response?.data?.message || 'Failed to save email settings', 'error');
     } finally {
       setSaving(false);
@@ -122,7 +122,7 @@ const EmailSettings = () => {
         showAlert('Test email sent successfully! Please check your inbox.', 'success');
       }
     } catch (error) {
-      console.error('Error sending test email:', error);
+      logger.error('Error sending test email:', error);
       showAlert(error.response?.data?.message || 'Failed to send test email', 'error');
     } finally {
       setTesting(false);

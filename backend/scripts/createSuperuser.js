@@ -11,13 +11,13 @@ const createSuperuser = async () => {
       useUnifiedTopology: true
     });
 
-    console.log('MongoDB Connected...');
+    logger.log('MongoDB Connected...');
 
     // Check if superuser already exists
     const existingSuperuser = await User.findOne({ role: 'superuser' });
     
     if (existingSuperuser) {
-      console.log('A superuser already exists in the database.');
+      logger.log('A superuser already exists in the database.');
       process.exit(0);
     }
 
@@ -26,10 +26,10 @@ const createSuperuser = async () => {
     const adminPassword = process.env.ADMIN_PASSWORD;
 
     if (!adminEmail || !adminPassword) {
-        console.error('❌ Error: ADMIN_EMAIL and ADMIN_PASSWORD environment variables are required');
-        console.log('Please set these environment variables before running this script:');
-        console.log('  ADMIN_EMAIL=your-admin@example.com');
-        console.log('  ADMIN_PASSWORD=your-secure-password');
+        logger.error('❌ Error: ADMIN_EMAIL and ADMIN_PASSWORD environment variables are required');
+        logger.log('Please set these environment variables before running this script:');
+        logger.log('  ADMIN_EMAIL=your-admin@example.com');
+        logger.log('  ADMIN_PASSWORD=your-secure-password');
         process.exit(1);
     }
     
@@ -43,14 +43,14 @@ const createSuperuser = async () => {
 
     await superuser.save();
 
-    console.log('✅ Superuser created successfully!');
-    console.log(`📧 Email: ${adminEmail}`);
-    console.log('🔑 Password: [Set via environment variable]');
-    console.log('Please change this password after first login!');
+    logger.log('✅ Superuser created successfully!');
+    logger.log(`📧 Email: ${adminEmail}`);
+    logger.log('🔑 Password: [Set via environment variable]');
+    logger.log('Please change this password after first login!');
 
     process.exit(0);
   } catch (err) {
-    console.error('Error creating superuser:', err.message);
+    logger.error('Error creating superuser:', err.message);
     process.exit(1);
   }
 };

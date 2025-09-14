@@ -48,7 +48,7 @@ const ClientManagement = () => {
       const response = await axiosInstance.get(url);
       setClients(response.data);
     } catch (err) {
-      console.error('Error fetching clients:', err);
+      logger.error('Error fetching clients:', err);
       setError('Failed to load clients. Please try again later.');
       toast.error('Error loading clients');
     } finally {
@@ -65,7 +65,7 @@ const ClientManagement = () => {
       const response = await axiosInstance.get('/booking-categories/areas');
       setLocationAreas(response.data.data || response.data);
     } catch (err) {
-      console.error('Error fetching location areas:', err);
+      logger.error('Error fetching location areas:', err);
     }
   };
 
@@ -139,7 +139,7 @@ const ClientManagement = () => {
       fetchClients();
       
     } catch (err) {
-      console.error(`Error ${modalType === 'edit' ? 'updating' : 'adding'} client:`, err);
+      logger.error(`Error ${modalType === 'edit' ? 'updating' : 'adding'} client:`, err);
       toast.error(`Failed to ${modalType === 'edit' ? 'update' : 'add'} client`);
     }
   };
@@ -423,7 +423,7 @@ const ClientManagement = () => {
                         accept="image/*"
                         onChange={(e) => {
                           if (e.target.files && e.target.files[0]) {
-                            console.log('Photo file selected:', e.target.files[0].name);
+                            logger.log('Photo file selected:', e.target.files[0].name);
                             // Convert to base64 immediately to ensure it's saved
                             const reader = new FileReader();
                             reader.onload = (event) => {
@@ -431,7 +431,7 @@ const ClientManagement = () => {
                                 ...newClient,
                                 photo: event.target.result
                               });
-                              console.log('Photo converted to base64 immediately');
+                              logger.log('Photo converted to base64 immediately');
                             };
                             reader.readAsDataURL(e.target.files[0]);
                           }
@@ -544,8 +544,8 @@ const ClientManagement = () => {
                 {locationAreas.map((area) => {
                   const areaValue = area._id || area.name;
                   // Debug log to check what's in the location areas
-                  console.log(`Area: ${area.name}, Value: ${areaValue}`);
-                  console.log(`Current locationAreas:`, newClient.locationAreas);
+                  logger.log(`Area: ${area.name}, Value: ${areaValue}`);
+                  logger.log(`Current locationAreas:`, newClient.locationAreas);
                   
                   return (
                     <Form.Check
@@ -558,12 +558,12 @@ const ClientManagement = () => {
                               newClient.locationAreas.includes(area._id)
                               }
                       onChange={(e) => {
-                        console.log(`Checkbox ${area.name} changed to ${e.target.checked}`);
+                        logger.log(`Checkbox ${area.name} changed to ${e.target.checked}`);
                         // Always use the area ID for consistency
                         const updatedAreas = e.target.checked
                           ? [...(newClient.locationAreas || []), area._id]
                           : (newClient.locationAreas || []).filter(a => a !== area._id);
-                        console.log('Updated areas:', updatedAreas);
+                        logger.log('Updated areas:', updatedAreas);
                         setNewClient({
                           ...newClient,
                           locationAreas: updatedAreas
@@ -754,7 +754,7 @@ const ClientManagement = () => {
                       })
                       .catch(err => {
                         toast.error(err.response?.data?.message || `Error updating client status`);
-                        console.error('Error updating client status:', err);
+                        logger.error('Error updating client status:', err);
                       });
                   }}
                 >
@@ -774,7 +774,7 @@ const ClientManagement = () => {
                         })
                         .catch(err => {
                           toast.error(err.response?.data?.message || 'Error deleting client');
-                          console.error('Error deleting client:', err);
+                          logger.error('Error deleting client:', err);
                         });
                     }
                   }}
@@ -793,7 +793,7 @@ const ClientManagement = () => {
                       // Copy email to clipboard
                       navigator.clipboard.writeText(selectedClient.email)
                         .then(() => toast.info('Email copied to clipboard'))
-                        .catch(err => console.error('Failed to copy email:', err));
+                        .catch(err => logger.error('Failed to copy email:', err));
                       
                       // Open email client
                       window.open(mailtoLink, '_blank');
@@ -814,7 +814,7 @@ const ClientManagement = () => {
                     variant="primary"
                     onClick={() => {
                       // Set up the edit form with the selected client's data
-                      console.log("Selected client for edit:", selectedClient);
+                      logger.log("Selected client for edit:", selectedClient);
                       
                       // Extract address properly
                       let addressStr = '';
@@ -846,7 +846,7 @@ const ClientManagement = () => {
                       }
                       
                       // Make sure we're using IDs consistently
-                      console.log("Location areas for edit (before):", locationAreas);
+                      logger.log("Location areas for edit (before):", locationAreas);
                       
                       // Simplify location areas handling
                       // Extract IDs from location areas
@@ -857,7 +857,7 @@ const ClientManagement = () => {
                         locationAreas = [];
                       }
                       
-                      console.log("Simplified location areas for edit:", locationAreas);
+                      logger.log("Simplified location areas for edit:", locationAreas);
                       
                       // Set the form data directly
                       setNewClient({

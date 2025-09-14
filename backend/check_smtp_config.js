@@ -4,11 +4,11 @@ const mongoose = require('mongoose');
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
-    console.log('Connected to MongoDB');
+    logger.log('Connected to MongoDB');
     return checkSMTPConfig();
   })
   .catch(err => {
-    console.error('MongoDB connection error:', err);
+    logger.error('MongoDB connection error:', err);
     process.exit(1);
   });
 
@@ -16,16 +16,16 @@ async function checkSMTPConfig() {
   try {
     // First, let's see what collections exist
     const collections = await mongoose.connection.db.listCollections().toArray();
-    console.log('\n=== Available Collections ===');
-    collections.forEach(col => console.log('-', col.name));
+    logger.log('\n=== Available Collections ===');
+    collections.forEach(col => logger.log('-', col.name));
     
     // Try to find EmailSettings with a flexible schema
     const EmailSettings = mongoose.model('EmailSettings', new mongoose.Schema({}, { strict: false }));
     const settings = await EmailSettings.findOne();
     
     if (settings) {
-      console.log('\n=== Raw Email Settings Document ===');
-      console.log(JSON.stringify(settings.toObject(), null, 2));
+      logger.log('\n=== Raw Email Settings Document ===');
+      logger.log(JSON.stringify(settings.toObject(), null, 2));
       
       // Try common field names
       const possibleFields = {
@@ -38,16 +38,16 @@ async function checkSMTPConfig() {
         enabled: settings.enabled || settings.isEnabled || settings.is_enabled
       };
       
-      console.log('\n=== Parsed SMTP Configuration ===');
-      console.log('SMTP Host:', possibleFields.host);
-      console.log('SMTP Port:', possibleFields.port);
-      console.log('SMTP User:', possibleFields.user);
-      console.log('Sender Email:', possibleFields.senderEmail);
-      console.log('Sender Name:', possibleFields.senderName);
-      console.log('Is Enabled:', possibleFields.enabled);
+      logger.log('\n=== Parsed SMTP Configuration ===');
+      logger.log('SMTP Host:', possibleFields.host);
+      logger.log('SMTP Port:', possibleFields.port);
+      logger.log('SMTP User:', possibleFields.user);
+      logger.log('Sender Email:', possibleFields.senderEmail);
+      logger.log('Sender Name:', possibleFields.senderName);
+      logger.log('Is Enabled:', possibleFields.enabled);
       
     } else {
-      console.log('\n❌ No email settings found in EmailSettings collection');
+      logger.log('\n❌ No email settings found in EmailSettings collection');
       
       // Try other possible collection names
       const alternativeNames = ['emailsettings', 'email_settings', 'mailsettings', 'settings'];
@@ -56,8 +56,8 @@ async function checkSMTPConfig() {
           const AltModel = mongoose.model(name, new mongoose.Schema({}, { strict: false }));
           const altSettings = await AltModel.findOne();
           if (altSettings) {
-            console.log(`\n✅ Found settings in '${name}' collection:`);
-            console.log(JSON.stringify(altSettings.toObject(), null, 2));
+            logger.log(`\n✅ Found settings in '${name}' collection:`);
+            logger.log(JSON.stringify(altSettings.toObject(), null, 2));
             break;
           }
         } catch (err) {
@@ -67,9 +67,9 @@ async function checkSMTPConfig() {
     }
     
   } catch (error) {
-    console.error('Error checking SMTP config:', error);
+    logger.error('Error checking SMTP config:', error);
   } finally {
     mongoose.disconnect();
-    console.log('\nDisconnected from MongoDB');
+    logger.log('\nDisconnected from MongoDB');
   }
 }

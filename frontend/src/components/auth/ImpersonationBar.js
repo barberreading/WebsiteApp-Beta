@@ -79,7 +79,7 @@ const ImpersonationBar = () => {
                   onClick={async () => {
                     const result = await impersonateUser(role);
                     if (result.success && result.testUser) {
-                      console.log(`Switched to ${label} view as: ${result.testUser}`);
+                      logger.log(`Switched to ${label} view as: ${result.testUser}`);
                     }
                   }}
                 >

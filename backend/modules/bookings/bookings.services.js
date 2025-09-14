@@ -392,7 +392,7 @@ const createBooking = async (bookingData, user) => {
     const populatedBooking = await Booking.findById(booking._id).populate('client', 'name').populate('staff', 'name').populate('service', 'name');
     await createBookingCreatedEntry(populatedBooking, user, {});
   } catch (auditError) {
-    console.error('Error creating audit trail entry for booking creation:', auditError);
+    logger.error('Error creating audit trail entry for booking creation:', auditError);
   }
 
   try {
@@ -404,13 +404,13 @@ const createBooking = async (bookingData, user) => {
       await sendBookingConfirmation(booking, clientData, staffDetails, serviceDetails);
     }
   } catch (emailError) {
-    console.error('Error sending booking confirmation email:', emailError);
+    logger.error('Error sending booking confirmation email:', emailError);
   }
 
   try {
     await createHRDocumentAccess(booking);
   } catch (hrAccessError) {
-    console.error('Error creating HR document access:', hrAccessError);
+    logger.error('Error creating HR document access:', hrAccessError);
   }
 
   return booking;
@@ -442,7 +442,7 @@ const updateBooking = async (id, bookingData, user) => {
     const populatedBooking = await Booking.findById(updatedBooking._id).populate('client', 'name').populate('staff', 'name').populate('service', 'name');
     await createBookingUpdatedEntry(populatedBooking, user, bookingData);
   } catch (auditError) {
-    console.error('Error creating audit trail entry for booking update:', auditError);
+    logger.error('Error creating audit trail entry for booking update:', auditError);
   }
 
   if (bookingData.status && bookingData.status !== oldStatus) {
@@ -456,7 +456,7 @@ const updateBooking = async (id, bookingData, user) => {
         }
       }
     } catch (emailError) {
-      console.error('Error sending booking status update email:', emailError);
+      logger.error('Error sending booking status update email:', emailError);
     }
   }
 

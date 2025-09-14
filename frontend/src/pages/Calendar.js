@@ -516,7 +516,7 @@ const Calendar = () => {
         const limitedEmployees = validEmployees.slice(0, maxSelection);
         setSelectedEmployees(limitedEmployees);
       } catch (error) {
-        console.error('Error parsing saved employees:', error);
+        logger.error('Error parsing saved employees:', error);
         localStorage.removeItem('selectedEmployees');
       }
     } else {
@@ -566,7 +566,7 @@ const Calendar = () => {
   // Fetch leave requests from API
   const fetchLeaveRequests = useCallback(async (startDateParam, endDateParam) => {
     try {
-      console.log('fetchLeaveRequests called with currentUser:', currentUser?.name, 'role:', currentUser?.role);
+      logger.log('fetchLeaveRequests called with currentUser:', currentUser?.name, 'role:', currentUser?.role);
       let startDate, endDate;
       
       if (startDateParam && endDateParam) {
@@ -591,14 +591,14 @@ const Calendar = () => {
       const formattedEndDate = new Date(endDate).toISOString();
       
       let apiUrl = `/leave-requests?startDate=${formattedStartDate}&endDate=${formattedEndDate}`;
-      console.log('Fetching leave requests from:', apiUrl);
+      logger.log('Fetching leave requests from:', apiUrl);
 
       
       // Note: Backend automatically filters leave requests by staff role
       // Staff users only see their own requests, managers see all
       
       const res = await axiosInstance.get(apiUrl);
-      console.log('Leave requests API response:', res.data);
+      logger.log('Leave requests API response:', res.data);
       const leaveRequestsData = res.data.data || [];
       
       // Transform leave requests for FullCalendar
@@ -673,7 +673,7 @@ const Calendar = () => {
       
       return leaveEvents;
     } catch (err) {
-      console.error('Error fetching leave requests:', err);
+      logger.error('Error fetching leave requests:', err);
       return [];
     }
   }, [currentUser]);
@@ -723,13 +723,13 @@ const Calendar = () => {
       }
       // Managers and superusers see all bookings (no additional filtering)
       
-      console.log('📅 Calendar: Making API call to:', apiUrl);
+      logger.log('📅 Calendar: Making API call to:', apiUrl);
       const res = await axiosInstance.get(apiUrl);
-      console.log('📅 Calendar: API response:', res.data);
+      logger.log('📅 Calendar: API response:', res.data);
       
       // Handle new paginated response format
       const bookingsData = res.data.data || [];
-      console.log('📅 Calendar: Extracted bookings data:', bookingsData?.length, 'bookings');
+      logger.log('📅 Calendar: Extracted bookings data:', bookingsData?.length, 'bookings');
       
 
       // Transform bookings for FullCalendar with error handling
@@ -769,7 +769,7 @@ const Calendar = () => {
       
       // Debug log for duration issues
       if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
-        console.warn('Invalid booking times:', { id: booking._id, start: booking.startTime, end: booking.endTime });
+        logger.warn('Invalid booking times:', { id: booking._id, start: booking.startTime, end: booking.endTime });
       }
       
       return {
@@ -797,7 +797,7 @@ const Calendar = () => {
       classNames: ['booking-event', `status-${booking.status || 'scheduled'}`]
         };
     } catch (mapError) {
-      console.error('Error processing booking:', booking, mapError);
+      logger.error('Error processing booking:', booking, mapError);
       // Return a fallback event for invalid bookings
       return {
         id: booking._id || 'invalid-' + Math.random(),
@@ -810,12 +810,12 @@ const Calendar = () => {
     }
   }).filter(event => event !== null);
       
-      console.log('📅 Calendar: Processed calendar events:', calendarEvents?.length, 'events');
-      console.log('📅 Calendar: Sample event:', calendarEvents?.[0]);
+      logger.log('📅 Calendar: Processed calendar events:', calendarEvents?.length, 'events');
+      logger.log('📅 Calendar: Sample event:', calendarEvents?.[0]);
       setBookings(calendarEvents);
-      console.log('📅 Calendar: Set bookings state with', calendarEvents?.length, 'events');
+      logger.log('📅 Calendar: Set bookings state with', calendarEvents?.length, 'events');
     } catch (err) {
-      console.error('Error fetching bookings:', err);
+      logger.error('Error fetching bookings:', err);
       
       // Set empty bookings array to prevent UI errors
       setBookings([]);
@@ -844,27 +844,27 @@ const Calendar = () => {
   // Fetch booking alerts for the current user
   const fetchBookingAlerts = useCallback(async () => {
     try {
-      console.log('🚨 fetchBookingAlerts called with currentUser:', currentUser?.name, 'role:', currentUser?.role);
-      console.log('🚨 Full currentUser object:', JSON.stringify(currentUser, null, 2));
-      console.log('🚨 Role check - currentUser exists:', !!currentUser);
-      console.log('🚨 Role check - role value:', currentUser?.role);
-      console.log('🚨 Role check - role type:', typeof currentUser?.role);
-      console.log('🚨 Role check - is staff:', currentUser?.role === 'staff');
+      logger.log('🚨 fetchBookingAlerts called with currentUser:', currentUser?.name, 'role:', currentUser?.role);
+      logger.log('🚨 Full currentUser object:', JSON.stringify(currentUser, null, 2));
+      logger.log('🚨 Role check - currentUser exists:', !!currentUser);
+      logger.log('🚨 Role check - role value:', currentUser?.role);
+      logger.log('🚨 Role check - role type:', typeof currentUser?.role);
+      logger.log('🚨 Role check - is staff:', currentUser?.role === 'staff');
       
       // Only fetch alerts for staff members
       if (!currentUser || currentUser.role !== 'staff') {
-        console.log('❌ Not fetching alerts - user is not staff or not logged in');
-        console.log('❌ Reason: currentUser exists?', !!currentUser, 'role:', currentUser?.role);
+        logger.log('❌ Not fetching alerts - user is not staff or not logged in');
+        logger.log('❌ Reason: currentUser exists?', !!currentUser, 'role:', currentUser?.role);
         setBookingAlerts([]);
         return;
       }
       
-      console.log('✅ User is staff, proceeding to fetch alerts');
+      logger.log('✅ User is staff, proceeding to fetch alerts');
 
       const res = await axiosInstance.get('/booking-alerts/available');
       const alerts = Array.isArray(res.data.data) ? res.data.data : [];
-      console.log('Available booking alerts from API:', alerts.length, 'alerts');
-      console.log('Alert details:', alerts.map(a => ({ title: a.title, status: a.status })));
+      logger.log('Available booking alerts from API:', alerts.length, 'alerts');
+      logger.log('Alert details:', alerts.map(a => ({ title: a.title, status: a.status })));
 
       // Transform alerts for calendar display (no filtering needed - backend already filtered)
       const calendarAlerts = alerts.map(alert => ({
@@ -889,11 +889,11 @@ const Calendar = () => {
         classNames: ['booking-alert-event', 'flashing-border']
       }));
 
-      console.log('Fetched booking alerts:', calendarAlerts.length, 'alerts');
-      console.log('Alert details:', calendarAlerts);
+      logger.log('Fetched booking alerts:', calendarAlerts.length, 'alerts');
+      logger.log('Alert details:', calendarAlerts);
       setBookingAlerts(calendarAlerts);
     } catch (err) {
-      console.error('Error fetching booking alerts:', err);
+      logger.error('Error fetching booking alerts:', err);
       setBookingAlerts([]);
     }
   }, [currentUser]);
@@ -914,14 +914,14 @@ const Calendar = () => {
       }
       
       if (!currentUser) {
-        console.log('🚨 CRITICAL: currentUser is null/undefined, exiting fetchData early!');
-        console.log('🚨 This is why staffList shows 0 available!');
-        console.log('🚨 currentUser value:', currentUser);
-        console.log('🚨 typeof currentUser:', typeof currentUser);
+        logger.log('🚨 CRITICAL: currentUser is null/undefined, exiting fetchData early!');
+        logger.log('🚨 This is why staffList shows 0 available!');
+        logger.log('🚨 currentUser value:', currentUser);
+        logger.log('🚨 typeof currentUser:', typeof currentUser);
         return;
       }
       
-      console.log('✅ currentUser exists, proceeding with fetchData:', currentUser);
+      logger.log('✅ currentUser exists, proceeding with fetchData:', currentUser);
       
       // Build API requests based on user role and permissions
       const apiRequests = [
@@ -933,10 +933,10 @@ const Calendar = () => {
       // Add staff and client requests based on role permissions
       if (currentUser?.role === 'staff') {
         // Staff can only see themselves
-        console.log('🔧 DEBUG: Staff user - adding current user to staff list:', currentUser);
-        console.log('🔧 DEBUG: Current user structure:', JSON.stringify(currentUser, null, 2));
-        console.log('🔧 DEBUG: Current user has name?', !!currentUser?.name);
-        console.log('🔧 DEBUG: Current user has _id?', !!currentUser?._id);
+        logger.log('🔧 DEBUG: Staff user - adding current user to staff list:', currentUser);
+        logger.log('🔧 DEBUG: Current user structure:', JSON.stringify(currentUser, null, 2));
+        logger.log('🔧 DEBUG: Current user has name?', !!currentUser?.name);
+        logger.log('🔧 DEBUG: Current user has _id?', !!currentUser?._id);
         apiRequests.unshift(Promise.resolve({ data: [currentUser] }));
         apiRequests.push(axiosInstance.get('/clients')); // Staff can see clients for bookings
       } else if (currentUser?.role === 'client') {
@@ -957,14 +957,14 @@ const Calendar = () => {
       // Making API requests
       const [staffRes, servicesRes, keysRes, areasRes, clientsRes] = await Promise.all(apiRequests);
       
-      console.log('🔧 DEBUG: Staff API Response:', {
+      logger.log('🔧 DEBUG: Staff API Response:', {
         status: staffRes.status,
         dataType: typeof staffRes.data,
         dataLength: Array.isArray(staffRes.data) ? staffRes.data.length : 'Not an array',
         data: staffRes.data
       });
       
-      console.log('🔧 DEBUG: Current user for staff list:', {
+      logger.log('🔧 DEBUG: Current user for staff list:', {
         exists: !!currentUser,
         id: currentUser?._id,
         name: currentUser?.name,
@@ -972,10 +972,10 @@ const Calendar = () => {
         fullObject: currentUser
       });
       
-      console.log('🔧 DEBUG: Setting staff list with data:', staffRes.data);
+      logger.log('🔧 DEBUG: Setting staff list with data:', staffRes.data);
       setStaffList(staffRes.data || []);
       
-      console.log('🔧 DEBUG: Staff list should now contain:', staffRes.data?.length || 0, 'members');
+      logger.log('🔧 DEBUG: Staff list should now contain:', staffRes.data?.length || 0, 'members');
       setServiceList(servicesRes.data);
       setClientList(clientsRes.data);
       setBookingKeys(keysRes.data.data || keysRes.data);
@@ -989,20 +989,20 @@ const Calendar = () => {
 
   // Filter bookings based on role and selected employees
   const filterBookings = useCallback(() => {
-    console.log('🔍 filterBookings called - currentUser:', currentUser?.name, 'role:', currentUser?.role, 'id:', currentUser?._id);
-    console.log('📊 Available data - bookings:', bookings.length, 'bookingAlerts:', bookingAlerts.length, 'leaveRequests:', leaveRequests.length);
+    logger.log('🔍 filterBookings called - currentUser:', currentUser?.name, 'role:', currentUser?.role, 'id:', currentUser?._id);
+    logger.log('📊 Available data - bookings:', bookings.length, 'bookingAlerts:', bookingAlerts.length, 'leaveRequests:', leaveRequests.length);
     
     // Debug: Log sample booking data structure
     if (bookings.length > 0) {
-      console.log('📋 Sample booking data:', bookings[0]);
-      console.log('📋 Sample booking extendedProps:', bookings[0]?.extendedProps);
+      logger.log('📋 Sample booking data:', bookings[0]);
+      logger.log('📋 Sample booking extendedProps:', bookings[0]?.extendedProps);
     }
 
      let filtered = [...bookings];
     
     if (hasRole(['staff']) && !hasRole(['manager', 'superuser', 'admin'])) {
-          console.log('👤 Filtering for staff user:', currentUser?.name, 'ID:', currentUser?._id);
-          console.log('🔍 Full currentUser object:', JSON.stringify(currentUser, null, 2));
+          logger.log('👤 Filtering for staff user:', currentUser?.name, 'ID:', currentUser?._id);
+          logger.log('🔍 Full currentUser object:', JSON.stringify(currentUser, null, 2));
           // Staff can only see their own bookings
           filtered = bookings.filter(booking => {
             const staffObj = booking.extendedProps.staff;
@@ -1017,17 +1017,17 @@ const Calendar = () => {
             
             // Handle both string and ObjectId comparisons
             const matches = staffId === userId || String(staffId) === String(userId);
-            console.log('🔍 Booking staff check:');
-            console.log('  Staff Object:', staffObj);
-            console.log('  Staff ID:', staffId, 'type:', typeof staffId);
-            console.log('  User ID:', userId, 'type:', typeof userId);
-            console.log('  String comparison:', String(staffId) === String(userId));
-            console.log('  Match:', matches);
+            logger.log('🔍 Booking staff check:');
+            logger.log('  Staff Object:', staffObj);
+            logger.log('  Staff ID:', staffId, 'type:', typeof staffId);
+            logger.log('  User ID:', userId, 'type:', typeof userId);
+            logger.log('  String comparison:', String(staffId) === String(userId));
+            logger.log('  Match:', matches);
             return matches;
           });
-          console.log('✅ Staff bookings filtered:', filtered.length, 'out of', bookings.length, 'total bookings');
+          logger.log('✅ Staff bookings filtered:', filtered.length, 'out of', bookings.length, 'total bookings');
           // Add booking alerts for staff members
-          console.log('Adding booking alerts:', bookingAlerts.length, 'alerts');
+          logger.log('Adding booking alerts:', bookingAlerts.length, 'alerts');
           filtered = [...filtered, ...bookingAlerts];
           // Add leave requests for staff (they see their own leave requests)
           const staffLeaveRequests = leaveRequests.filter(leave => {
@@ -1042,7 +1042,7 @@ const Calendar = () => {
             }
             
             const matches = leaveStaffId === userId || String(leaveStaffId) === String(userId);
-            console.log('🍃 Leave request staff check:', {
+            logger.log('🍃 Leave request staff check:', {
               staffObj,
               leaveStaffId,
               userId,
@@ -1051,9 +1051,9 @@ const Calendar = () => {
             });
             return matches;
           });
-          console.log('Staff leave requests filtered:', staffLeaveRequests.length, 'requests');
+          logger.log('Staff leave requests filtered:', staffLeaveRequests.length, 'requests');
           filtered = [...filtered, ...staffLeaveRequests];
-          console.log('Total filtered events for staff:', filtered.length);
+          logger.log('Total filtered events for staff:', filtered.length);
     } else if (hasRole(['manager', 'superuser', 'admin']) && selectedEmployees.length > 0) {
       // Managers see selected employees' bookings
       filtered = bookings.filter(booking => 
@@ -1198,17 +1198,17 @@ const Calendar = () => {
   
   // Render staff selection component
   const renderStaffSelection = () => {
-    console.log('🔍 DEBUG: renderStaffSelection called');
-    console.log('🔍 DEBUG: currentView:', currentView);
-    console.log('🔍 DEBUG: hasManagerRole:', hasManagerRole);
-    console.log('🔍 DEBUG: currentUser:', currentUser);
-    console.log('🔍 DEBUG: staffList:', staffList);
+    logger.log('🔍 DEBUG: renderStaffSelection called');
+    logger.log('🔍 DEBUG: currentView:', currentView);
+    logger.log('🔍 DEBUG: hasManagerRole:', hasManagerRole);
+    logger.log('🔍 DEBUG: currentUser:', currentUser);
+    logger.log('🔍 DEBUG: staffList:', staffList);
     
     // Don't show staff selection in month view or for staff/client users
     if (currentView === 'month' || !hasManagerRole) {
-      console.log('🔍 DEBUG: Not showing staff selection because:');
-      console.log('- currentView === month:', currentView === 'month');
-      console.log('- !hasManagerRole:', !hasManagerRole);
+      logger.log('🔍 DEBUG: Not showing staff selection because:');
+      logger.log('- currentView === month:', currentView === 'month');
+      logger.log('- !hasManagerRole:', !hasManagerRole);
       return null;
     }
     
@@ -1323,17 +1323,17 @@ const Calendar = () => {
   useEffect(() => {
     // Ensure user is loaded and has a role before fetching any data
     if (isUserLoaded && currentUser && currentUser.role) {
-      console.log('✅ User is loaded, fetching data... Role:', currentUser.role, 'User:', JSON.stringify(currentUser));
+      logger.log('✅ User is loaded, fetching data... Role:', currentUser.role, 'User:', JSON.stringify(currentUser));
       fetchData();
       fetchBookingAlerts();
       fetchLeaveRequests().then(leaveEvents => {
         setLeaveRequests(leaveEvents);
       }).catch(err => {
-        console.error("Error fetching leave requests in useEffect:", err);
+        logger.error("Error fetching leave requests in useEffect:", err);
         setLeaveRequests([]);
       });
     } else {
-      console.log('⏳ User not fully loaded yet, skipping initial data fetch. isUserLoaded:', isUserLoaded, 'currentUser:', currentUser);
+      logger.log('⏳ User not fully loaded yet, skipping initial data fetch. isUserLoaded:', isUserLoaded, 'currentUser:', currentUser);
     }
   }, [isUserLoaded, currentUser, fetchData, fetchBookingAlerts, fetchLeaveRequests]);
 
@@ -1341,26 +1341,26 @@ const Calendar = () => {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden && isUserLoaded && currentUser && currentUser.role) {
-        console.log('📱 Page became visible, refreshing calendar data...');
+        logger.log('📱 Page became visible, refreshing calendar data...');
         fetchData();
         fetchBookingAlerts();
         fetchLeaveRequests().then(leaveEvents => {
           setLeaveRequests(leaveEvents);
         }).catch(err => {
-          console.error("Error fetching leave requests on visibility change:", err);
+          logger.error("Error fetching leave requests on visibility change:", err);
         });
       }
     };
 
     const handleWindowFocus = () => {
       if (isUserLoaded && currentUser && currentUser.role) {
-        console.log('🔄 Window focused, refreshing calendar data...');
+        logger.log('🔄 Window focused, refreshing calendar data...');
         fetchData();
         fetchBookingAlerts();
         fetchLeaveRequests().then(leaveEvents => {
           setLeaveRequests(leaveEvents);
         }).catch(err => {
-          console.error("Error fetching leave requests on window focus:", err);
+          logger.error("Error fetching leave requests on window focus:", err);
         });
       }
     };
@@ -1382,13 +1382,13 @@ const Calendar = () => {
 
     // Set up periodic refresh every 2 minutes
     const refreshInterval = setInterval(() => {
-      console.log('⏰ Periodic refresh of calendar data...');
+      logger.log('⏰ Periodic refresh of calendar data...');
       fetchData();
       fetchBookingAlerts();
       fetchLeaveRequests().then(leaveEvents => {
         setLeaveRequests(leaveEvents);
       }).catch(err => {
-        console.error("Error fetching leave requests on periodic refresh:", err);
+        logger.error("Error fetching leave requests on periodic refresh:", err);
       });
     }, 2 * 60 * 1000); // 2 minutes
 
@@ -1401,13 +1401,13 @@ const Calendar = () => {
   useEffect(() => {
     const handleBookingCreated = () => {
       if (isUserLoaded && currentUser && currentUser.role) {
-        console.log('🆕 New booking created, refreshing calendar data...');
+        logger.log('🆕 New booking created, refreshing calendar data...');
         fetchData();
         fetchBookingAlerts();
         fetchLeaveRequests().then(leaveEvents => {
           setLeaveRequests(leaveEvents);
         }).catch(err => {
-          console.error("Error fetching leave requests after booking creation:", err);
+          logger.error("Error fetching leave requests after booking creation:", err);
         });
       }
     };
@@ -1717,7 +1717,7 @@ const Calendar = () => {
       
       setAvailableStaff(available);
     } catch (err) {
-      console.error('Error checking staff availability:', err);
+      logger.error('Error checking staff availability:', err);
       setAvailableStaff(staffList);
     }
   };
@@ -1907,7 +1907,7 @@ const Calendar = () => {
     } catch (err) {
       const errorMsg = err.response?.data?.msg || 'Failed to create booking';
       toast.error(errorMsg);
-      console.error(err);
+      logger.error(err);
     }
   };
   
@@ -1964,7 +1964,7 @@ const Calendar = () => {
       
       return false; // No conflicts
     } catch (error) {
-      console.error('Error checking booking conflicts:', error);
+      logger.error('Error checking booking conflicts:', error);
       return true; // Assume conflict on error to be safe
     }
   };
@@ -1985,7 +1985,7 @@ const Calendar = () => {
       
     } catch (err) {
       toast.error('Failed to cancel booking');
-      console.error(err);
+      logger.error(err);
     }
   };
 
@@ -2001,7 +2001,7 @@ const Calendar = () => {
       
     } catch (err) {
       toast.error('Failed to delete booking');
-      console.error(err);
+      logger.error(err);
     }
   };
 
@@ -2029,7 +2029,7 @@ const Calendar = () => {
     } catch (err) {
       const errorMsg = err.response?.data?.message || `Failed to ${action} booking alert`;
       toast.error(errorMsg);
-      console.error(err);
+      logger.error(err);
     }
   };
 
@@ -2242,18 +2242,18 @@ const Calendar = () => {
                 }}
                 events={(() => {
                   // Use only filteredBookings as it already includes filtered alerts and leave requests
-                  console.log('🗓️ FullCalendar Events Debug:');
-                  console.log('filteredBookings (includes all filtered events):', filteredBookings.length, filteredBookings);
-                  console.log('🗓️ Raw state arrays:');
-                  console.log('  - bookings:', bookings.length, bookings);
-                  console.log('  - bookingAlerts:', bookingAlerts.length, bookingAlerts);
-                  console.log('  - leaveRequests:', leaveRequests.length, leaveRequests);
-                  console.log('🗓️ Current user for filtering:', currentUser?._id, currentUser?.name);
+                  logger.log('🗓️ FullCalendar Events Debug:');
+                  logger.log('filteredBookings (includes all filtered events):', filteredBookings.length, filteredBookings);
+                  logger.log('🗓️ Raw state arrays:');
+                  logger.log('  - bookings:', bookings.length, bookings);
+                  logger.log('  - bookingAlerts:', bookingAlerts.length, bookingAlerts);
+                  logger.log('  - leaveRequests:', leaveRequests.length, leaveRequests);
+                  logger.log('🗓️ Current user for filtering:', currentUser?._id, currentUser?.name);
                   
                   // Additional debugging: Check if events have proper structure
                   if (filteredBookings.length > 0) {
-                    console.log('🗓️ Sample filtered event:', filteredBookings[0]);
-                    console.log('🗓️ Event types in filteredBookings:', filteredBookings.map(e => e.extendedProps?.type || 'booking'));
+                    logger.log('🗓️ Sample filtered event:', filteredBookings[0]);
+                    logger.log('🗓️ Event types in filteredBookings:', filteredBookings.map(e => e.extendedProps?.type || 'booking'));
                   }
                   
                   return filteredBookings;

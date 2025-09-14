@@ -21,7 +21,7 @@ const StaffDistanceSearch = () => {
                 setClients(response.data);
             } catch (err) {
                 setError('Failed to fetch clients.');
-                console.error(err);
+                logger.error(err);
             }
         };
         fetchClients();
@@ -86,7 +86,7 @@ const StaffDistanceSearch = () => {
             }
         } catch (err) {
             setError(err.message || 'An error occurred during the search.');
-            console.error(err);
+            logger.error(err);
         }
         setLoading(false);
     };

@@ -24,7 +24,7 @@ export const formatDate = (date) => {
       year: 'numeric'
     });
   } catch (error) {
-    console.error('Error formatting date:', error, 'Date value:', date);
+    logger.error('Error formatting date:', error, 'Date value:', date);
     return '';
   }
 };
@@ -55,7 +55,7 @@ export const formatDateTime = (date) => {
       hour12: true
     });
   } catch (error) {
-    console.error('Error formatting date time:', error, 'Date value:', date);
+    logger.error('Error formatting date time:', error, 'Date value:', date);
     return '';
   }
 };

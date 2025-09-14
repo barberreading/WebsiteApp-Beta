@@ -7,13 +7,13 @@ const auth = require('../middleware/auth');
 /**
  * @route   GET /api/monitoring/status
  * @desc    Get current system monitoring status
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
 router.get('/status', auth, async (req, res) => {
   try {
-    // Check if user has admin privileges (you may need to adjust this based on your user model)
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+    // Check if user has superuser privileges (you may need to adjust this based on your user model)
+    if (req.user.role !== 'superuser') {
+      return res.status(403).json({ message: 'Access denied. Superuser privileges required.' });
     }
 
     const systemStatus = errorMonitoringService.getSystemStatus();
@@ -24,7 +24,7 @@ router.get('/status', auth, async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error getting monitoring status:', error);
+    logger.error('Error getting monitoring status:', error);
     await logError('MONITORING_STATUS_ERROR', error.message, {
       userId: req.user?.id,
       error: error.stack
@@ -41,13 +41,13 @@ router.get('/status', auth, async (req, res) => {
 /**
  * @route   POST /api/monitoring/auto-resolution
  * @desc    Enable or disable automatic error resolution
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
 router.post('/auto-resolution', auth, async (req, res) => {
   try {
-    // Check if user has admin privileges
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+    // Check if user has superuser privileges
+    if (req.user.role !== 'superuser') {
+      return res.status(403).json({ message: 'Access denied. Superuser privileges required.' });
     }
 
     const { enabled } = req.body;
@@ -72,7 +72,7 @@ router.post('/auto-resolution', auth, async (req, res) => {
       autoResolutionEnabled: enabled
     });
   } catch (error) {
-    console.error('Error toggling auto-resolution:', error);
+    logger.error('Error toggling auto-resolution:', error);
     await logError('AUTO_RESOLUTION_TOGGLE_ERROR', error.message, {
       userId: req.user?.id,
       error: error.stack
@@ -89,13 +89,13 @@ router.post('/auto-resolution', auth, async (req, res) => {
 /**
  * @route   POST /api/monitoring/health-check
  * @desc    Trigger manual health check
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
 router.post('/health-check', auth, async (req, res) => {
   try {
-    // Check if user has admin privileges
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+    // Check if user has superuser privileges
+    if (req.user.role !== 'superuser') {
+      return res.status(403).json({ message: 'Access denied. Superuser privileges required.' });
     }
 
     // Trigger manual health check
@@ -114,7 +114,7 @@ router.post('/health-check', auth, async (req, res) => {
       data: systemStatus
     });
   } catch (error) {
-    console.error('Error performing manual health check:', error);
+    logger.error('Error performing manual health check:', error);
     await logError('MANUAL_HEALTH_CHECK_ERROR', error.message, {
       userId: req.user?.id,
       error: error.stack
@@ -131,13 +131,13 @@ router.post('/health-check', auth, async (req, res) => {
 /**
  * @route   GET /api/monitoring/metrics
  * @desc    Get detailed system metrics
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
 router.get('/metrics', auth, async (req, res) => {
   try {
-    // Check if user has admin privileges
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+    // Check if user has superuser privileges
+    if (req.user.role !== 'superuser') {
+      return res.status(403).json({ message: 'Access denied. Superuser privileges required.' });
     }
 
     const systemStatus = errorMonitoringService.getSystemStatus();
@@ -164,7 +164,7 @@ router.get('/metrics', auth, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error getting system metrics:', error);
+    logger.error('Error getting system metrics:', error);
     await logError('METRICS_ERROR', error.message, {
       userId: req.user?.id,
       error: error.stack
@@ -181,13 +181,13 @@ router.get('/metrics', auth, async (req, res) => {
 /**
  * @route   GET /api/monitoring/resolution-history
  * @desc    Get error resolution history
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
 router.get('/resolution-history', auth, async (req, res) => {
   try {
-    // Check if user has admin privileges
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+    // Check if user has superuser privileges
+    if (req.user.role !== 'superuser') {
+      return res.status(403).json({ message: 'Access denied. Superuser privileges required.' });
     }
 
     const { limit = 50 } = req.query;
@@ -205,7 +205,7 @@ router.get('/resolution-history', auth, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error getting resolution history:', error);
+    logger.error('Error getting resolution history:', error);
     await logError('RESOLUTION_HISTORY_ERROR', error.message, {
       userId: req.user?.id,
       error: error.stack
@@ -222,13 +222,13 @@ router.get('/resolution-history', auth, async (req, res) => {
 /**
  * @route   POST /api/monitoring/start
  * @desc    Start error monitoring service
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
 router.post('/start', auth, async (req, res) => {
   try {
-    // Check if user has admin privileges
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+    // Check if user has superuser privileges
+    if (req.user.role !== 'superuser') {
+      return res.status(403).json({ message: 'Access denied. Superuser privileges required.' });
     }
 
     await errorMonitoringService.startMonitoring();
@@ -242,7 +242,7 @@ router.post('/start', auth, async (req, res) => {
       message: 'Error monitoring service started successfully'
     });
   } catch (error) {
-    console.error('Error starting monitoring service:', error);
+    logger.error('Error starting monitoring service:', error);
     await logError('MONITORING_START_ERROR', error.message, {
       userId: req.user?.id,
       error: error.stack
@@ -259,13 +259,13 @@ router.post('/start', auth, async (req, res) => {
 /**
  * @route   POST /api/monitoring/stop
  * @desc    Stop error monitoring service
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
 router.post('/stop', auth, async (req, res) => {
   try {
-    // Check if user has admin privileges
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+    // Check if user has superuser privileges
+    if (req.user.role !== 'superuser') {
+      return res.status(403).json({ message: 'Access denied. Superuser privileges required.' });
     }
 
     errorMonitoringService.stopMonitoring();
@@ -279,7 +279,7 @@ router.post('/stop', auth, async (req, res) => {
       message: 'Error monitoring service stopped successfully'
     });
   } catch (error) {
-    console.error('Error stopping monitoring service:', error);
+    logger.error('Error stopping monitoring service:', error);
     await logError('MONITORING_STOP_ERROR', error.message, {
       userId: req.user?.id,
       error: error.stack

@@ -45,12 +45,12 @@ const Timesheets = () => {
         }
       });
       
-      console.log('Fetched timesheets:', res.data);
+      logger.log('Fetched timesheets:', res.data);
       setTimesheets(res.data);
       setError('');
     } catch (err) {
       setError('Failed to fetch timesheets');
-      console.error(err);
+      logger.error(err);
     } finally {
       setLoading(false);
     }
@@ -128,7 +128,7 @@ const Timesheets = () => {
       setPayrollReport(res.data);
     } catch (err) {
       setPayrollError('Failed to generate payroll report');
-      console.error(err);
+      logger.error(err);
     } finally {
       setPayrollLoading(false);
     }
@@ -185,7 +185,7 @@ const Timesheets = () => {
       setOverrideReason('');
       alert(`Timesheet ${status} by manager override`);
     } catch (error) {
-      console.error('Error overriding timesheet:', error);
+      logger.error('Error overriding timesheet:', error);
       setError('Failed to override timesheet');
     } finally {
       setLoading(false);
@@ -207,7 +207,7 @@ const Timesheets = () => {
       setError('');
       alert('Timesheet deleted successfully');
     } catch (error) {
-      console.error('Error deleting timesheet:', error);
+      logger.error('Error deleting timesheet:', error);
       if (error.response?.data?.msg) {
         setError(error.response.data.msg);
       } else {
@@ -291,7 +291,7 @@ const Timesheets = () => {
       const timesheetDate = timesheet.date ? new Date(timesheet.date) : new Date();
       const formattedDate = `${timesheetDate.getFullYear()}-${(timesheetDate.getMonth() + 1).toString().padStart(2, '0')}-${timesheetDate.getDate().toString().padStart(2, '0')}`;
       
-      console.log('Setting form data:', {
+      logger.log('Setting form data:', {
         clockIn: clockInTime,
         clockOut: clockOutTime,
         date: formattedDate
@@ -311,7 +311,7 @@ const Timesheets = () => {
       
       setShowEditModal(true);
     } catch (error) {
-      console.error('Error opening edit modal:', error);
+      logger.error('Error opening edit modal:', error);
       alert('Error opening edit modal. Please try again.');
     }
   };
@@ -320,7 +320,7 @@ const Timesheets = () => {
   const handleEditFormChange = (e) => {
     const { name, value, type, checked } = e.target;
     const fieldValue = type === 'checkbox' ? checked : value;
-    console.log(`Updating ${name} to ${fieldValue}`);
+    logger.log(`Updating ${name} to ${fieldValue}`);
     setEditFormData({
       ...editFormData,
       [name]: fieldValue
@@ -357,7 +357,7 @@ const Timesheets = () => {
         clockOutDate.setDate(clockOutDate.getDate() + 1);
       }
       
-      console.log('Saving updated timesheet with all fields');
+      logger.log('Saving updated timesheet with all fields');
       
       // Prepare update data with all fields
       const updateData = {
@@ -389,7 +389,7 @@ const Timesheets = () => {
       alert('Timesheet updated successfully');
     } catch (err) {
       setError('Failed to update timesheet: ' + (err.response?.data?.msg || err.message));
-      console.error(err);
+      logger.error(err);
       alert('Failed to update timesheet');
     } finally {
       setLoading(false);
@@ -462,7 +462,7 @@ const Timesheets = () => {
         setProcessingStatus('completed');
       }
     } catch (err) {
-      console.error('Error uploading timesheets:', err);
+      logger.error('Error uploading timesheets:', err);
       setError('Failed to process timesheet scans');
       setProcessingStatus('error');
     }
@@ -479,7 +479,7 @@ const Timesheets = () => {
       setProcessingStatus('completed');
       fetchTimesheets(); // Refresh the list
     } catch (err) {
-      console.error('Error submitting manual entries:', err);
+      logger.error('Error submitting manual entries:', err);
       setError('Failed to process manual entries');
     }
   };
@@ -495,7 +495,7 @@ const Timesheets = () => {
       // Success message
       alert('Timesheet submitted for approval successfully!');
     } catch (err) {
-      console.error('Error submitting timesheet for approval:', err);
+      logger.error('Error submitting timesheet for approval:', err);
       alert('Failed to submit timesheet for approval. Please try again.');
     }
   };
@@ -523,7 +523,7 @@ const Timesheets = () => {
       fetchTimesheets();
       alert('Timesheet approved successfully!');
     } catch (err) {
-      console.error('Error approving timesheet:', err);
+      logger.error('Error approving timesheet:', err);
       alert('Failed to approve timesheet. Please try again.');
     }
   };
@@ -546,7 +546,7 @@ const Timesheets = () => {
         alert('Timesheet approved successfully!');
       }
     } catch (err) {
-      console.error('Error approving timesheet:', err);
+      logger.error('Error approving timesheet:', err);
       alert('Failed to approve timesheet. Please try again.');
     }
   };
@@ -557,7 +557,7 @@ const Timesheets = () => {
       fetchTimesheets();
       alert('Timesheet finally approved successfully!');
     } catch (err) {
-      console.error('Error in manager approval:', err);
+      logger.error('Error in manager approval:', err);
       alert('Failed to approve timesheet. Please try again.');
     }
   };
@@ -589,7 +589,7 @@ const Timesheets = () => {
       // Success message
       alert('Timesheet rejected successfully!');
     } catch (err) {
-      console.error('Error rejecting timesheet:', err);
+      logger.error('Error rejecting timesheet:', err);
       alert('Failed to reject timesheet. Please try again.');
     }
   };
@@ -652,7 +652,7 @@ const Timesheets = () => {
       // Success message
       alert('Timesheet submitted successfully!');
     } catch (err) {
-      console.error('Error submitting timesheet:', err);
+      logger.error('Error submitting timesheet:', err);
       alert('Failed to submit timesheet. Please try again.');
     }
   };

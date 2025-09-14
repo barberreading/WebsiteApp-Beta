@@ -11,7 +11,7 @@ const formatDate = (dateString) => {
   try {
     return new Date(dateString).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'});
   } catch (error) {
-    console.error('Error formatting date:', error);
+    logger.error('Error formatting date:', error);
     return dateString;
   }
 };
@@ -56,7 +56,7 @@ const Clients = () => {
       setLoading(false);
     } catch (err) {
       toast.error('Failed to fetch clients: ' + (err.response?.data?.msg || err.message));
-      console.error('Error fetching clients:', err);
+      logger.error('Error fetching clients:', err);
       setLoading(false);
     }
   }, []);
@@ -113,12 +113,12 @@ const Clients = () => {
           }
         };
         
-        console.log('Submitting client data:', clientData);
+        logger.log('Submitting client data:', clientData);
         
         // Submit the client data directly to the API
         const response = await axiosInstance.post('/clients', clientData);
         
-        console.log('Client creation response:', response.data);
+        logger.log('Client creation response:', response.data);
         
         // Show success message
         toast.success('Customer added successfully');
@@ -130,13 +130,13 @@ const Clients = () => {
         handleEdit(response.data);
         
       } catch (err) {
-        console.error('Error creating client:', err);
+        logger.error('Error creating client:', err);
         // Log detailed error information
         if (err.response) {
-          console.error('Error response:', err.response.data);
-          console.error('Error status:', err.response.status);
+          logger.error('Error response:', err.response.data);
+          logger.error('Error status:', err.response.status);
         } else if (err.request) {
-          console.error('Error request:', err.request);
+          logger.error('Error request:', err.request);
         }
         
         const errorMsg = err.response?.data?.msg || 'Error adding customer: ' + (err.message || 'Unknown error');
@@ -172,7 +172,7 @@ const Clients = () => {
             [child]: value
           }
         };
-        console.log('Updated nested field:', name, 'New formData:', newData);
+        logger.log('Updated nested field:', name, 'New formData:', newData);
         return newData;
       });
     } else {
@@ -181,7 +181,7 @@ const Clients = () => {
           ...prevData,
           [name]: value
         };
-        console.log('Updated field:', name, 'Value:', value, 'New formData:', newData);
+        logger.log('Updated field:', name, 'Value:', value, 'New formData:', newData);
         return newData;
       });
     }
@@ -246,7 +246,7 @@ const Clients = () => {
   const [selectedClient, setSelectedClient] = useState(null);
 
   const handleViewDetails = (client) => {
-    console.log("Viewing client details:", client);
+    logger.log("Viewing client details:", client);
     // Create a deep copy to avoid reference issues
     const clientCopy = JSON.parse(JSON.stringify(client));
     setSelectedClient(clientCopy);
@@ -259,7 +259,7 @@ const Clients = () => {
   const handleDelete = async (clientId) => {
     if (window.confirm('Are you sure you want to delete this client?')) {
       try {
-        console.log('Deleting client with ID:', clientId);
+        logger.log('Deleting client with ID:', clientId);
         await axiosInstance.delete(`/clients/${clientId}`);
         toast.success('Client deleted successfully');
         // Close any open modals
@@ -270,7 +270,7 @@ const Clients = () => {
       } catch (err) {
         const errorMsg = err.response?.data?.msg || 'Failed to delete client';
         toast.error(errorMsg);
-        console.error('Error deleting client:', err);
+        logger.error('Error deleting client:', err);
       }
     }
   };
@@ -287,7 +287,7 @@ const Clients = () => {
     } catch (err) {
       const errorMsg = err.response?.data?.msg || 'Failed to update client status';
       toast.error(errorMsg);
-      console.error('Error toggling client status:', err);
+      logger.error('Error toggling client status:', err);
     }
   };
 
@@ -723,19 +723,19 @@ const Clients = () => {
                       }
                     };
                     
-                    console.log('Creating client with form data:', clientData);
+                    logger.log('Creating client with form data:', clientData);
                     
                     // Use axios instance for consistent headers
                     axiosInstance.post('/clients', clientData)
                     .then(response => {
-                      console.log('Client created successfully:', response.data);
+                      logger.log('Client created successfully:', response.data);
                       toast.success('Client added successfully!');
                       setShowModal(false);
                       fetchClients();
                       resetForm();
                     })
                     .catch(error => {
-                      console.error('Error creating client:', error);
+                      logger.error('Error creating client:', error);
                       const errorMsg = error.response?.data?.msg || error.message || 'Unknown error';
                       toast.error(`Error adding client: ${errorMsg}`);
                     });
@@ -763,7 +763,7 @@ const Clients = () => {
                         fetchClients();
                       })
                       .catch(error => {
-                        console.error('Error updating client:', error);
+                        logger.error('Error updating client:', error);
                         toast.error(`Error updating client: ${error.response?.data?.message || error.message}`);
                       });
                   }
@@ -864,7 +864,7 @@ const Clients = () => {
                       <Button 
                         variant="primary" 
                         onClick={() => {
-                          console.log('Create booking button clicked for client:', selectedClient._id);
+                          logger.log('Create booking button clicked for client:', selectedClient._id);
                           // Navigate directly to booking page with client ID
                           window.location.href = `/bookings/new?clientId=${selectedClient._id}&clientName=${encodeURIComponent(selectedClient.name)}`;
                         }}
@@ -886,7 +886,7 @@ const Clients = () => {
                       <Button 
                         variant="info" 
                         onClick={() => {
-                          console.log('Send email button clicked for client:', selectedClient.name);
+                          logger.log('Send email button clicked for client:', selectedClient.name);
                           // Create and open email directly
                           const subject = `Regarding your appointment`;
                           const body = `Hello ${selectedClient.name},\n\nI hope this email finds you well.\n\nBest regards,\nYour Team`;
@@ -898,7 +898,7 @@ const Clients = () => {
                             navigator.clipboard.writeText(selectedClient.email);
                             toast.success('Email address copied to clipboard');
                           } catch (error) {
-                            console.error('Could not copy to clipboard:', error);
+                            logger.error('Could not copy to clipboard:', error);
                           }
                         }}
                         className="w-100"
@@ -917,7 +917,7 @@ const Clients = () => {
           <Button 
             variant="danger" 
             onClick={() => {
-              console.log('Delete button clicked, client ID:', selectedClient._id);
+              logger.log('Delete button clicked, client ID:', selectedClient._id);
               if (window.confirm('Are you sure you want to delete this client?')) {
                 try {
                   axiosInstance.delete(`/clients/${selectedClient._id}`)
@@ -929,11 +929,11 @@ const Clients = () => {
                     .catch(err => {
                       const errorMsg = err.response?.data?.msg || 'Failed to delete client';
                       toast.error(errorMsg);
-                      console.error('Error deleting client:', err);
+                      logger.error('Error deleting client:', err);
                     });
                 } catch (err) {
                   toast.error('Error deleting client');
-                  console.error('Error deleting client:', err);
+                  logger.error('Error deleting client:', err);
                 }
               }
             }} 
@@ -945,7 +945,7 @@ const Clients = () => {
             Close
           </Button>
           <Button variant="primary" onClick={() => {
-            console.log('Edit button clicked for client:', selectedClient.name);
+            logger.log('Edit button clicked for client:', selectedClient.name);
             setCurrentClient(selectedClient);
             setFormData({
               name: selectedClient.name,

@@ -9,7 +9,7 @@
  * @returns {string} Formatted error message
  */
 export const handleApiError = (error, defaultMessage = 'An error occurred. Please try again.') => {
-  console.error(defaultMessage, error);
+  logger.error(defaultMessage, error);
   
   // Handle authentication errors
   if (error.response && error.response.status === 401) {

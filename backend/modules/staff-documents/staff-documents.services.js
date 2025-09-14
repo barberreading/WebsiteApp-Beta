@@ -46,7 +46,7 @@ const uploadStaffDocument = async (user, file, body) => {
     await newDocument.save();
     return { success: true, data: newDocument };
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     return { success: false, statusCode: 500, message: 'Server error', error: err.message };
   }
 };
@@ -136,7 +136,7 @@ const getStaffDocuments = async (user, query) => {
 
     return { success: true, data: documents };
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     return { success: false, statusCode: 500, message: 'Server error', error: err.message };
   }
 };
@@ -184,7 +184,7 @@ const getStaffDocumentById = async (user, documentId) => {
 
     return { success: true, data: document };
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     return { success: false, statusCode: 500, message: 'Server error', error: err.message };
   }
 };
@@ -200,7 +200,7 @@ const downloadStaffDocument = async (user, documentId) => {
 
     return { success: true, data: accessResult.data };
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     return { success: false, statusCode: 500, message: 'Server error', error: err.message };
   }
 };
@@ -228,7 +228,7 @@ const getPublicStaffDocument = async (accessKey) => {
       }
     };
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     return { success: false, statusCode: 500, message: 'Server error', error: err.message };
   }
 };
@@ -246,7 +246,7 @@ const downloadPublicStaffDocument = async (accessKey) => {
 
     return { success: true, data: document };
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     return { success: false, statusCode: 500, message: 'Server error', error: err.message };
   }
 };
@@ -283,7 +283,7 @@ const updateStaffDocument = async (user, documentId, body) => {
     await document.save();
     return { success: true, data: document };
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     return { success: false, statusCode: 500, message: 'Server error', error: err.message };
   }
 };
@@ -306,7 +306,7 @@ const deleteStaffDocument = async (user, documentId) => {
     await document.remove();
     return { success: true, data: { msg: 'Document deleted successfully' } };
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     return { success: false, statusCode: 500, message: 'Server error', error: err.message };
   }
 };

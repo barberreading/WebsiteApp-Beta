@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 const authService = require('./auth.services');
 const asyncHandler = require('../../middleware/async.js');
+const logger = require('../../utils/logger');
 
 /**
  * @desc    Register user

@@ -9,9 +9,9 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log('MongoDB Connected'))
+.then(() => logger.log('MongoDB Connected'))
 .catch(err => {
-  console.error('MongoDB Connection Error:', err);
+  logger.error('MongoDB Connection Error:', err);
   process.exit(1);
 });
 
@@ -322,9 +322,9 @@ const addSampleUsers = async () => {
       });
     }
     
-    console.log('Sample users added successfully');
+    logger.log('Sample users added successfully');
   } catch (err) {
-    console.error('Error adding sample users:', err);
+    logger.error('Error adding sample users:', err);
   }
 };
 
@@ -337,9 +337,9 @@ const addSampleClients = async () => {
     // Add new sample clients
     await Client.insertMany(sampleClients);
     
-    console.log('Sample clients added successfully');
+    logger.log('Sample clients added successfully');
   } catch (err) {
-    console.error('Error adding sample clients:', err);
+    logger.error('Error adding sample clients:', err);
   }
 };
 
@@ -347,7 +347,7 @@ const addSampleClients = async () => {
 const addAllSampleData = async () => {
   await addSampleUsers();
   await addSampleClients();
-  console.log('All sample data added successfully');
+  logger.log('All sample data added successfully');
   process.exit(0);
 };
 

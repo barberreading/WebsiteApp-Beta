@@ -122,7 +122,7 @@ export const BrandingProvider = ({ children }) => {
       
       setError(null);
     } catch (err) {
-      console.error('Error loading branding:', err);
+      logger.error('Error loading branding:', err);
       setError('Failed to load branding configuration');
     } finally {
       setLoading(false);
@@ -143,7 +143,7 @@ export const BrandingProvider = ({ children }) => {
       
       return { success: true, data: res.data };
     } catch (err) {
-      console.error('Error updating branding:', err);
+      logger.error('Error updating branding:', err);
       setError('Failed to update branding configuration');
       return { success: false, error: err.response?.data?.msg || 'Error updating branding' };
     }

@@ -62,16 +62,16 @@ const sendTimesheetStatusNotification = async (timesheet, staff, status, rejecti
         body = template.body;
       }
     } catch (error) {
-      console.log(`Using fallback template for timesheet ${status} notification`);
+      logger.log(`Using fallback template for timesheet ${status} notification`);
     }
     
     // Send email
     const info = await sendEmail(staff.email, subject, body);
     
-    console.log(`Timesheet ${status} notification email sent:`, info.messageId);
+    logger.log(`Timesheet ${status} notification email sent:`, info.messageId);
     return info;
   } catch (error) {
-    console.error(`Error sending timesheet ${status} notification email:`, error);
+    logger.error(`Error sending timesheet ${status} notification email:`, error);
     throw error;
   }
 };

@@ -6,7 +6,7 @@ require('dotenv').config();
 async function checkAndrewBooking() {
   try {
     await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/test');
-    console.log('Connected to MongoDB');
+    logger.log('Connected to MongoDB');
     
     // First, let's find any user named Andrew Barber
     const andrewUser = await User.findOne({ 
@@ -16,7 +16,7 @@ async function checkAndrewBooking() {
       ]
     });
     
-    console.log('Andrew Barber user found:', andrewUser ? andrewUser.name : 'Not found');
+    logger.log('Andrew Barber user found:', andrewUser ? andrewUser.name : 'Not found');
     
     // Check for bookings with Andrew in the title or as client
     const bookings = await Booking.find({
@@ -32,20 +32,20 @@ async function checkAndrewBooking() {
     .sort({ createdAt: -1 })
     .limit(10);
     
-    console.log(`\nFound ${bookings.length} bookings for Andrew Barber:`);
+    logger.log(`\nFound ${bookings.length} bookings for Andrew Barber:`);
     
     bookings.forEach((booking, index) => {
-      console.log(`\n--- Booking ${index + 1} ---`);
-      console.log('ID:', booking._id);
-      console.log('Title:', booking.title);
-      console.log('Client:', booking.client?.name || 'No client');
-      console.log('Staff:', booking.staff?.name || 'No staff');
-      console.log('Service:', booking.service?.name || 'No service');
-      console.log('Start Time:', booking.startTime);
-      console.log('End Time:', booking.endTime);
-      console.log('Status:', booking.status);
-      console.log('Created At:', booking.createdAt);
-      console.log('Notes:', booking.notes || 'No notes');
+      logger.log(`\n--- Booking ${index + 1} ---`);
+      logger.log('ID:', booking._id);
+      logger.log('Title:', booking.title);
+      logger.log('Client:', booking.client?.name || 'No client');
+      logger.log('Staff:', booking.staff?.name || 'No staff');
+      logger.log('Service:', booking.service?.name || 'No service');
+      logger.log('Start Time:', booking.startTime);
+      logger.log('End Time:', booking.endTime);
+      logger.log('Status:', booking.status);
+      logger.log('Created At:', booking.createdAt);
+      logger.log('Notes:', booking.notes || 'No notes');
     });
     
     // Also check for recent bookings around the 15th
@@ -60,18 +60,18 @@ async function checkAndrewBooking() {
     .populate('service', 'name')
     .sort({ startTime: 1 });
     
-    console.log(`\n\nBookings around January 15th (${recentBookings.length} found):`);
+    logger.log(`\n\nBookings around January 15th (${recentBookings.length} found):`);
     recentBookings.forEach((booking, index) => {
-      console.log(`\n--- Booking ${index + 1} ---`);
-      console.log('Title:', booking.title);
-      console.log('Client:', booking.client?.name || 'No client');
-      console.log('Staff:', booking.staff?.name || 'No staff');
-      console.log('Start Time:', booking.startTime);
-      console.log('Status:', booking.status);
+      logger.log(`\n--- Booking ${index + 1} ---`);
+      logger.log('Title:', booking.title);
+      logger.log('Client:', booking.client?.name || 'No client');
+      logger.log('Staff:', booking.staff?.name || 'No staff');
+      logger.log('Start Time:', booking.startTime);
+      logger.log('Status:', booking.status);
     });
     
   } catch (error) {
-    console.error('Error:', error);
+    logger.error('Error:', error);
   } finally {
     await mongoose.disconnect();
     process.exit(0);

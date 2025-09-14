@@ -30,7 +30,7 @@ class AutoErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('AutoErrorBoundary caught an error:', error, errorInfo);
+    logger.error('AutoErrorBoundary caught an error:', error, errorInfo);
     
     this.setState({
       error: error,
@@ -61,7 +61,7 @@ class AutoErrorBoundary extends React.Component {
         autoResolutionEnabled: this.state.autoResolveEnabled
       });
     } catch (logError) {
-      console.error('Failed to log error to backend:', logError);
+      logger.error('Failed to log error to backend:', logError);
     }
   }
 
@@ -72,7 +72,7 @@ class AutoErrorBoundary extends React.Component {
     this.setState({ isResolving: true });
     
     const resolutionStrategy = this.determineResolutionStrategy(error);
-    console.log(`🔧 Attempting automatic resolution with strategy: ${resolutionStrategy}`);
+    logger.log(`🔧 Attempting automatic resolution with strategy: ${resolutionStrategy}`);
     
     try {
       const resolved = await this.executeResolutionStrategy(resolutionStrategy, error, errorInfo);
@@ -91,7 +91,7 @@ class AutoErrorBoundary extends React.Component {
       }));
       
       if (resolved) {
-        console.log('✅ Error resolved automatically!');
+        logger.log('✅ Error resolved automatically!');
         // Reset error state after successful resolution
         setTimeout(() => {
           this.setState({
@@ -102,7 +102,7 @@ class AutoErrorBoundary extends React.Component {
           });
         }, 1000);
       } else {
-        console.log('❌ Automatic resolution failed');
+        logger.log('❌ Automatic resolution failed');
         // Try again after delay if we haven't exceeded max attempts
         if (this.state.resolutionAttempts < this.maxResolutionAttempts - 1) {
           setTimeout(() => {
@@ -111,7 +111,7 @@ class AutoErrorBoundary extends React.Component {
         }
       }
     } catch (resolutionError) {
-      console.error('Error during automatic resolution:', resolutionError);
+      logger.error('Error during automatic resolution:', resolutionError);
       this.setState({ isResolving: false });
     }
   }
@@ -184,11 +184,11 @@ class AutoErrorBoundary extends React.Component {
       });
       
       if (response.ok) {
-        console.log('🌐 Network connectivity restored');
+        logger.log('🌐 Network connectivity restored');
         return true;
       }
     } catch (networkError) {
-      console.log('🌐 Network still unavailable, will retry');
+      logger.log('🌐 Network still unavailable, will retry');
     }
     
     return false;
@@ -199,7 +199,7 @@ class AutoErrorBoundary extends React.Component {
    */
   async resolveChunkLoadingError() {
     try {
-      console.log('📦 Attempting to resolve chunk loading error...');
+      logger.log('📦 Attempting to resolve chunk loading error...');
       
       // Clear any cached modules
       if ('serviceWorker' in navigator) {
@@ -217,7 +217,7 @@ class AutoErrorBoundary extends React.Component {
         );
       }
       
-      console.log('📦 Cache cleared, reloading application...');
+      logger.log('📦 Cache cleared, reloading application...');
       
       // Reload the page to get fresh chunks
       setTimeout(() => {
@@ -226,7 +226,7 @@ class AutoErrorBoundary extends React.Component {
       
       return true;
     } catch (cacheError) {
-      console.error('Failed to clear cache:', cacheError);
+      logger.error('Failed to clear cache:', cacheError);
       return false;
     }
   }
@@ -236,7 +236,7 @@ class AutoErrorBoundary extends React.Component {
    */
   async resolveAuthError() {
     try {
-      console.log('🔐 Attempting to resolve authentication error...');
+      logger.log('🔐 Attempting to resolve authentication error...');
       
       // Try to refresh the auth token
       const refreshToken = localStorage.getItem('refreshToken');
@@ -248,19 +248,19 @@ class AutoErrorBoundary extends React.Component {
         if (response.data.token) {
           localStorage.setItem('token', response.data.token);
           axiosInstance.defaults.headers.common['x-auth-token'] = response.data.token;
-          console.log('🔐 Authentication token refreshed');
+          logger.log('🔐 Authentication token refreshed');
           return true;
         }
       }
       
       // If refresh fails, redirect to login
-      console.log('🔐 Redirecting to login...');
+      logger.log('🔐 Redirecting to login...');
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       window.location.href = '/login';
       return true;
     } catch (authError) {
-      console.error('Failed to resolve auth error:', authError);
+      logger.error('Failed to resolve auth error:', authError);
       return false;
     }
   }
@@ -270,7 +270,7 @@ class AutoErrorBoundary extends React.Component {
    */
   async resolveComponentError() {
     try {
-      console.log('⚛️ Attempting to resolve component error...');
+      logger.log('⚛️ Attempting to resolve component error...');
       
       // Force a component re-render by updating state
       this.forceUpdate();
@@ -282,7 +282,7 @@ class AutoErrorBoundary extends React.Component {
       
       return true;
     } catch (componentError) {
-      console.error('Failed to resolve component error:', componentError);
+      logger.error('Failed to resolve component error:', componentError);
       return false;
     }
   }
@@ -292,7 +292,7 @@ class AutoErrorBoundary extends React.Component {
    */
   async resolveMemoryError() {
     try {
-      console.log('🧠 Attempting to resolve memory error...');
+      logger.log('🧠 Attempting to resolve memory error...');
       
       // Force garbage collection if available
       if (window.gc) {
@@ -302,19 +302,19 @@ class AutoErrorBoundary extends React.Component {
       // Clear large objects from memory
       if (window.performance && window.performance.memory) {
         const memInfo = window.performance.memory;
-        console.log(`Memory usage: ${memInfo.usedJSHeapSize / 1048576}MB / ${memInfo.totalJSHeapSize / 1048576}MB`);
+        logger.log(`Memory usage: ${memInfo.usedJSHeapSize / 1048576}MB / ${memInfo.totalJSHeapSize / 1048576}MB`);
       }
       
       // Suggest page reload for severe memory issues
       const memoryUsage = window.performance?.memory?.usedJSHeapSize || 0;
       if (memoryUsage > 100 * 1048576) { // > 100MB
-        console.log('🧠 High memory usage detected, reloading page...');
+        logger.log('🧠 High memory usage detected, reloading page...');
         setTimeout(() => window.location.reload(), 2000);
       }
       
       return true;
     } catch (memoryError) {
-      console.error('Failed to resolve memory error:', memoryError);
+      logger.error('Failed to resolve memory error:', memoryError);
       return false;
     }
   }
@@ -324,7 +324,7 @@ class AutoErrorBoundary extends React.Component {
    */
   async attemptGenericRecovery() {
     try {
-      console.log('🔧 Attempting generic error recovery...');
+      logger.log('🔧 Attempting generic error recovery...');
       
       // Wait a moment for transient issues to resolve
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -334,7 +334,7 @@ class AutoErrorBoundary extends React.Component {
       
       return true;
     } catch (genericError) {
-      console.error('Generic recovery failed:', genericError);
+      logger.error('Generic recovery failed:', genericError);
       return false;
     }
   }

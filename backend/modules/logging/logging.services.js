@@ -30,11 +30,11 @@ const truncateLogIfNeeded = (logPath) => {
       const stats = fs.statSync(logPath);
       if (stats.size > LOG_CONFIG.maxLogSize) {
         fs.truncateSync(logPath, 0);
-        console.log(`Truncated log file: ${logPath}`);
+        logger.log(`Truncated log file: ${logPath}`);
       }
     }
   } catch (error) {
-    console.error(`Error truncating log file ${logPath}:`, error);
+    logger.error(`Error truncating log file ${logPath}:`, error);
   }
 };
 
@@ -47,12 +47,12 @@ const clearLog = (logPath) => {
   try {
     if (fs.existsSync(logPath)) {
       fs.writeFileSync(logPath, '');
-      console.log(`Cleared log file: ${logPath}`);
+      logger.log(`Cleared log file: ${logPath}`);
       return true;
     }
     return false;
   } catch (error) {
-    console.error(`Error clearing log file ${logPath}:`, error);
+    logger.error(`Error clearing log file ${logPath}:`, error);
     return false;
   }
 };

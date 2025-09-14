@@ -46,7 +46,7 @@ const ActivityLog = () => {
       setActivities(activitiesData);
       setTotalResults(response.data.totalCount || activitiesData.length);
     } catch (err) {
-      console.error('Error fetching activity log:', err);
+      logger.error('Error fetching activity log:', err);
       setError('Failed to load activity log. Please try again later.');
       toast.error('Error loading activity log');
     } finally {

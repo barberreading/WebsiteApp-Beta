@@ -6,9 +6,9 @@ require('dotenv').config();
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log('Connected to MongoDB');
+    logger.log('Connected to MongoDB');
   } catch (error) {
-    console.error('MongoDB connection error:', error);
+    logger.error('MongoDB connection error:', error);
     process.exit(1);
   }
 };
@@ -19,7 +19,7 @@ const createTestUser = async () => {
     
     // Delete existing test user if exists
     await User.deleteOne({ email: 'test@example.com' });
-    console.log('Deleted existing test user');
+    logger.log('Deleted existing test user');
     
     // Create test user with plain password (let mongoose middleware handle hashing)
     const testUser = new User({
@@ -31,18 +31,18 @@ const createTestUser = async () => {
     });
     
     await testUser.save();
-    console.log('Test user created successfully');
-    console.log('Email: test@example.com');
-    console.log('Password: password123');
+    logger.log('Test user created successfully');
+    logger.log('Email: test@example.com');
+    logger.log('Password: password123');
     
     // Verify the password works
     const savedUser = await User.findOne({ email: 'test@example.com' }).select('+password');
     const isMatch = await savedUser.matchPassword('password123');
-    console.log('Password verification:', isMatch);
+    logger.log('Password verification:', isMatch);
     
     process.exit(0);
   } catch (error) {
-    console.error('Error creating test user:', error);
+    logger.error('Error creating test user:', error);
     process.exit(1);
   }
 };

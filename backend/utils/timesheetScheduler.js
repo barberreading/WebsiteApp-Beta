@@ -19,7 +19,7 @@ const scheduleDailyTimesheetCheck = () => {
   // Run every day at 6:00 PM to send approval requests for completed timesheets
   cron.schedule('0 18 * * *', async () => {
     try {
-      console.log('Running daily timesheet approval request check...');
+      logger.log('Running daily timesheet approval request check...');
       
       // Find all timesheets from today that are pending and haven't had approval requests sent
       const today = new Date();
@@ -31,7 +31,7 @@ const scheduleDailyTimesheetCheck = () => {
         approvalRequestSent: { $ne: true }
       }).populate('staff').populate('client');
       
-      console.log(`Found ${timesheets.length} timesheets needing approval requests`);
+      logger.log(`Found ${timesheets.length} timesheets needing approval requests`);
       
       // Send approval requests for each timesheet
       for (const timesheet of timesheets) {
@@ -46,20 +46,20 @@ const scheduleDailyTimesheetCheck = () => {
           timesheet.approvalRequestSent = true;
           await timesheet.save();
           
-          console.log(`Sent approval request for timesheet ${timesheet._id}`);
+          logger.log(`Sent approval request for timesheet ${timesheet._id}`);
         } catch (error) {
-          console.error(`Error sending approval request for timesheet ${timesheet._id}:`, error);
+          logger.error(`Error sending approval request for timesheet ${timesheet._id}:`, error);
         }
       }
     } catch (error) {
-      console.error('Error in daily timesheet approval check:', error);
+      logger.error('Error in daily timesheet approval check:', error);
     }
   });
   
   // Run every Monday at 10:00 AM to send reminders for missing and unapproved timesheets
   cron.schedule('0 10 * * 1', async () => {
     try {
-      console.log('Running weekly timesheet reminder check...');
+      logger.log('Running weekly timesheet reminder check...');
       
       // Get date range for last week (Monday to Sunday)
       const today = new Date();
@@ -71,7 +71,7 @@ const scheduleDailyTimesheetCheck = () => {
       lastWeekStart.setDate(lastWeekEnd.getDate() - 6); // Last Monday
       lastWeekStart.setHours(0, 0, 0, 0);
       
-      console.log(`Checking timesheets for period: ${lastWeekStart.toDateString()} to ${lastWeekEnd.toDateString()}`);
+      logger.log(`Checking timesheets for period: ${lastWeekStart.toDateString()} to ${lastWeekEnd.toDateString()}`);
       
       // 1. CROSS-REFERENCE BOOKINGS WITH TIMESHEETS TO FIND MISSING TIMESHEETS
       // Find all bookings from last week
@@ -80,7 +80,7 @@ const scheduleDailyTimesheetCheck = () => {
         status: { $in: ['confirmed', 'completed'] }
       }).populate('staff').populate('client');
       
-      console.log(`Found ${lastWeekBookings.length} bookings from last week`);
+      logger.log(`Found ${lastWeekBookings.length} bookings from last week`);
       
       // Group bookings by staff
       const bookingsByStaff = {};
@@ -102,7 +102,7 @@ const scheduleDailyTimesheetCheck = () => {
         date: { $gte: lastWeekStart, $lte: lastWeekEnd }
       });
       
-      console.log(`Found ${lastWeekTimesheets.length} timesheets from last week`);
+      logger.log(`Found ${lastWeekTimesheets.length} timesheets from last week`);
       
       // Group timesheets by staff and date
       const timesheetsByStaffAndDate = {};
@@ -150,7 +150,7 @@ const scheduleDailyTimesheetCheck = () => {
         const { staff, missingDates } = missingTimesheetsByStaff[staffId];
         
         await sendMissingTimesheetReminder(staff, missingDates);
-        console.log(`Sent missing timesheet reminder to ${staff.firstName} ${staff.lastName} for ${missingDates.length} dates`);
+        logger.log(`Sent missing timesheet reminder to ${staff.firstName} ${staff.lastName} for ${missingDates.length} dates`);
       }
       
       // 2. SEND REMINDERS FOR UNAPPROVED TIMESHEETS
@@ -177,7 +177,7 @@ const scheduleDailyTimesheetCheck = () => {
           
           // Send reminder email to client
           await sendUnapprovedTimesheetReminder(timesheetData, client);
-          console.log(`Sent reminder for ${unapprovedTimesheets.length} timesheets to client ${client.name}`);
+          logger.log(`Sent reminder for ${unapprovedTimesheets.length} timesheets to client ${client.name}`);
           
           // Also notify staff and managers about pending approval
           for (const timesheet of unapprovedTimesheets) {
@@ -188,16 +188,16 @@ const scheduleDailyTimesheetCheck = () => {
           const managers = await User.find({ role: { $in: ['manager', 'superuser'] } });
           for (const manager of managers) {
             // Send manager notification about unapproved timesheets
-            console.log(`Notified manager ${manager.firstName} ${manager.lastName} about unapproved timesheets for client ${client.name}`);
+            logger.log(`Notified manager ${manager.firstName} ${manager.lastName} about unapproved timesheets for client ${client.name}`);
           }
         }
       }
     } catch (error) {
-      console.error('Error in weekly timesheet reminder check:', error);
+      logger.error('Error in weekly timesheet reminder check:', error);
     }
   });
   
-  console.log('Timesheet reminder scheduler initialized');
+  logger.log('Timesheet reminder scheduler initialized');
 };
 
 module.exports = {

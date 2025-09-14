@@ -12,9 +12,9 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log('MongoDB Connected'))
+.then(() => logger.log('MongoDB Connected'))
 .catch(err => {
-  console.error('MongoDB Connection Error:', err);
+  logger.error('MongoDB Connection Error:', err);
   process.exit(1);
 });
 
@@ -223,18 +223,18 @@ const addTemplates = async () => {
       const existingTemplate = await EmailTemplate.findOne({ name: template.name });
       
       if (existingTemplate) {
-        console.log(`Template "${template.name}" already exists. Updating...`);
+        logger.log(`Template "${template.name}" already exists. Updating...`);
         await EmailTemplate.findOneAndUpdate({ name: template.name }, template);
       } else {
-        console.log(`Creating new template: "${template.name}"`);
+        logger.log(`Creating new template: "${template.name}"`);
         await EmailTemplate.create(template);
       }
     }
     
-    console.log('All timesheet email templates have been added/updated successfully!');
+    logger.log('All timesheet email templates have been added/updated successfully!');
     process.exit(0);
   } catch (error) {
-    console.error('Error adding email templates:', error);
+    logger.error('Error adding email templates:', error);
     process.exit(1);
   }
 };

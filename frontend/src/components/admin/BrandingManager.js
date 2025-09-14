@@ -43,7 +43,7 @@ const BrandingManager = () => {
       setBranding(res.data);
       setLoading(false);
     } catch (err) {
-      console.error('Error fetching branding:', err);
+      logger.error('Error fetching branding:', err);
       setAlert({
         open: true,
         message: 'Failed to load branding settings',
@@ -122,7 +122,7 @@ const BrandingManager = () => {
         reader.readAsDataURL(logoFile);
       });
     } catch (err) {
-      console.error('Error uploading logo:', err);
+      logger.error('Error uploading logo:', err);
       throw err;
     }
   };
@@ -152,7 +152,7 @@ const BrandingManager = () => {
       // Reset logo file state
       setLogoFile(null);
     } catch (err) {
-      console.error('Error saving branding:', err);
+      logger.error('Error saving branding:', err);
       setAlert({
         open: true,
         message: 'Failed to save branding settings',

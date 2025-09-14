@@ -10,7 +10,7 @@ const updateUserPhoto = async (userId, photoData) => {
     
     return user.photo;
   } catch (err) {
-    console.error('Error updating photo in service:', err.message);
+    logger.error('Error updating photo in service:', err.message);
     throw new Error('Server Error');
   }
 };

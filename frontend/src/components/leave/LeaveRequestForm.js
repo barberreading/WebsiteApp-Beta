@@ -96,7 +96,7 @@ const LeaveRequestForm = () => {
         navigate('/leave-requests');
       }, 2000);
     } catch (err) {
-      console.error('Error submitting leave request:', err);
+      logger.error('Error submitting leave request:', err);
       setError(err.response?.data?.message || 'Failed to submit leave request');
     } finally {
       setLoading(false);

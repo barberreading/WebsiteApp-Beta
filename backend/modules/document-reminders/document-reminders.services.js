@@ -7,7 +7,7 @@ const { sendEmail } = require('../email/email.services');
  */
 const checkDocumentReminders = async () => {
   try {
-    console.log('Checking for document reminders...');
+    logger.log('Checking for document reminders...');
     
     // Find documents that are expiring soon (within 30 days) and haven't had a reminder sent
     const thirtyDaysFromNow = new Date();
@@ -18,12 +18,12 @@ const checkDocumentReminders = async () => {
       reminderSent: false
     }).populate('userId', 'name email');
     
-    console.log(`Found ${documents.length} documents requiring reminders`);
+    logger.log(`Found ${documents.length} documents requiring reminders`);
     
     // Send reminders for each document
     for (const doc of documents) {
       if (!doc.userId) {
-        console.log(`Document ${doc._id} has no associated user`);
+        logger.log(`Document ${doc._id} has no associated user`);
         continue;
       }
       
@@ -45,12 +45,12 @@ const checkDocumentReminders = async () => {
       doc.reminderSent = true;
       await doc.save();
       
-      console.log(`Reminder sent for document ${doc._id} to ${doc.userId.email}`);
+      logger.log(`Reminder sent for document ${doc._id} to ${doc.userId.email}`);
     }
     
     return { success: true, count: documents.length };
   } catch (error) {
-    console.error('Error sending document reminders:', error);
+    logger.error('Error sending document reminders:', error);
     return { success: false, error: error.message };
   }
 };
@@ -61,7 +61,7 @@ const checkDocumentReminders = async () => {
  */
 const resetReminderFlags = async () => {
   try {
-    console.log('Resetting document reminder flags...');
+    logger.log('Resetting document reminder flags...');
     
     // Find documents that had reminders sent but are still valid (expiry date in the future)
     const result = await StaffDocument.updateMany(
@@ -74,11 +74,11 @@ const resetReminderFlags = async () => {
       }
     );
     
-    console.log(`Reset reminder flags for ${result.modifiedCount} documents`);
+    logger.log(`Reset reminder flags for ${result.modifiedCount} documents`);
     
     return { success: true, count: result.modifiedCount };
   } catch (error) {
-    console.error('Error resetting document reminder flags:', error);
+    logger.error('Error resetting document reminder flags:', error);
     return { success: false, error: error.message };
   }
 };

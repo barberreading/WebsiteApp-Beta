@@ -37,7 +37,7 @@ const Profile = () => {
   };
   
   useEffect(() => {
-    console.log("Profile - Auth State:", { currentUser, isAuthenticated });
+    logger.log("Profile - Auth State:", { currentUser, isAuthenticated });
   }, [currentUser, isAuthenticated]);
 
   useEffect(() => {
@@ -104,7 +104,7 @@ const Profile = () => {
       setError('');
     } catch (err) {
       setError('Failed to fetch profile');
-      console.error(err);
+      logger.error(err);
     } finally {
       setLoading(false);
     }
@@ -152,7 +152,7 @@ const Profile = () => {
       fetchUserProfile();
     } catch (err) {
       setError('Failed to update profile');
-      console.error(err);
+      logger.error(err);
     } finally {
       setLoading(false);
     }
@@ -210,7 +210,7 @@ const Profile = () => {
         confirmPassword: ''
       });
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       setPasswordError(err.response?.data?.msg || 'Failed to change password');
     } finally {
       setLoading(false);

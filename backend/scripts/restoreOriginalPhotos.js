@@ -18,7 +18,7 @@ const restoreOriginalPhotos = async () => {
       useUnifiedTopology: true
     });
     
-    console.log('Connected to MongoDB');
+    logger.log('Connected to MongoDB');
     
     // Update the original three staff members with distinctive photos
     for (const [name, photo] of Object.entries(originalStaffPhotos)) {
@@ -29,19 +29,19 @@ const restoreOriginalPhotos = async () => {
       );
       
       if (result) {
-        console.log(`Updated photo for ${name}`);
+        logger.log(`Updated photo for ${name}`);
       } else {
-        console.log(`User ${name} not found`);
+        logger.log(`User ${name} not found`);
       }
     }
     
-    console.log('\nOriginal staff photos have been restored with distinctive avatars.');
-    console.log('Note: These are new distinctive avatars since the original photos were overwritten.');
+    logger.log('\nOriginal staff photos have been restored with distinctive avatars.');
+    logger.log('Note: These are new distinctive avatars since the original photos were overwritten.');
     
     process.exit(0);
     
   } catch (error) {
-    console.error('Error restoring original photos:', error);
+    logger.error('Error restoring original photos:', error);
     process.exit(1);
   }
 };

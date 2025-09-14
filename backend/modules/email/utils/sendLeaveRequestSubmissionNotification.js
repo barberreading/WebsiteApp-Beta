@@ -12,7 +12,7 @@ const sendLeaveRequestSubmissionNotification = async (leaveRequest, staff) => {
       });
       
       if (managersAndAdmins.length === 0) {
-        console.log('No managers or admins found to notify');
+        logger.log('No managers or admins found to notify');
         return false;
       }
       
@@ -75,7 +75,7 @@ const sendLeaveRequestSubmissionNotification = async (leaveRequest, staff) => {
       
       return true;
     } catch (error) {
-      console.error('Error sending leave request submission notification:', error);
+      logger.error('Error sending leave request submission notification:', error);
       return false;
     }
   }

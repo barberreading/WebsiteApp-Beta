@@ -9,7 +9,7 @@ const sendLeaveRequestWithdrawalNotification = async (leaveRequest, staff) => {
     const managersAndAdmins = await User.find({ role: { $in: ['manager', 'superuser'] } });
 
     if (managersAndAdmins.length === 0) {
-      console.log('No managers or admins found to notify of leave withdrawal.');
+      logger.log('No managers or admins found to notify of leave withdrawal.');
       return false;
     }
 
@@ -40,7 +40,7 @@ const sendLeaveRequestWithdrawalNotification = async (leaveRequest, staff) => {
 
     return true;
   } catch (error) {
-    console.error('Error sending leave request withdrawal notification:', error);
+    logger.error('Error sending leave request withdrawal notification:', error);
     return false;
   }
 };

@@ -23,25 +23,25 @@ const Login = () => {
     setLoading(true);
     
     try {
-      console.log('🔐 Starting login process...');
+      logger.log('🔐 Starting login process...');
       const result = await login(email, password, rememberMe);
-      console.log('🔐 Login result:', result);
+      logger.log('🔐 Login result:', result);
       
       if (result?.success) {
-        console.log('✅ Login successful, navigating to dashboard...');
+        logger.log('✅ Login successful, navigating to dashboard...');
         if (result?.isTemporaryPassword) {
-          console.log('🔑 Temporary password detected, redirecting to change password');
+          logger.log('🔑 Temporary password detected, redirecting to change password');
           navigate('/change-password');
         } else {
-          console.log('🏠 Navigating to dashboard...');
+          logger.log('🏠 Navigating to dashboard...');
           navigate('/dashboard');
         }
       } else {
-        console.log('❌ Login failed:', result?.error);
+        logger.log('❌ Login failed:', result?.error);
         setError(result?.error || 'Login failed');
       }
     } catch (err) {
-      console.log('💥 Login error:', err);
+      logger.log('💥 Login error:', err);
       setError(err.message || 'Login failed');
     } finally {
       setLoading(false);

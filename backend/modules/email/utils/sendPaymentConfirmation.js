@@ -17,10 +17,10 @@ const sendPaymentConfirmation = async (invoice, client, booking, service, user) 
     const branding = await getBrandingForEmail();
   const info = await sendEmail(client.email, subject, wrapEmailContent(body, subject, branding));
 
-    console.log('Payment confirmation email sent:', info.messageId);
+    logger.log('Payment confirmation email sent:', info.messageId);
     return info;
   } catch (error) {
-    console.error('Error sending payment confirmation email:', error);
+    logger.error('Error sending payment confirmation email:', error);
     throw error;
   }
 };

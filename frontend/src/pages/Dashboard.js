@@ -20,7 +20,7 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log("Dashboard - Auth State:", { currentUser, isAuthenticated });
+    logger.log("Dashboard - Auth State:", { currentUser, isAuthenticated });
   }, [currentUser, isAuthenticated]);
 
   useEffect(() => {
@@ -296,7 +296,7 @@ const Dashboard = () => {
           </Col>
         )}
         
-        {hasRole(['admin']) && (
+        {hasRole(['superuser']) && (
           <Col md={3} sm={6} className="mb-3">
             <Link to="/monitoring-dashboard" className="text-decoration-none">
               <Card className="dashboard-card text-center h-100">

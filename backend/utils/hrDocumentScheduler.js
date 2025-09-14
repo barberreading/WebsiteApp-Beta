@@ -9,17 +9,17 @@ const initializeHRDocumentScheduler = () => {
   // Run cleanup every hour to deactivate expired access records
   cron.schedule('0 * * * *', async () => {
     try {
-      console.log('Running HR document access cleanup...');
+      logger.log('Running HR document access cleanup...');
       const cleanedCount = await cleanupExpiredAccess();
       if (cleanedCount > 0) {
-        console.log(`Cleaned up ${cleanedCount} expired HR document access records`);
+        logger.log(`Cleaned up ${cleanedCount} expired HR document access records`);
       }
     } catch (error) {
-      console.error('Error during HR document access cleanup:', error);
+      logger.error('Error during HR document access cleanup:', error);
     }
   });
   
-  console.log('HR document access scheduler initialized');
+  logger.log('HR document access scheduler initialized');
 };
 
 module.exports = {

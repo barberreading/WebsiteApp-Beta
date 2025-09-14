@@ -24,7 +24,7 @@ const scheduleTimesheetNotifications = () => {
   // Schedule Sunday lockout reminders (1:00 PM)
   scheduleSundayLockoutReminders();
   
-  console.log('Timesheet notification jobs scheduled');
+  logger.log('Timesheet notification jobs scheduled');
 };
 
 /**
@@ -54,7 +54,7 @@ const scheduleBookingStartReminders = () => {
         }
       }
     } catch (error) {
-      console.error('Error sending booking start reminders:', error);
+      logger.error('Error sending booking start reminders:', error);
     }
   });
 };
@@ -86,7 +86,7 @@ const scheduleBookingEndReminders = () => {
         }
       }
     } catch (error) {
-      console.error('Error sending booking end reminders:', error);
+      logger.error('Error sending booking end reminders:', error);
     }
   });
 };
@@ -121,7 +121,7 @@ const scheduleDailySubmissionReminders = () => {
         }
       }
     } catch (error) {
-      console.error('Error sending daily submission reminders:', error);
+      logger.error('Error sending daily submission reminders:', error);
     }
   });
 };
@@ -157,7 +157,7 @@ const scheduleSundayLockoutReminders = () => {
         }
       }
     } catch (error) {
-      console.error('Error sending Sunday lockout reminders:', error);
+      logger.error('Error sending Sunday lockout reminders:', error);
     }
   });
 };

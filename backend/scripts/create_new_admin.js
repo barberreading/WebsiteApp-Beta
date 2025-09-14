@@ -8,12 +8,12 @@ mongoose.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true
 })
 .then(async () => {
-  console.log('MongoDB Connected');
+  logger.log('MongoDB Connected');
   
   try {
     // Delete existing admin user first
     await User.deleteOne({ email: 'admin@example.com' });
-    console.log('Deleted existing admin user if any');
+    logger.log('Deleted existing admin user if any');
     
     // Create a completely new admin user
     const newAdmin = new User({
@@ -25,18 +25,18 @@ mongoose.connect(process.env.MONGO_URI, {
     });
     
     await newAdmin.save();
-    console.log('New admin user created successfully');
-    console.log('Login with:');
-    console.log('Email: admin@example.com');
-    console.log('Password: password123');
+    logger.log('New admin user created successfully');
+    logger.log('Login with:');
+    logger.log('Email: admin@example.com');
+    logger.log('Password: password123');
     
     process.exit(0);
   } catch (err) {
-    console.error('Error:', err);
+    logger.error('Error:', err);
     process.exit(1);
   }
 })
 .catch(err => {
-  console.error('MongoDB connection error:', err);
+  logger.error('MongoDB connection error:', err);
   process.exit(1);
 });

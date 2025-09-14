@@ -13,17 +13,17 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/test', {
 
 async function resetTestStaffPassword() {
   try {
-    console.log('🔍 Finding test staff user...');
+    logger.log('🔍 Finding test staff user...');
     
     const testStaff = await User.findOne({ email: 'barberreading@hotmail.co.uk' });
     
     if (!testStaff) {
-      console.log('❌ Test staff user not found');
+      logger.log('❌ Test staff user not found');
       return;
     }
     
-    console.log('✅ Found test staff user:', testStaff.name);
-    console.log('Current password hash:', testStaff.password);
+    logger.log('✅ Found test staff user:', testStaff.name);
+    logger.log('Current password hash:', testStaff.password);
     
     // Hash the new password
     const salt = await bcrypt.genSalt(10);
@@ -35,13 +35,13 @@ async function resetTestStaffPassword() {
       isActive: true // Also ensure the user is active
     });
     
-    console.log('✅ Password reset to "admin123" for test staff user');
-    console.log('✅ User set to active');
+    logger.log('✅ Password reset to "admin123" for test staff user');
+    logger.log('✅ User set to active');
     
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    logger.error('❌ Error:', error.message);
   } finally {
-    console.log('🔌 Disconnecting from MongoDB');
+    logger.log('🔌 Disconnecting from MongoDB');
     mongoose.disconnect();
   }
 }

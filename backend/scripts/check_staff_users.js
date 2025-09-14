@@ -15,44 +15,44 @@ async function checkStaffUsers() {
   try {
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/staff_management');
-    console.log('✅ Connected to MongoDB');
+    logger.log('✅ Connected to MongoDB');
     
     // Find all users
     const allUsers = await User.find({});
-    console.log('\n📊 All Users in Database:');
-    console.log('Total users:', allUsers.length);
+    logger.log('\n📊 All Users in Database:');
+    logger.log('Total users:', allUsers.length);
     
     allUsers.forEach((user, index) => {
-      console.log(`${index + 1}. ${user.name} (${user.email}) - Role: ${user.role} - Active: ${user.isActive}`);
+      logger.log(`${index + 1}. ${user.name} (${user.email}) - Role: ${user.role} - Active: ${user.isActive}`);
     });
     
     // Find staff users specifically
     const staffUsers = await User.find({ role: 'staff' });
-    console.log('\n👥 Staff Users:');
-    console.log('Total staff:', staffUsers.length);
+    logger.log('\n👥 Staff Users:');
+    logger.log('Total staff:', staffUsers.length);
     
     staffUsers.forEach((user, index) => {
-      console.log(`${index + 1}. ${user.name} (${user.email}) - ID: ${user._id} - Active: ${user.isActive}`);
+      logger.log(`${index + 1}. ${user.name} (${user.email}) - ID: ${user._id} - Active: ${user.isActive}`);
     });
     
     // Check if there's a test staff user
     const testStaff = await User.findOne({ email: 'barberreading@hotmail.co.uk' });
     if (testStaff) {
-      console.log('\n🎯 Found Test Staff User:');
-      console.log('Name:', testStaff.name);
-      console.log('Email:', testStaff.email);
-      console.log('Role:', testStaff.role);
-      console.log('ID:', testStaff._id);
-      console.log('Active:', testStaff.isActive);
+      logger.log('\n🎯 Found Test Staff User:');
+      logger.log('Name:', testStaff.name);
+      logger.log('Email:', testStaff.email);
+      logger.log('Role:', testStaff.role);
+      logger.log('ID:', testStaff._id);
+      logger.log('Active:', testStaff.isActive);
     } else {
-      console.log('\n❌ No test staff user found with email barberreading@hotmail.co.uk');
+      logger.log('\n❌ No test staff user found with email barberreading@hotmail.co.uk');
     }
     
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    logger.error('❌ Error:', error.message);
   } finally {
     await mongoose.disconnect();
-    console.log('\n🔌 Disconnected from MongoDB');
+    logger.log('\n🔌 Disconnected from MongoDB');
   }
 }
 

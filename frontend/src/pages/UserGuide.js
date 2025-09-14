@@ -13,7 +13,7 @@ const UserGuide = () => {
         setGuideContent(data.content);
       } catch (err) {
         setError('Failed to load user guide. Please try again later.');
-        console.error('Error fetching user guide:', err);
+        logger.error('Error fetching user guide:', err);
       }
     };
 

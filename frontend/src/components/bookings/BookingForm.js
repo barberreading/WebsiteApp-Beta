@@ -147,7 +147,7 @@ const BookingForm = () => {
           setLocationAreas(areasResponse.data.data);
         }
       } catch (err) {
-        console.error('Error fetching booking data:', err);
+        logger.error('Error fetching booking data:', err);
         setBookingKeys([]);
         setBookingCategories([]);
         setLocationAreas([]);
@@ -165,7 +165,7 @@ const BookingForm = () => {
       setInitialLoading(true);
       try {
         if (!validateToken()) {
-          console.log('Authentication validation failed');
+          logger.log('Authentication validation failed');
           setError('Authentication failed. Please log in again.');
           setInitialLoading(false);
           return;
@@ -236,16 +236,16 @@ const BookingForm = () => {
             endTime: endDate.toISOString()
           }
         });
-        console.log('Raw response from /available-staff:', response);
+        logger.log('Raw response from /available-staff:', response);
         if (response.data && response.data.success && Array.isArray(response.data.data)) {
-          console.log('Setting available staff:', response.data.data);
+          logger.log('Setting available staff:', response.data.data);
           setAvailableStaff(response.data.data);
         } else {
-          console.log('No available staff found or invalid response format. Response:', response.data);
+          logger.log('No available staff found or invalid response format. Response:', response.data);
           setAvailableStaff([]);
         }
       } catch (err) {
-        console.error('Error fetching available staff:', err);
+        logger.error('Error fetching available staff:', err);
         setAvailableStaff([]);
         // Handle error appropriately, maybe show a message to the user
       }
@@ -255,7 +255,7 @@ const BookingForm = () => {
   }, [formData.startTime, formData.endTime]);
 
   useEffect(() => {
-    console.log('useEffect for available staff triggered. Start:', formData.startTime, 'End:', formData.endTime);
+    logger.log('useEffect for available staff triggered. Start:', formData.startTime, 'End:', formData.endTime);
     fetchAvailableStaff();
   }, [fetchAvailableStaff]);
 
@@ -384,7 +384,7 @@ const BookingForm = () => {
         bookingData.title = `${selectedService ? selectedService.name : 'Service'} - ${selectedClient ? selectedClient.name || `${selectedClient.firstName || ''} ${selectedClient.lastName || ''}` : 'Client'}`;
       }
       
-      console.log('Submitting booking data:', bookingData);
+      logger.log('Submitting booking data:', bookingData);
       
       // Handle multi-day booking
       if (formData.isMultiDay && formData.endDate) {
@@ -416,18 +416,18 @@ const BookingForm = () => {
               // Only update the master booking in edit mode
               if (i === 0) {
                 const response = await axiosInstance.put(`/bookings/${id}`, dailyBooking);
-                console.log('Updated booking response:', response.data);
+                logger.log('Updated booking response:', response.data);
               } else {
                 // Create additional bookings if they don't exist
                 const response = await axiosInstance.post('/bookings', dailyBooking);
-                console.log('Created additional booking response:', response.data);
+                logger.log('Created additional booking response:', response.data);
               }
             } else {
               const response = await axiosInstance.post('/bookings', dailyBooking);
-              console.log('Created booking response:', response.data);
+              logger.log('Created booking response:', response.data);
             }
           } catch (bookingError) {
-            console.error(`Error saving booking day ${i}:`, bookingError);
+            logger.error(`Error saving booking day ${i}:`, bookingError);
             throw new Error(`Failed to save booking for day ${i+1}: ${bookingError.response?.data?.message || bookingError.message}`);
           }
         }
@@ -486,13 +486,13 @@ const BookingForm = () => {
           try {
             if (isEditMode && booking.recurrenceMaster) {
               const response = await axiosInstance.put(`/bookings/${id}`, booking);
-              console.log('Updated recurring booking response:', response.data);
+              logger.log('Updated recurring booking response:', response.data);
             } else {
               const response = await axiosInstance.post('/bookings', booking);
-              console.log('Created recurring booking response:', response.data);
+              logger.log('Created recurring booking response:', response.data);
             }
           } catch (bookingError) {
-            console.error(`Error saving recurring booking ${i}:`, bookingError);
+            logger.error(`Error saving recurring booking ${i}:`, bookingError);
             throw new Error(`Failed to save recurring booking ${i+1}: ${bookingError.response?.data?.message || bookingError.message}`);
           }
         }
@@ -509,19 +509,19 @@ const BookingForm = () => {
         bookingData.startTime = new Date(bookingData.startTime).toISOString();
         bookingData.endTime = new Date(bookingData.endTime).toISOString();
         
-        console.log('Final booking data being sent:', bookingData);
+        logger.log('Final booking data being sent:', bookingData);
         
         let bookingResponse;
         if (isEditMode) {
           bookingResponse = await axiosInstance.put(`/bookings/${id}`, bookingData);
-          console.log('Updated regular booking response:', bookingResponse.data);
+          logger.log('Updated regular booking response:', bookingResponse.data);
         } else {
           // Use booking interceptor for creation with offline fallback
           bookingResponse = await bookingInterceptor.createBookingWithFallback(bookingData, {
             source: 'booking_form',
             userAgent: navigator.userAgent
           });
-          console.log('Created regular booking response:', bookingResponse.data);
+          logger.log('Created regular booking response:', bookingResponse.data);
           
           // Handle offline response
           if (bookingResponse.data.offline) {
@@ -535,7 +535,7 @@ const BookingForm = () => {
           }
         }
       } catch (bookingError) {
-        console.error('Error saving regular booking:', bookingError);
+        logger.error('Error saving regular booking:', bookingError);
         const errorMessage = bookingError.response?.data?.msg || bookingError.response?.data?.message || bookingError.message;
         throw new Error(`Failed to save booking: ${errorMessage}`);
       }
@@ -546,7 +546,7 @@ const BookingForm = () => {
         navigate('/bookings');
       }, 2000);
     } catch (err) {
-      console.error('Error in booking submission:', err);
+      logger.error('Error in booking submission:', err);
       setError(err.response?.data?.message || err.message || 'Error saving booking. Please try again.');
     } finally {
       setLoading(false);
@@ -925,7 +925,7 @@ const BookingForm = () => {
                     size="small"
                     type="button"
                     onClick={() => {
-                      console.log('Category button clicked:', category.name || category);
+                      logger.log('Category button clicked:', category.name || category);
                       const categoryId = category._id || category;
                       const updatedCategories = formData.categories.includes(categoryId)
                         ? formData.categories.filter(c => c !== categoryId)

@@ -89,17 +89,17 @@ const sendBookingReminder = async (booking, client, staff, service) => {
           emailBody += linksHtml;
         }
       } catch (error) {
-        console.error('Error fetching staff documents:', error);
+        logger.error('Error fetching staff documents:', error);
       }
     }
 
     const branding = await getBrandingForEmail();
     const info = await sendEmail(client.email, subject, wrapEmailContent(emailBody, subject, branding));
 
-    console.log('Booking reminder email sent:', info.messageId);
+    logger.log('Booking reminder email sent:', info.messageId);
     return info;
   } catch (error) {
-    console.error('Error sending booking reminder email:', error);
+    logger.error('Error sending booking reminder email:', error);
     throw error;
   }
 };

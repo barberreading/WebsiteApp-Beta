@@ -13,15 +13,15 @@ async function resetAdmin() {
       useUnifiedTopology: true
     });
     
-    console.log('MongoDB Connected');
+    logger.log('MongoDB Connected');
     
     // Get admin credentials from environment variables
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
     const adminPassword = process.env.ADMIN_PASSWORD;
     
     if (!adminPassword) {
-      console.error('ERROR: ADMIN_PASSWORD environment variable not set');
-      console.log('Please set ADMIN_PASSWORD environment variable before running this script');
+      logger.error('ERROR: ADMIN_PASSWORD environment variable not set');
+      logger.log('Please set ADMIN_PASSWORD environment variable before running this script');
       process.exit(1);
     }
     
@@ -43,7 +43,7 @@ async function resetAdmin() {
       });
       
       await newAdmin.save();
-      console.log('Admin user created successfully');
+      logger.log('Admin user created successfully');
     } else {
       // Update existing admin password
       const salt = await bcrypt.genSalt(10);
@@ -53,15 +53,15 @@ async function resetAdmin() {
       adminUser.isTemporaryPassword = false;
       await adminUser.save();
       
-      console.log('Admin password reset successfully');
+      logger.log('Admin password reset successfully');
     }
     
-    console.log('Done! You can now log in with the configured credentials');
+    logger.log('Done! You can now log in with the configured credentials');
     
     mongoose.disconnect();
     process.exit(0);
   } catch (err) {
-    console.error('Error:', err);
+    logger.error('Error:', err);
     process.exit(1);
   }
 }

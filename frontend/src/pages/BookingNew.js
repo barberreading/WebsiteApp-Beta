@@ -40,7 +40,7 @@ const BookingNew = () => {
         setStaff(staffRes.data);
       } catch (err) {
         setError('Failed to load form data');
-        console.error(err);
+        logger.error(err);
       }
     };
 
@@ -75,7 +75,7 @@ const BookingNew = () => {
       }, 1500);
     } catch (err) {
       setError(err.response?.data?.msg || 'Failed to create booking');
-      console.error(err);
+      logger.error(err);
     }
   };
 

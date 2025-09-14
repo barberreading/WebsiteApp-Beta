@@ -36,7 +36,7 @@ export const useBookingAlerts = () => {
       const alerts = await fetchBookingAlertsForUser(currentUser, hasRole);
       setBookingAlerts(alerts);
     } catch (err) {
-      console.error('Failed to fetch booking alerts:', err);
+      logger.error('Failed to fetch booking alerts:', err);
       setError(err.message || 'Failed to fetch booking alerts');
       setBookingAlerts([]);
     } finally {
@@ -87,7 +87,7 @@ export const useLeaveRequests = (startDate = null, endDate = null) => {
       );
       setLeaveRequests(requests);
     } catch (err) {
-      console.error('Failed to fetch leave requests:', err);
+      logger.error('Failed to fetch leave requests:', err);
       setError(err.message || 'Failed to fetch leave requests');
       setLeaveRequests([]);
     } finally {

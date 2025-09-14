@@ -11,7 +11,7 @@ async function testClientsAPI() {
   }
   
   try {
-    console.log('Testing clients API...');
+    logger.log('Testing clients API...');
     
     // Login first
     const loginResponse = await axios.post('http://localhost:3002/api/auth/login', {
@@ -19,7 +19,7 @@ async function testClientsAPI() {
       password: adminPassword
     });
     
-    console.log('✓ Login successful');
+    logger.log('✓ Login successful');
     
     const headers = {
       'Authorization': `Bearer ${loginResponse.data.token}`,
@@ -28,15 +28,15 @@ async function testClientsAPI() {
     
     // Test clients endpoint
     const clientsResponse = await axios.get('http://localhost:3002/api/clients', { headers });
-    console.log('✓ Clients API response received');
+    logger.log('✓ Clients API response received');
     
     // Handle both array and object response formats
     const clientsData = Array.isArray(clientsResponse.data) ? clientsResponse.data : clientsResponse.data.data;
     
     if (clientsData && Array.isArray(clientsData)) {
-      console.log(`Found ${clientsData.length} clients:`);
+      logger.log(`Found ${clientsData.length} clients:`);
       clientsData.forEach(client => {
-        console.log(`- ${client.name} (${client.email})`);
+        logger.log(`- ${client.name} (${client.email})`);
       });
       
       // Look for Test Nursery
@@ -45,19 +45,19 @@ async function testClientsAPI() {
       );
       
       if (testNursery) {
-        console.log('✓ Test Nursery found!');
-        console.log('  ID:', testNursery._id);
-        console.log('  Status:', testNursery.status);
+        logger.log('✓ Test Nursery found!');
+        logger.log('  ID:', testNursery._id);
+        logger.log('  Status:', testNursery.status);
       } else {
-        console.log('✗ Test Nursery not found');
+        logger.log('✗ Test Nursery not found');
       }
     } else {
-      console.log('Unexpected response format:', typeof clientsResponse.data);
-      console.log('Response data:', clientsResponse.data);
+      logger.log('Unexpected response format:', typeof clientsResponse.data);
+      logger.log('Response data:', clientsResponse.data);
     }
     
   } catch (error) {
-    console.error('Error:', error.response?.data?.message || error.message);
+    logger.error('Error:', error.response?.data?.message || error.message);
   }
 }
 

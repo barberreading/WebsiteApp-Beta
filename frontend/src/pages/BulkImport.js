@@ -33,7 +33,7 @@ const BulkImport = () => {
       link.remove();
     } catch (err) {
       setError('Failed to download template. Please try again.');
-      console.error(err);
+      logger.error(err);
     }
   };
 
@@ -67,7 +67,7 @@ const BulkImport = () => {
       setResults(response.data);
     } catch (err) {
       setError(err.response?.data?.message || 'An error occurred during import');
-      console.error(err);
+      logger.error(err);
     } finally {
       setLoading(false);
     }

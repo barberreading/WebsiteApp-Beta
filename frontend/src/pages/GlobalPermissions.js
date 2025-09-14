@@ -23,7 +23,7 @@ const GlobalPermissions = () => {
       const response = await axiosInstance.get('/global-permissions');
       setPermissions(response.data);
     } catch (error) {
-      console.error('Error fetching permissions:', error);
+      logger.error('Error fetching permissions:', error);
       toast.error('Failed to load permissions');
     } finally {
       setLoading(false);
@@ -132,7 +132,7 @@ const GlobalPermissions = () => {
       await axiosInstance.put('/global-permissions', permissions);
       toast.success('Global permissions updated successfully');
     } catch (error) {
-      console.error('Error saving permissions:', error);
+      logger.error('Error saving permissions:', error);
       toast.error('Failed to save permissions');
     } finally {
       setSaving(false);
@@ -147,7 +147,7 @@ const GlobalPermissions = () => {
         await fetchPermissions();
         toast.success('Permissions reset to defaults');
       } catch (error) {
-        console.error('Error resetting permissions:', error);
+        logger.error('Error resetting permissions:', error);
         toast.error('Failed to reset permissions');
       } finally {
         setSaving(false);

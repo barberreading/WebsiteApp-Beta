@@ -3,13 +3,13 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://barberreading:CP41wgaa3ADAw3oV@eca0.jvyy1in.mongodb.net/test?retryWrites=true&w=majority&appName=ECA0')
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => logger.log('Connected to MongoDB'))
+  .catch(err => logger.error('MongoDB connection error:', err));
 
 async function createTestAdmin() {
   try {
-    console.log('Creating test admin user...');
+    logger.log('Creating test admin user...');
     
     // Check if test admin already exists
     const existingAdmin = await User.findOne({ 
@@ -17,9 +17,9 @@ async function createTestAdmin() {
     });
     
     if (existingAdmin) {
-      console.log('Test admin already exists:', existingAdmin.name);
-      console.log('Email:', existingAdmin.email);
-      console.log('Role:', existingAdmin.role);
+      logger.log('Test admin already exists:', existingAdmin.name);
+      logger.log('Email:', existingAdmin.email);
+      logger.log('Role:', existingAdmin.role);
       return existingAdmin;
     }
     
@@ -39,19 +39,19 @@ async function createTestAdmin() {
     });
     
     await testAdmin.save();
-    console.log('✅ Successfully created test admin user!');
-    console.log('Name:', testAdmin.name);
-    console.log('Email:', testAdmin.email);
-    console.log('Role:', testAdmin.role);
-    console.log('ID:', testAdmin._id);
+    logger.log('✅ Successfully created test admin user!');
+    logger.log('Name:', testAdmin.name);
+    logger.log('Email:', testAdmin.email);
+    logger.log('Role:', testAdmin.role);
+    logger.log('ID:', testAdmin._id);
     
     return testAdmin;
     
   } catch (error) {
-    console.error('Error creating test admin:', error);
+    logger.error('Error creating test admin:', error);
   } finally {
     await mongoose.connection.close();
-    console.log('Database connection closed.');
+    logger.log('Database connection closed.');
   }
 }
 

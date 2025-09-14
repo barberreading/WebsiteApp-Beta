@@ -4,7 +4,7 @@ require('dotenv').config();
 
 async function fixUserDataCorrect() {
   try {
-    console.log('Fixing user data with correct field names...');
+    logger.log('Fixing user data with correct field names...');
     
     // Connect to database
     const connectionString = process.env.SYNOLOGY_MONGO_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/test';
@@ -13,28 +13,28 @@ async function fixUserDataCorrect() {
       useUnifiedTopology: true
     });
     
-    console.log('Connected successfully!');
+    logger.log('Connected successfully!');
     
     // Get all users and check their structure
     const users = await User.find({});
-    console.log(`\nFound ${users.length} users. Checking structure...`);
+    logger.log(`\nFound ${users.length} users. Checking structure...`);
     
     // Check current user data
-    console.log('\nCurrent user data:');
+    logger.log('\nCurrent user data:');
     users.forEach((user, index) => {
-      console.log(`- ${user.name || 'NO NAME'} (${user.email}) - Role: ${user.role}`);
+      logger.log(`- ${user.name || 'NO NAME'} (${user.email}) - Role: ${user.role}`);
       if (index >= 4) { // Show first 5 users
-        console.log(`... and ${users.length - 5} more users`);
+        logger.log(`... and ${users.length - 5} more users`);
         return false;
       }
     });
     
     // Fix users that don't have names
     const usersNeedingNames = users.filter(user => !user.name);
-    console.log(`\n${usersNeedingNames.length} users need name fixes`);
+    logger.log(`\n${usersNeedingNames.length} users need name fixes`);
     
     if (usersNeedingNames.length > 0) {
-      console.log('\nFixing user names...');
+      logger.log('\nFixing user names...');
       
       for (const user of usersNeedingNames) {
         let name;
@@ -55,26 +55,26 @@ async function fixUserDataCorrect() {
           name = 'Unknown User';
         }
         
-        console.log(`Updating ${user.email}: ${name}`);
+        logger.log(`Updating ${user.email}: ${name}`);
         
         await User.findByIdAndUpdate(user._id, {
           name: name
         });
       }
       
-      console.log('\n✅ User names have been fixed!');
+      logger.log('\n✅ User names have been fixed!');
     }
     
     // Verify the fix
-    console.log('\n=== VERIFICATION ===');
+    logger.log('\n=== VERIFICATION ===');
     const updatedUsers = await User.find({}).select('name email role');
-    console.log(`Updated users:`);
+    logger.log(`Updated users:`);
     updatedUsers.forEach(user => {
-      console.log(`- ${user.name} (${user.email}) - Role: ${user.role}`);
+      logger.log(`- ${user.name} (${user.email}) - Role: ${user.role}`);
     });
     
     // Now let's also check if we need to add firstName and lastName fields for the calendar
-    console.log('\n=== ADDING FIRSTNAME/LASTNAME FOR CALENDAR COMPATIBILITY ===');
+    logger.log('\n=== ADDING FIRSTNAME/LASTNAME FOR CALENDAR COMPATIBILITY ===');
     for (const user of updatedUsers) {
       if (user.name && (!user.firstName || !user.lastName)) {
         const nameParts = user.name.split(' ');
@@ -86,17 +86,17 @@ async function fixUserDataCorrect() {
           lastName: lastName
         });
         
-        console.log(`Added firstName/lastName for ${user.name}: ${firstName} ${lastName}`);
+        logger.log(`Added firstName/lastName for ${user.name}: ${firstName} ${lastName}`);
       }
     }
     
-    console.log('\n✅ All user data has been fixed!');
+    logger.log('\n✅ All user data has been fixed!');
     
   } catch (error) {
-    console.error('Fix failed:', error.message);
+    logger.error('Fix failed:', error.message);
   } finally {
     await mongoose.connection.close();
-    console.log('\nDatabase connection closed');
+    logger.log('\nDatabase connection closed');
   }
 }
 

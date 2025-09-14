@@ -59,7 +59,7 @@ const BookingCategoriesManager = () => {
       const areasRes = await axiosInstance.get('/booking-categories/areas');
       setAreas(areasRes.data.data);
     } catch (err) {
-      console.error('Error fetching categories:', err);
+      logger.error('Error fetching categories:', err);
       setError('Failed to load categories. Please try again.');
     } finally {
       setLoading(false);
@@ -122,7 +122,7 @@ const BookingCategoriesManager = () => {
       fetchCategories();
       handleCloseDialog();
     } catch (err) {
-      console.error('Error saving category:', err);
+      logger.error('Error saving category:', err);
       setError(err.response?.data?.message || `Failed to ${mode} ${type}`);
     } finally {
       setLoading(false);
@@ -142,7 +142,7 @@ const BookingCategoriesManager = () => {
       setSuccess(`${type === 'key' ? 'Booking key' : 'Location area'} deleted successfully!`);
       fetchCategories();
     } catch (err) {
-      console.error('Error deleting category:', err);
+      logger.error('Error deleting category:', err);
       setError(err.response?.data?.message || `Failed to delete ${type}`);
     } finally {
       setLoading(false);

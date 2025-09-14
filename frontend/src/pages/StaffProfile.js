@@ -64,7 +64,7 @@ const StaffProfile = () => {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error('Error downloading document:', err);
+      logger.error('Error downloading document:', err);
     }
   };
 

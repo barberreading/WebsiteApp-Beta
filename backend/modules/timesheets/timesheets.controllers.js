@@ -15,7 +15,7 @@ exports.updateTimesheet = async (req, res) => {
         const timesheet = await timesheetService.updateTimesheet(req.params.id, req.user, req.body);
         res.json(timesheet);
     } catch (err) {
-        console.error(err.message);
+        logger.error(err.message);
         res.status(500).send('Server Error');
     }
 };
@@ -25,7 +25,7 @@ exports.clockIn = async (req, res) => {
         const timesheet = await timesheetService.clockIn(req.user.id, req.body);
         res.json(timesheet);
     } catch (err) {
-        console.error('Error clocking in:', err.message);
+        logger.error('Error clocking in:', err.message);
         res.status(500).send('Server Error');
     }
 };
@@ -35,7 +35,7 @@ exports.clockOut = async (req, res) => {
         const timesheet = await timesheetService.clockOut(req.user.id, req.body);
         res.json(timesheet);
     } catch (err) {
-        console.error('Error clocking out:', err.message);
+        logger.error('Error clocking out:', err.message);
         res.status(500).send('Server Error');
     }
 };
@@ -45,7 +45,7 @@ exports.getCurrentStatus = async (req, res) => {
         const status = await timesheetService.getCurrentStatus(req.user.id);
         res.json(status);
     } catch (err) {
-        console.error('Error getting clock status:', err.message);
+        logger.error('Error getting clock status:', err.message);
         res.status(500).send('Server Error');
     }
 };
@@ -58,7 +58,7 @@ exports.bulkUpload = async (req, res) => {
         const results = await timesheetService.bulkUpload(req.file, req.user.id);
         res.json({ success: true, message: 'Bulk upload processed', results });
     } catch (err) {
-        console.error('Bulk upload error:', err.message);
+        logger.error('Bulk upload error:', err.message);
         res.status(500).send('Server Error');
     }
 };
@@ -68,7 +68,7 @@ exports.getLockSettings = (req, res) => {
         const settings = timesheetService.getLockSettings();
         res.json(settings);
     } catch (err) {
-        console.error('Error getting lock settings:', err.message);
+        logger.error('Error getting lock settings:', err.message);
         res.status(500).send('Server Error');
     }
 };
@@ -83,7 +83,7 @@ exports.overrideTimesheet = async (req, res) => {
         const timesheet = await timesheetService.overrideTimesheet(req.params.id, req.user.id);
         res.json(timesheet);
     } catch (err) {
-        console.error('Error overriding timesheet:', err.message);
+        logger.error('Error overriding timesheet:', err.message);
         res.status(500).send('Server Error');
     }
 };
@@ -93,7 +93,7 @@ exports.getClientApprovalTimesheets = async (req, res) => {
         const timesheets = await timesheetService.getClientApprovalTimesheets(req.user.id);
         res.json(timesheets);
     } catch (err) {
-        console.error('Error getting client approval timesheets:', err.message);
+        logger.error('Error getting client approval timesheets:', err.message);
         res.status(500).send('Server Error');
     }
 };
@@ -103,7 +103,7 @@ exports.clientApproveTimesheet = async (req, res) => {
         const timesheet = await timesheetService.clientApproveTimesheet(req.params.id, req.user.id, req.body);
         res.json(timesheet);
     } catch (err) {
-        console.error('Error approving timesheet:', err.message);
+        logger.error('Error approving timesheet:', err.message);
         res.status(500).send('Server Error');
     }
 };

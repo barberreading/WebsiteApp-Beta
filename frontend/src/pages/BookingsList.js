@@ -57,7 +57,7 @@ const BookingsList = () => {
       const response = await axiosInstance.get(`/bookings/range?${params.toString()}`);
       setBookings(response.data);
     } catch (err) {
-      console.error('Error fetching bookings:', err);
+      logger.error('Error fetching bookings:', err);
       setError('Failed to load bookings. Please try again.');
       toast.error(err.response?.data?.msg || 'Error loading bookings');
     } finally {
@@ -71,7 +71,7 @@ const BookingsList = () => {
       const response = await axiosInstance.get(`/clients`);
       setClients(response.data);
     } catch (err) {
-      console.error('Error fetching clients:', err);
+      logger.error('Error fetching clients:', err);
     }
   };
 
@@ -81,7 +81,7 @@ const BookingsList = () => {
       const response = await axiosInstance.get(`/users/staff`);
       setStaff(response.data);
     } catch (err) {
-      console.error('Error fetching staff:', err);
+      logger.error('Error fetching staff:', err);
     }
   };
 
@@ -144,7 +144,7 @@ const BookingsList = () => {
     
     // Safety check to ensure bookingsList is an array
     if (!Array.isArray(bookingsList)) {
-      console.warn('groupBookingsByDate received non-array:', bookingsList);
+      logger.warn('groupBookingsByDate received non-array:', bookingsList);
       return [];
     }
     

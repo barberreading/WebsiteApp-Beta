@@ -10,45 +10,45 @@ const checkUserPhotos = async () => {
       useUnifiedTopology: true
     });
     
-    console.log('Connected to MongoDB');
+    logger.log('Connected to MongoDB');
     
     // Find all users and show their photo status
     const users = await User.find({}, 'name email role photo').sort({ name: 1 });
     
-    console.log('\n=== Current User Photo Status ===');
+    logger.log('\n=== Current User Photo Status ===');
     users.forEach(user => {
       const photoStatus = user.photo ? 
         (user.photo.startsWith('data:image') ? 'Has photo (base64)' : 'Has photo (URL)') : 
         'No photo';
       
-      console.log(`${user.name} (${user.role}): ${photoStatus}`);
+      logger.log(`${user.name} (${user.role}): ${photoStatus}`);
       if (user.photo && user.photo.length > 100) {
-        console.log(`  Photo preview: ${user.photo.substring(0, 50)}...`);
+        logger.log(`  Photo preview: ${user.photo.substring(0, 50)}...`);
       } else if (user.photo) {
-        console.log(`  Photo: ${user.photo}`);
+        logger.log(`  Photo: ${user.photo}`);
       }
     });
     
     // Check specifically for the three original staff members
-    console.log('\n=== Original Staff Members Check ===');
+    logger.log('\n=== Original Staff Members Check ===');
     const originalStaff = ['Andrew Barber', 'Sarah Johnson', 'Michael Smith'];
     
     for (const staffName of originalStaff) {
       const user = await User.findOne({ name: staffName });
       if (user) {
-        console.log(`${staffName}: Found - Photo status: ${user.photo ? 'Has photo' : 'No photo'}`);
+        logger.log(`${staffName}: Found - Photo status: ${user.photo ? 'Has photo' : 'No photo'}`);
         if (user.photo) {
-          console.log(`  Photo type: ${user.photo.startsWith('data:image') ? 'Base64 encoded' : 'URL/Other'}`);
+          logger.log(`  Photo type: ${user.photo.startsWith('data:image') ? 'Base64 encoded' : 'URL/Other'}`);
         }
       } else {
-        console.log(`${staffName}: Not found in database`);
+        logger.log(`${staffName}: Not found in database`);
       }
     }
     
     process.exit(0);
     
   } catch (error) {
-    console.error('Error checking user photos:', error);
+    logger.error('Error checking user photos:', error);
     process.exit(1);
   }
 };

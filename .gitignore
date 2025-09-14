@@ -26,7 +26,9 @@ pids
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
 backend/.env
+backend/.env.production
 frontend/.env.local
 
 # Build output

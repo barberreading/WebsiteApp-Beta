@@ -29,9 +29,9 @@ import axiosInstance from '../../utils/axiosInstance';
 import Placeholder from '../common/Placeholder';
 
 const BookingAlertForm = () => {
-  console.log('BookingAlertForm component rendered');
+  logger.log('BookingAlertForm component rendered');
   const { currentUser } = useAuth();
-  console.log('Current user in BookingAlertForm:', currentUser);
+  logger.log('Current user in BookingAlertForm:', currentUser);
   const [services, setServices] = useState([]);
   const [clients, setClients] = useState([]);
   const [bookingKeys, setBookingKeys] = useState([]);
@@ -68,38 +68,38 @@ const BookingAlertForm = () => {
   
   useEffect(() => {
     let isMounted = true;
-    console.log('BookingAlertForm useEffect running, currentUser:', currentUser);
+    logger.log('BookingAlertForm useEffect running, currentUser:', currentUser);
     
     const fetchData = async () => {
-      console.log('Starting data fetch...');
+      logger.log('Starting data fetch...');
       
       try {
         // Fetch services
         const servicesRes = await axiosInstance.get('/services?active=true');
-        console.log('Services response:', servicesRes.data);
+        logger.log('Services response:', servicesRes.data);
         if (isMounted) setServices(servicesRes.data);
         
         // Fetch clients
         const clientsRes = await axiosInstance.get('/clients');
-        console.log('Clients response:', clientsRes.data);
+        logger.log('Clients response:', clientsRes.data);
         if (isMounted) setClients(clientsRes.data);
         
         // Fetch booking keys
         const keysRes = await axiosInstance.get('/booking-categories/keys');
-        console.log('Booking keys response:', keysRes.data);
+        logger.log('Booking keys response:', keysRes.data);
         if (isMounted) setBookingKeys(keysRes.data.data || keysRes.data);
         
         // Fetch location areas
         const areasRes = await axiosInstance.get('/booking-categories/areas');
-        console.log('Location areas response:', areasRes.data);
+        logger.log('Location areas response:', areasRes.data);
         if (isMounted) setLocationAreas(areasRes.data.data || areasRes.data);
         
         // Fetch templates
         const templatesRes = await axiosInstance.get('/booking-alert-templates');
-        console.log('Templates response:', templatesRes.data);
+        logger.log('Templates response:', templatesRes.data);
         if (isMounted) setTemplates(templatesRes.data.data || templatesRes.data);
       } catch (err) {
-        console.error('Error fetching data:', err);
+        logger.error('Error fetching data:', err);
         if (isMounted) setError('Failed to load form data. Please try again.');
       }
     };
@@ -231,11 +231,11 @@ const BookingAlertForm = () => {
     
     // Prevent duplicate submissions
     if (isSubmittingRef.current || loading) {
-      console.log('Duplicate submission prevented');
+      logger.log('Duplicate submission prevented');
       return;
     }
     
-    console.log('Starting booking alert submission');
+    logger.log('Starting booking alert submission');
     isSubmittingRef.current = true;
     setLoading(true);
     setError('');
@@ -248,7 +248,7 @@ const BookingAlertForm = () => {
       timestamp: Date.now()
     };
     
-    console.log('🔒 Preserving auth state for booking alert submission:', {
+    logger.log('🔒 Preserving auth state for booking alert submission:', {
       hasToken: !!preservedAuthState.token,
       hasUser: !!preservedAuthState.user,
       userRole: preservedAuthState.user?.role
@@ -360,7 +360,7 @@ const BookingAlertForm = () => {
         }
       });
       
-      console.log('Final booking alert data being sent:', bookingAlertData);
+      logger.log('Final booking alert data being sent:', bookingAlertData);
       
       // Validate authentication state before making request
       const tokenBeforeRequest = localStorage.getItem('token');
@@ -370,10 +370,10 @@ const BookingAlertForm = () => {
       }
       
       // Log authentication state before request
-      console.log('\n=== FRONTEND: BEFORE POST REQUEST ===');
-      console.log('User authenticated:', !!currentUser);
-      console.log('Session active:', !!tokenBeforeRequest);
-      console.log('Timestamp:', new Date().toISOString());
+      logger.log('\n=== FRONTEND: BEFORE POST REQUEST ===');
+      logger.log('User authenticated:', !!currentUser);
+      logger.log('Session active:', !!tokenBeforeRequest);
+      logger.log('Timestamp:', new Date().toISOString());
       
       // Store original authentication state to compare after request
       const originalAuthState = {
@@ -389,17 +389,17 @@ const BookingAlertForm = () => {
       const authStateChanged = tokenAfterRequest !== originalAuthState.token;
       
       // Log authentication state after request
-      console.log('\n=== FRONTEND: AFTER POST REQUEST ===');
-      console.log('Response status:', response.status);
-      console.log('User still authenticated:', !!currentUser);
-      console.log('Session still active:', !!tokenAfterRequest);
-      console.log('Auth state changed:', authStateChanged);
-      console.log('Request completed successfully');
+      logger.log('\n=== FRONTEND: AFTER POST REQUEST ===');
+      logger.log('Response status:', response.status);
+      logger.log('User still authenticated:', !!currentUser);
+      logger.log('Session still active:', !!tokenAfterRequest);
+      logger.log('Auth state changed:', authStateChanged);
+      logger.log('Request completed successfully');
       
       // If authentication state changed unexpectedly, warn user but don't fail
       if (authStateChanged) {
-        console.warn('⚠️ Authentication state changed during request!');
-        console.warn('Session state may have been refreshed during request');
+        logger.warn('⚠️ Authentication state changed during request!');
+        logger.warn('Session state may have been refreshed during request');
       }
       
       if (response.status === 201) {
@@ -428,17 +428,17 @@ const BookingAlertForm = () => {
         setActiveStep(0);
       }
     } catch (err) {
-        console.log('\n=== FRONTEND: ERROR OCCURRED ===');
-        console.error('Error creating booking alert:', err.message);
-        console.log('Error status:', err.response?.status);
-        console.log('User authenticated during error:', !!currentUser);
-        console.log('Session active during error:', !!localStorage.getItem('token'));
-        console.log('Is this a 401 error?', err.response?.status === 401);
+        logger.log('\n=== FRONTEND: ERROR OCCURRED ===');
+        logger.error('Error creating booking alert:', err.message);
+        logger.log('Error status:', err.response?.status);
+        logger.log('User authenticated during error:', !!currentUser);
+        logger.log('Session active during error:', !!localStorage.getItem('token'));
+        logger.log('Is this a 401 error?', err.response?.status === 401);
         
         // Handle authentication errors without triggering logout
         if (err.response?.status === 401) {
-          console.log('🚨 401 ERROR DETECTED - Handling gracefully to prevent logout');
-          console.log('Error message:', err.response?.data?.message || err.response?.data?.msg);
+          logger.log('🚨 401 ERROR DETECTED - Handling gracefully to prevent logout');
+          logger.log('Error message:', err.response?.data?.message || err.response?.data?.msg);
           
           // Check if token still exists after error
           const tokenAfterError = localStorage.getItem('token');
@@ -464,14 +464,14 @@ const BookingAlertForm = () => {
         const authStateLost = !currentToken && preservedAuthState.token;
         
         if (authStateLost) {
-          console.warn('🚨 Authentication state was lost during submission! Attempting recovery...');
-          console.warn('Preserved token exists:', !!preservedAuthState.token);
-          console.warn('Current token exists:', !!currentToken);
+          logger.warn('🚨 Authentication state was lost during submission! Attempting recovery...');
+          logger.warn('Preserved token exists:', !!preservedAuthState.token);
+          logger.warn('Current token exists:', !!currentToken);
           
           // Attempt to restore the token if it was lost
           if (preservedAuthState.token) {
             localStorage.setItem('token', preservedAuthState.token);
-            console.log('✅ Authentication session restored from preserved state');
+            logger.log('✅ Authentication session restored from preserved state');
             
             // Show warning to user about potential session issue
             setError('Session temporarily interrupted but recovered. Your booking alert submission may need to be retried.');
@@ -528,7 +528,7 @@ const BookingAlertForm = () => {
           alert('Template saved successfully!');
         }
       } catch (err) {
-        console.error('Error saving template:', err);
+        logger.error('Error saving template:', err);
         setError(err.response?.data?.message || 'Failed to save template');
       }
     };

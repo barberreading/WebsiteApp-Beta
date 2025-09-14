@@ -20,10 +20,10 @@ const sendInvoice = async (invoice, client, booking, service, user) => {
     const branding = await getBrandingForEmail();
   const info = await sendEmail(client.email, subject, wrapEmailContent(body, subject, branding));
 
-    console.log('Invoice email sent:', info.messageId);
+    logger.log('Invoice email sent:', info.messageId);
     return info;
   } catch (error) {
-    console.error('Error sending invoice email:', error);
+    logger.error('Error sending invoice email:', error);
     throw error;
   }
 };

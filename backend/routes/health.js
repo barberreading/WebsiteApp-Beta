@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
       });
       healthStatus.services.database = 'healthy';
     } catch (dbError) {
-      console.error('Database health check failed:', dbError);
+      logger.error('Database health check failed:', dbError);
       healthStatus.services.database = 'unhealthy';
       healthStatus.status = 'degraded';
     }
@@ -41,7 +41,7 @@ router.get('/', async (req, res) => {
     res.status(statusCode).json(healthStatus);
 
   } catch (error) {
-    console.error('Health check error:', error);
+    logger.error('Health check error:', error);
     res.status(503).json({
       status: 'unhealthy',
       timestamp: new Date().toISOString(),
@@ -90,7 +90,7 @@ router.get('/detailed', async (req, res) => {
         responseTime: `${dbTime}ms`
       });
     } catch (dbError) {
-      console.error('Database detailed check failed:', dbError);
+      logger.error('Database detailed check failed:', dbError);
       detailedHealth.services.database = 'unhealthy';
       detailedHealth.status = 'degraded';
       detailedHealth.checks.push({
@@ -120,7 +120,7 @@ router.get('/detailed', async (req, res) => {
     res.status(statusCode).json(detailedHealth);
 
   } catch (error) {
-    console.error('Detailed health check error:', error);
+    logger.error('Detailed health check error:', error);
     res.status(503).json({
       status: 'unhealthy',
       timestamp: new Date().toISOString(),

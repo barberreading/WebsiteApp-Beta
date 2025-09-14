@@ -21,7 +21,7 @@ export const UserTemplateProvider = ({ children }) => {
       setError(null);
     } catch (err) {
       setError(err.response?.data?.msg || 'Error loading templates');
-      console.error('Error loading templates:', err);
+      logger.error('Error loading templates:', err);
     } finally {
       setLoading(false);
     }
@@ -35,7 +35,7 @@ export const UserTemplateProvider = ({ children }) => {
       return { success: true, data: res.data };
     } catch (err) {
       setError(err.response?.data?.msg || 'Error creating template');
-      console.error('Error creating template:', err);
+      logger.error('Error creating template:', err);
       return { success: false, error: err.response?.data?.msg || 'Error creating template' };
     }
   };
@@ -50,7 +50,7 @@ export const UserTemplateProvider = ({ children }) => {
       return { success: true, data: res.data };
     } catch (err) {
       setError(err.response?.data?.msg || 'Error updating template');
-      console.error('Error updating template:', err);
+      logger.error('Error updating template:', err);
       return { success: false, error: err.response?.data?.msg || 'Error updating template' };
     }
   };
@@ -63,7 +63,7 @@ export const UserTemplateProvider = ({ children }) => {
       return { success: true };
     } catch (err) {
       setError(err.response?.data?.msg || 'Error deleting template');
-      console.error('Error deleting template:', err);
+      logger.error('Error deleting template:', err);
       return { success: false, error: err.response?.data?.msg || 'Error deleting template' };
     }
   };

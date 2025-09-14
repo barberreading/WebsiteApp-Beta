@@ -9,16 +9,16 @@ const Client = require('./models/Client');
 async function createTestData() {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log('Connected to MongoDB');
+    logger.log('Connected to MongoDB');
     
     // Find a staff user
     const staffUser = await User.findOne({ role: 'staff' });
     if (!staffUser) {
-      console.log('No staff user found');
+      logger.log('No staff user found');
       process.exit(1);
     }
     
-    console.log('Found staff user:', staffUser.name, staffUser.email);
+    logger.log('Found staff user:', staffUser.name, staffUser.email);
     
     // Find a service and client
     const service = await Service.findOne();
@@ -26,7 +26,7 @@ async function createTestData() {
     const manager = await User.findOne({ role: { $in: ['manager', 'admin', 'superuser'] } });
     
     if (!service || !client || !manager) {
-      console.log('Missing required data - Service:', !!service, 'Client:', !!client, 'Manager:', !!manager);
+      logger.log('Missing required data - Service:', !!service, 'Client:', !!client, 'Manager:', !!manager);
       process.exit(1);
     }
     
@@ -51,7 +51,7 @@ async function createTestData() {
     });
     
     await testAlert.save();
-    console.log('Created test booking alert:', testAlert.title);
+    logger.log('Created test booking alert:', testAlert.title);
     
     // Create a test leave request for the staff user (must be at least one week in advance)
      const testLeave = new LeaveRequest({
@@ -63,11 +63,11 @@ async function createTestData() {
      });
     
     await testLeave.save();
-    console.log('Created test leave request for:', staffUser.name);
+    logger.log('Created test leave request for:', staffUser.name);
     
     process.exit(0);
   } catch (error) {
-    console.error('Error:', error);
+    logger.error('Error:', error);
     process.exit(1);
   }
 }

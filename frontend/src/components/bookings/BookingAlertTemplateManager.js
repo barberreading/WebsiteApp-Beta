@@ -79,7 +79,7 @@ const BookingAlertTemplateManager = () => {
       const response = await axiosInstance.get('/booking-alert-templates');
       setTemplates(response.data.data);
     } catch (err) {
-      console.error('Error fetching templates:', err);
+      logger.error('Error fetching templates:', err);
       setError('Failed to load templates');
     } finally {
       setLoading(false);
@@ -96,7 +96,7 @@ const BookingAlertTemplateManager = () => {
       const areasRes = await axiosInstance.get('/booking-categories/areas');
       setLocationAreas(areasRes.data.data);
     } catch (err) {
-      console.error('Error fetching form data:', err);
+      logger.error('Error fetching form data:', err);
       setError('Failed to load form data');
     }
   };
@@ -205,7 +205,7 @@ const BookingAlertTemplateManager = () => {
       handleCloseDialog();
       fetchTemplates();
     } catch (err) {
-      console.error('Error saving template:', err);
+      logger.error('Error saving template:', err);
       setError(err.response?.data?.message || err.message || 'Failed to save template');
     } finally {
       setLoading(false);
@@ -223,7 +223,7 @@ const BookingAlertTemplateManager = () => {
       setSuccess('Template deleted successfully!');
       fetchTemplates();
     } catch (err) {
-      console.error('Error deleting template:', err);
+      logger.error('Error deleting template:', err);
       setError('Failed to delete template');
     } finally {
       setLoading(false);

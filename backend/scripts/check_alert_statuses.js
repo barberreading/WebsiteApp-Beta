@@ -4,26 +4,26 @@ const BookingAlert = require('./models/BookingAlert');
 
 mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
-    console.log('Connected to MongoDB');
+    logger.log('Connected to MongoDB');
     
     const alerts = await BookingAlert.find({}).select('_id title status claimedBy');
     
-    console.log('\nCurrent booking alert statuses:');
-    console.log('================================');
+    logger.log('\nCurrent booking alert statuses:');
+    logger.log('================================');
     
     alerts.forEach(alert => {
-      console.log(`ID: ${alert._id}`);
-      console.log(`Title: ${alert.title}`);
-      console.log(`Status: ${alert.status}`);
-      console.log(`ClaimedBy: ${alert.claimedBy || 'None'}`);
-      console.log('---');
+      logger.log(`ID: ${alert._id}`);
+      logger.log(`Title: ${alert.title}`);
+      logger.log(`Status: ${alert.status}`);
+      logger.log(`ClaimedBy: ${alert.claimedBy || 'None'}`);
+      logger.log('---');
     });
     
-    console.log(`\nTotal alerts: ${alerts.length}`);
+    logger.log(`\nTotal alerts: ${alerts.length}`);
     
     process.exit(0);
   })
   .catch(err => {
-    console.error('Error:', err);
+    logger.error('Error:', err);
     process.exit(1);
   });

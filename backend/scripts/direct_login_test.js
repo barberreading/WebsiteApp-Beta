@@ -10,7 +10,7 @@ mongoose.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true
 })
 .then(async () => {
-  console.log('MongoDB Connected');
+  logger.log('MongoDB Connected');
   
   try {
     // Get admin credentials from environment variables
@@ -18,8 +18,8 @@ mongoose.connect(process.env.MONGO_URI, {
     const plainPassword = process.env.ADMIN_PASSWORD;
     
     if (!plainPassword) {
-      console.error('ERROR: ADMIN_PASSWORD environment variable not set');
-      console.log('Please set ADMIN_PASSWORD environment variable before running this script');
+      logger.error('ERROR: ADMIN_PASSWORD environment variable not set');
+      logger.log('Please set ADMIN_PASSWORD environment variable before running this script');
       process.exit(1);
     }
     
@@ -40,7 +40,7 @@ mongoose.connect(process.env.MONGO_URI, {
     );
     
     if (!user) {
-      console.log('Admin user not found, creating new admin user');
+      logger.log('Admin user not found, creating new admin user');
       
       // Create new admin user if not found
       const newAdmin = new User({
@@ -52,33 +52,33 @@ mongoose.connect(process.env.MONGO_URI, {
       });
       
       await newAdmin.save();
-      console.log('New admin user created');
+      logger.log('New admin user created');
     } else {
-      console.log('Admin user found and password updated');
+      logger.log('Admin user found and password updated');
     }
     
     // Test login directly with API
-    console.log('Testing login with API...');
+    logger.log('Testing login with API...');
     try {
       const loginResponse = await axios.post('http://localhost:3002/api/auth/login', {
         email: adminEmail,
         password: plainPassword
       });
       
-      console.log('Login successful!');
-      console.log('Response:', JSON.stringify(loginResponse.data, null, 2));
+      logger.log('Login successful!');
+      logger.log('Response:', JSON.stringify(loginResponse.data, null, 2));
     } catch (error) {
-      console.error('Login failed!');
-      console.error('Error:', error.response ? error.response.data : error.message);
+      logger.error('Login failed!');
+      logger.error('Error:', error.response ? error.response.data : error.message);
     }
     
     process.exit(0);
   } catch (err) {
-    console.error('Error:', err);
+    logger.error('Error:', err);
     process.exit(1);
   }
 })
 .catch(err => {
-  console.error('MongoDB connection error:', err);
+  logger.error('MongoDB connection error:', err);
   process.exit(1);
 });

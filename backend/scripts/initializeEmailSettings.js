@@ -6,9 +6,9 @@ require('dotenv').config();
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log('MongoDB connected successfully');
+    logger.log('MongoDB connected successfully');
   } catch (error) {
-    console.error('MongoDB connection error:', error);
+    logger.error('MongoDB connection error:', error);
     process.exit(1);
   }
 };
@@ -19,7 +19,7 @@ const initializeEmailSettings = async () => {
     const existingSettings = await EmailSettings.findOne();
     
     if (existingSettings) {
-      console.log('Email settings already exist:', existingSettings);
+      logger.log('Email settings already exist:', existingSettings);
       return;
     }
 
@@ -40,9 +40,9 @@ const initializeEmailSettings = async () => {
     });
 
     await defaultSettings.save();
-    console.log('Default email settings created successfully:', defaultSettings);
+    logger.log('Default email settings created successfully:', defaultSettings);
   } catch (error) {
-    console.error('Error initializing email settings:', error);
+    logger.error('Error initializing email settings:', error);
   } finally {
     mongoose.connection.close();
   }

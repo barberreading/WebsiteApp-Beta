@@ -11,10 +11,10 @@ const loginAndGetToken = async () => {
 
     const token = loginRes.data.token;
     fs.writeFileSync('token.txt', token);
-    console.log('Token saved to token.txt');
+    logger.log('Token saved to token.txt');
 
   } catch (err) {
-    console.error('Error during login:', err.response ? err.response.data : err.message);
+    logger.error('Error during login:', err.response ? err.response.data : err.message);
   }
 };
 

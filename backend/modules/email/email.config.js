@@ -19,7 +19,7 @@ const getEmailTransporter = async () => {
       });
     }
   } catch (error) {
-    console.error('Error getting email settings:', error);
+    logger.error('Error getting email settings:', error);
   }
   
   // Fallback to environment variables if no settings in database or settings disabled
@@ -43,7 +43,7 @@ const getSenderInfo = async () => {
       return `"${settings.from.name}" <${settings.from.email}>`;
     }
   } catch (error) {
-    console.error('Error getting sender info:', error);
+    logger.error('Error getting sender info:', error);
   }
   
   // Fallback to environment variables

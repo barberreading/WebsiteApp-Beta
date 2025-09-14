@@ -8,6 +8,8 @@ const MonitoringDashboard = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState(30000); // 30 seconds
   const [activeTab, setActiveTab] = useState('overview');
+  const [metricsData, setMetricsData] = useState(null);
+  const [metricsLoading, setMetricsLoading] = useState(false);
 
   // Fetch monitoring status
   const fetchMonitoringStatus = useCallback(async () => {
@@ -32,7 +34,7 @@ const MonitoringDashboard = () => {
       setMonitoringData(data.data);
       setError(null);
     } catch (err) {
-      console.error('Error fetching monitoring status:', err);
+      logger.error('Error fetching monitoring status:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -41,6 +43,7 @@ const MonitoringDashboard = () => {
 
   // Fetch detailed metrics
   const fetchMetrics = useCallback(async () => {
+    setMetricsLoading(true);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/monitoring/metrics', {
@@ -55,10 +58,14 @@ const MonitoringDashboard = () => {
       }
 
       const data = await response.json();
+      setMetricsData(data.data);
       return data.data;
     } catch (err) {
-      console.error('Error fetching metrics:', err);
+      logger.error('Error fetching metrics:', err);
+      setError('Failed to load metrics: ' + err.message);
       throw err;
+    } finally {
+      setMetricsLoading(false);
     }
   }, []);
 
@@ -80,7 +87,7 @@ const MonitoringDashboard = () => {
       const data = await response.json();
       return data.data;
     } catch (err) {
-      console.error('Error fetching statistics:', err);
+      logger.error('Error fetching statistics:', err);
       throw err;
     }
   }, []);
@@ -113,7 +120,7 @@ const MonitoringDashboard = () => {
       // Show success message
       alert(data.message);
     } catch (err) {
-      console.error('Error toggling auto-resolution:', err);
+      logger.error('Error toggling auto-resolution:', err);
       alert('Failed to toggle auto-resolution: ' + err.message);
     }
   };
@@ -139,7 +146,7 @@ const MonitoringDashboard = () => {
       setMonitoringData(data.data);
       alert('Health check completed successfully');
     } catch (err) {
-      console.error('Error triggering health check:', err);
+      logger.error('Error triggering health check:', err);
       alert('Failed to perform health check: ' + err.message);
     } finally {
       setLoading(false);
@@ -171,7 +178,7 @@ const MonitoringDashboard = () => {
       
       alert(data.message);
     } catch (err) {
-      console.error('Error toggling monitoring:', err);
+      logger.error('Error toggling monitoring:', err);
       alert('Failed to toggle monitoring: ' + err.message);
     }
   };
@@ -344,11 +351,11 @@ const MonitoringDashboard = () => {
                 </div>
                 <div className="info-item">
                   <label>Node.js Version:</label>
-                  <span>{process.version || 'Unknown'}</span>
+                  <span>{monitoringData?.nodeVersion || 'Unknown'}</span>
                 </div>
                 <div className="info-item">
                   <label>Environment:</label>
-                  <span>{process.env.NODE_ENV || 'Unknown'}</span>
+                  <span>{monitoringData?.environment || 'production'}</span>
                 </div>
               </div>
             </div>
@@ -357,13 +364,118 @@ const MonitoringDashboard = () => {
 
         {activeTab === 'metrics' && (
           <div className="metrics-tab">
-            <div className="metrics-placeholder">
-              <h3>System Metrics</h3>
-              <p>Detailed metrics will be loaded here...</p>
-              <button onClick={() => fetchMetrics().then(console.log)}>
-                Load Metrics
-              </button>
-            </div>
+            {!metricsData ? (
+              <div className="metrics-placeholder">
+                <h3>System Metrics</h3>
+                <p>Click the button below to load detailed system metrics...</p>
+                <button 
+                  onClick={fetchMetrics}
+                  disabled={metricsLoading}
+                  className={metricsLoading ? 'loading' : ''}
+                >
+                  {metricsLoading ? 'Loading...' : 'Load Metrics'}
+                </button>
+              </div>
+            ) : (
+              <div className="metrics-content">
+                <div className="metrics-header">
+                  <h3>System Metrics</h3>
+                  <button onClick={fetchMetrics} disabled={metricsLoading}>
+                    {metricsLoading ? 'Refreshing...' : 'Refresh'}
+                  </button>
+                </div>
+                
+                <div className="metrics-grid">
+                  {/* Process Metrics */}
+                  <div className="metric-card">
+                    <h4>Process Information</h4>
+                    <div className="metric-item">
+                      <label>Uptime:</label>
+                      <span>{Math.floor(metricsData.processMetrics?.uptime / 3600)}h {Math.floor((metricsData.processMetrics?.uptime % 3600) / 60)}m</span>
+                    </div>
+                    <div className="metric-item">
+                      <label>Node Version:</label>
+                      <span>{metricsData.processMetrics?.version}</span>
+                    </div>
+                    <div className="metric-item">
+                      <label>Platform:</label>
+                      <span>{metricsData.processMetrics?.platform} ({metricsData.processMetrics?.arch})</span>
+                    </div>
+                    <div className="metric-item">
+                      <label>Process ID:</label>
+                      <span>{metricsData.processMetrics?.pid}</span>
+                    </div>
+                  </div>
+
+                  {/* Memory Metrics */}
+                  <div className="metric-card">
+                    <h4>Memory Usage</h4>
+                    <div className="metric-item">
+                      <label>RSS:</label>
+                      <span>{Math.round(metricsData.processMetrics?.memoryUsage?.rss / 1024 / 1024)}MB</span>
+                    </div>
+                    <div className="metric-item">
+                      <label>Heap Used:</label>
+                      <span>{Math.round(metricsData.processMetrics?.memoryUsage?.heapUsed / 1024 / 1024)}MB</span>
+                    </div>
+                    <div className="metric-item">
+                      <label>Heap Total:</label>
+                      <span>{Math.round(metricsData.processMetrics?.memoryUsage?.heapTotal / 1024 / 1024)}MB</span>
+                    </div>
+                    <div className="metric-item">
+                      <label>External:</label>
+                      <span>{Math.round(metricsData.processMetrics?.memoryUsage?.external / 1024 / 1024)}MB</span>
+                    </div>
+                  </div>
+
+                  {/* System Status */}
+                  <div className="metric-card">
+                    <h4>System Status</h4>
+                    <div className="metric-item">
+                      <label>Monitoring:</label>
+                      <span className={`status-badge ${metricsData.isMonitoring ? 'active' : 'inactive'}`}>
+                        {metricsData.isMonitoring ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
+                    <div className="metric-item">
+                      <label>Auto Resolution:</label>
+                      <span className={`status-badge ${metricsData.autoResolutionEnabled ? 'enabled' : 'disabled'}`}>
+                        {metricsData.autoResolutionEnabled ? 'Enabled' : 'Disabled'}
+                      </span>
+                    </div>
+                    <div className="metric-item">
+                      <label>Last Health Check:</label>
+                      <span>{metricsData.lastHealthCheck ? new Date(metricsData.lastHealthCheck).toLocaleString() : 'Never'}</span>
+                    </div>
+                  </div>
+
+                  {/* Environment Info */}
+                  <div className="metric-card">
+                    <h4>Environment</h4>
+                    <div className="metric-item">
+                      <label>Node Environment:</label>
+                      <span>{metricsData.environmentInfo?.nodeEnv || 'production'}</span>
+                    </div>
+                    <div className="metric-item">
+                      <label>Port:</label>
+                      <span>{metricsData.environmentInfo?.port}</span>
+                    </div>
+                    <div className="metric-item">
+                      <label>MongoDB:</label>
+                      <span className={`status-badge ${metricsData.environmentInfo?.mongoUri === 'Connected' ? 'connected' : 'disconnected'}`}>
+                        {metricsData.environmentInfo?.mongoUri}
+                      </span>
+                    </div>
+                    <div className="metric-item">
+                      <label>JWT Secret:</label>
+                      <span className={`status-badge ${metricsData.environmentInfo?.jwtSecret === 'Configured' ? 'configured' : 'missing'}`}>
+                        {metricsData.environmentInfo?.jwtSecret}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

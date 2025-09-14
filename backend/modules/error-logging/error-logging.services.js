@@ -78,8 +78,8 @@ const logError = async (error, metadata = {}) => {
     });
   } catch (logError) {
     // If logging to the database fails, at least log to the console
-    console.error('Error logging failed:', logError);
-    console.error('Original error:', error);
+    logger.error('Error logging failed:', logError);
+    logger.error('Original error:', error);
   }
 };
 

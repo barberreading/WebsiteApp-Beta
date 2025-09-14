@@ -73,7 +73,7 @@ const NetworkErrorHandler = () => {
             break;
           }
         } catch (err) {
-          console.log(`Failed to connect to ${endpoint}:`, err.message);
+          logger.log(`Failed to connect to ${endpoint}:`, err.message);
           // Continue to next endpoint
         }
       }

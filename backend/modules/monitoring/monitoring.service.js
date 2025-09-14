@@ -22,7 +22,7 @@ class MonitoringService {
         timestamp: new Date().toISOString()
       };
     } catch (error) {
-      console.error('Error getting system status:', error);
+      logger.error('Error getting system status:', error);
       throw new Error('Failed to retrieve system status');
     }
   }
@@ -63,12 +63,12 @@ class MonitoringService {
           architecture: process.arch,
           processId: process.pid,
           nodeEnv: process.env.NODE_ENV,
-          port: process.env.PORT || 3001
+          port: process.env.PORT || 3002
         },
         timestamp: new Date().toISOString()
       };
     } catch (error) {
-      console.error('Error getting detailed metrics:', error);
+      logger.error('Error getting detailed metrics:', error);
       throw new Error('Failed to retrieve detailed metrics');
     }
   }
@@ -151,7 +151,7 @@ class MonitoringService {
         timestamp: new Date().toISOString()
       };
     } catch (error) {
-      console.error('Error analyzing error patterns:', error);
+      logger.error('Error analyzing error patterns:', error);
       throw new Error('Failed to analyze error patterns');
     }
   }
@@ -178,7 +178,7 @@ class MonitoringService {
         timestamp: new Date().toISOString()
       };
     } catch (error) {
-      console.error('Error getting health summary:', error);
+      logger.error('Error getting health summary:', error);
       throw new Error('Failed to get health summary');
     }
   }
@@ -250,7 +250,7 @@ class MonitoringService {
       
       return recommendations;
     } catch (error) {
-      console.error('Error generating recommendations:', error);
+      logger.error('Error generating recommendations:', error);
       return [{
         type: 'error',
         message: 'Unable to generate health recommendations',
@@ -287,7 +287,7 @@ class MonitoringService {
       // For other formats, return the raw data object
       return exportData;
     } catch (error) {
-      console.error('Error exporting system data:', error);
+      logger.error('Error exporting system data:', error);
       throw new Error('Failed to export system data');
     }
   }

@@ -153,6 +153,8 @@ const AppNavbar = () => {
                         <NavDropdown.Item as={Link} to="/global-permissions">Global Permissions</NavDropdown.Item>
                         <NavDropdown.Item as={Link} to="/user-guide-editor">User Guide Editor</NavDropdown.Item>
                         <NavDropdown.Item as={Link} to="/error-dashboard">Error Dashboard</NavDropdown.Item>
+                        <NavDropdown.Item as={Link} to="/monitoring-dashboard">Monitoring Dashboard</NavDropdown.Item>
+                        <NavDropdown.Item as={Link} to="/resolution-history">Resolution History</NavDropdown.Item>
                       </>
                     )}
                   </NavDropdown>

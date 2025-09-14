@@ -1,15 +1,16 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const TokenBlacklist = require('../models/TokenBlacklist');
+const logger = require('../utils/logger');
 
 // Protect routes
 exports.protect = async function(req, res, next) {
   // Log auth middleware entry for booking alert requests
   if (req.path.includes('booking-alerts')) {
-    console.log('\n=== AUTH MIDDLEWARE START ===');
-    console.log('Request Path:', req.path);
-    console.log('Request Method:', req.method);
-    console.log('Timestamp:', new Date().toISOString());
+    logger.debug('\n=== AUTH MIDDLEWARE START ===');
+    logger.debug('Request Path:', req.path);
+    logger.debug('Request Method:', req.method);
+    logger.debug('Timestamp:', new Date().toISOString());
   }
   
   // Get token from header - check both formats
@@ -24,9 +25,9 @@ exports.protect = async function(req, res, next) {
   }
   
   if (req.path.includes('booking-alerts')) {
-    console.log('Token found:', !!token);
-    console.log('Token length:', token ? token.length : 0);
-    console.log('Token preview:', token ? token.substring(0, 20) + '...' : 'none');
+    logger.debug('Token found:', !!token);
+    logger.debug('Token length:', token ? token.length : 0);
+    logger.secureLog('Token preview:', { hasToken: !!token });
   }
 
   // Check if no token
@@ -50,8 +51,8 @@ exports.protect = async function(req, res, next) {
     }
     
     if (req.path.includes('booking-alerts')) {
-      console.log('Token decoded successfully');
-      console.log('Decoded payload:', JSON.stringify(decoded, null, 2));
+      logger.debug('Token decoded successfully');
+      logger.secureLog('Decoded payload:', { userId: decoded.user?.id || decoded.id, exp: decoded.exp });
     }
 
     // Add user from payload
@@ -62,11 +63,9 @@ exports.protect = async function(req, res, next) {
     }
     
     if (req.path.includes('booking-alerts')) {
-      console.log('User lookup result:', !!req.user);
+      logger.debug('User lookup result:', !!req.user);
       if (req.user) {
-        console.log('User ID:', req.user.id);
-        console.log('User Email:', req.user.email);
-        console.log('User Role:', req.user.role);
+        logger.secureLog('User found:', { userId: req.user.id, email: req.user.email, role: req.user.role });
       }
     }
     
@@ -78,17 +77,17 @@ exports.protect = async function(req, res, next) {
       };
       
       if (req.path.includes('booking-alerts')) {
-        console.log('Created temporary user object:', req.user);
+        logger.debug('Created temporary user object:', req.user);
       }
     }
     
     if (req.path.includes('booking-alerts')) {
-      console.log('=== AUTH MIDDLEWARE SUCCESS ===\n');
+      logger.debug('=== AUTH MIDDLEWARE SUCCESS ===\n');
     }
     
     next();
   } catch (err) {
-    console.error('Token validation error:', err.message);
+    logger.warn('Token validation error:', err.message);
     res.status(401).json({ msg: 'Token is not valid' });
   }
 };
@@ -101,16 +100,16 @@ exports.authorize = (...roles) => {
     
     // Debug logging can be enabled here if needed
     // if (req.path.includes('booking-alerts') || req.path.includes('email-templates')) {
-    //   console.log('=== AUTHORIZE MIDDLEWARE START ===');
-    //   console.log('Request path:', req.path);
-    //   console.log('Original roles:', roles);
-    //   console.log('Flattened roles:', flatRoles);
-    //   console.log('User object:', req.user);
-    //   console.log('User role:', req.user?.role);
+    //   logger.log('=== AUTHORIZE MIDDLEWARE START ===');
+    //   logger.log('Request path:', req.path);
+    //   logger.log('Original roles:', roles);
+    //   logger.log('Flattened roles:', flatRoles);
+    //   logger.log('User object:', req.user);
+    //   logger.log('User role:', req.user?.role);
     // }
     
     if (!req.user) {
-      console.error('No user object in authorize middleware');
+      logger.error('No user object in authorize middleware');
       return res.status(401).json({ msg: 'Authentication required' });
     }
     

@@ -84,29 +84,29 @@ const addSampleClients = async () => {
       useUnifiedTopology: true
     });
     
-    console.log('Connected to MongoDB');
+    logger.log('Connected to MongoDB');
     
     // Check if clients already exist
     const existingClients = await Client.find({});
-    console.log(`Found ${existingClients.length} existing clients`);
+    logger.log(`Found ${existingClients.length} existing clients`);
     
     if (existingClients.length > 0) {
-      console.log('Clients already exist. Skipping sample data creation.');
+      logger.log('Clients already exist. Skipping sample data creation.');
       process.exit(0);
     }
     
     // Add sample clients
     const result = await Client.insertMany(sampleClients);
-    console.log(`Successfully added ${result.length} sample clients:`);
+    logger.log(`Successfully added ${result.length} sample clients:`);
     
     result.forEach(client => {
-      console.log(`- ${client.firstName} ${client.lastName} (${client.email})`);
+      logger.log(`- ${client.firstName} ${client.lastName} (${client.email})`);
     });
     
     process.exit(0);
     
   } catch (error) {
-    console.error('Error adding sample clients:', error);
+    logger.error('Error adding sample clients:', error);
     process.exit(1);
   }
 };

@@ -1,70 +1,65 @@
 const express = require('express');
 const router = express.Router();
 const MonitoringController = require('./monitoring.controller');
-const auth = require('../../middleware/auth');
+const { protect, authorize } = require('../../middleware/auth');
 
-// Middleware to check admin privileges
-const requireAdmin = (req, res, next) => {
-  if (req.user.role !== 'admin' && req.user.role !== 'superuser') {
-    return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
-  }
-  next();
-};
+// Middleware to check superuser privileges only
+const requireSuperuser = authorize('superuser');
 
 /**
  * @route   GET /api/monitoring/status
  * @desc    Get current system monitoring status
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
-router.get('/status', auth, requireAdmin, MonitoringController.getStatus);
+router.get('/status', protect, requireSuperuser, MonitoringController.getStatus);
 
 /**
  * @route   POST /api/monitoring/auto-resolution
  * @desc    Enable or disable automatic error resolution
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
-router.post('/auto-resolution', auth, requireAdmin, MonitoringController.toggleAutoResolution);
+router.post('/auto-resolution', protect, requireSuperuser, MonitoringController.toggleAutoResolution);
 
 /**
  * @route   POST /api/monitoring/health-check
  * @desc    Trigger manual health check
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
-router.post('/health-check', auth, requireAdmin, MonitoringController.performHealthCheck);
+router.post('/health-check', protect, requireSuperuser, MonitoringController.performHealthCheck);
 
 /**
  * @route   GET /api/monitoring/metrics
  * @desc    Get detailed system metrics
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
-router.get('/metrics', auth, requireAdmin, MonitoringController.getMetrics);
+router.get('/metrics', protect, requireSuperuser, MonitoringController.getMetrics);
 
 /**
  * @route   GET /api/monitoring/resolution-history
  * @desc    Get error resolution history
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
-router.get('/resolution-history', auth, requireAdmin, MonitoringController.getResolutionHistory);
+router.get('/resolution-history', protect, requireSuperuser, MonitoringController.getResolutionHistory);
 
 /**
  * @route   POST /api/monitoring/start
  * @desc    Start error monitoring service
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
-router.post('/start', auth, requireAdmin, MonitoringController.startMonitoring);
+router.post('/start', protect, requireSuperuser, MonitoringController.startMonitoring);
 
 /**
  * @route   POST /api/monitoring/stop
  * @desc    Stop error monitoring service
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
-router.post('/stop', auth, requireAdmin, MonitoringController.stopMonitoring);
+router.post('/stop', protect, requireSuperuser, MonitoringController.stopMonitoring);
 
 /**
  * @route   GET /api/monitoring/statistics
  * @desc    Get error statistics and trends
- * @access  Private (Admin)
+ * @access  Private (Superuser)
  */
-router.get('/statistics', auth, requireAdmin, MonitoringController.getErrorStatistics);
+router.get('/statistics', protect, requireSuperuser, MonitoringController.getErrorStatistics);
 
 module.exports = router;

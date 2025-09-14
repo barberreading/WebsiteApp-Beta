@@ -37,7 +37,7 @@ exports.getEmailSettings = async () => {
             }
         };
     } catch (error) {
-        console.error('Error fetching email settings:', error);
+        logger.error('Error fetching email settings:', error);
         throw new ErrorResponse('Failed to fetch email settings', 500);
     }
 };
@@ -112,7 +112,7 @@ exports.updateEmailSettings = async (settingsData, userId) => {
             }
         };
     } catch (error) {
-        console.error('Error updating email settings:', error);
+        logger.error('Error updating email settings:', error);
         if (error instanceof ErrorResponse) {
             throw error;
         }
@@ -182,7 +182,7 @@ exports.testEmailSettings = async (testEmail) => {
             sentAt: new Date().toISOString()
         };
     } catch (error) {
-        console.error('Error testing email settings:', error);
+        logger.error('Error testing email settings:', error);
         
         // Handle specific nodemailer errors
         if (error.code === 'EAUTH') {

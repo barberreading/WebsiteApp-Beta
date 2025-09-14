@@ -9,7 +9,7 @@ const getBrandingForEmail = async () => {
     const branding = await getBranding();
     return branding || {};
   } catch (error) {
-    console.warn('Failed to fetch branding configuration for email:', error.message);
+    logger.warn('Failed to fetch branding configuration for email:', error.message);
     // Return default branding if database is unavailable
     return {
       companyName: 'Everything Childcare Agency',

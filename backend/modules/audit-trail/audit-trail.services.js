@@ -20,7 +20,7 @@ const createAuditTrailEntry = async (params) => {
     const savedEntry = await auditEntry.save();
     return savedEntry;
   } catch (error) {
-    console.error('Error creating audit trail entry:', error);
+    logger.error('Error creating audit trail entry:', error);
     throw error;
   }
 };
@@ -228,7 +228,7 @@ const getAuditTrailEntries = async (filters = {}) => {
       }
     };
   } catch (error) {
-    console.error('Error getting audit trail entries:', error);
+    logger.error('Error getting audit trail entries:', error);
     throw error;
   }
 };

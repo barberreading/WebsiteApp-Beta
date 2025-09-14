@@ -92,7 +92,7 @@ const UserManagement = () => {
       setError('');
     } catch (err) {
       setError('Failed to fetch users');
-      console.error(err);
+      logger.error(err);
     } finally {
       setLoading(false);
     }
@@ -112,7 +112,7 @@ const UserManagement = () => {
       const res = await axiosInstance.get('/services');
       setAvailableServices(res.data);
     } catch (err) {
-      console.error('Error fetching services:', err);
+      logger.error('Error fetching services:', err);
     }
   };
 
@@ -121,7 +121,7 @@ const UserManagement = () => {
       const res = await axiosInstance.get('/booking-categories/areas');
       setLocationAreas(res.data.data || []);
     } catch (err) {
-      console.error('Error fetching location areas:', err);
+      logger.error('Error fetching location areas:', err);
     }
   };
   
@@ -130,7 +130,7 @@ const UserManagement = () => {
       const res = await axiosInstance.get('/resources?type=room');
       setRooms(res.data);
     } catch (err) {
-      console.error('Error fetching rooms:', err);
+      logger.error('Error fetching rooms:', err);
     }
   };
   
@@ -139,7 +139,7 @@ const UserManagement = () => {
       const res = await axiosInstance.get('/resources?type=equipment');
       setEquipment(res.data);
     } catch (err) {
-      console.error('Error fetching equipment:', err);
+      logger.error('Error fetching equipment:', err);
     }
   };
 
@@ -555,13 +555,13 @@ const UserManagement = () => {
       handleClose();
     } catch (err) {
       setError('Failed to update user');
-      console.error(err);
+      logger.error(err);
     }
   };
   
   const handleAddUser = async (e) => {
     e.preventDefault();
-    console.log('Adding new user with enhanced data:', newUser);
+    logger.log('Adding new user with enhanced data:', newUser);
     
     // Validate required fields
     if (!newUser.name || !newUser.email || (!newUser.password && !newUser.sendPasswordEmail)) {
@@ -590,7 +590,7 @@ const UserManagement = () => {
       // Make API call to create user
       const response = await axiosInstance.post('/users', userToCreate);
       
-      console.log('User created successfully with enhanced data:', response.data);
+      logger.log('User created successfully with enhanced data:', response.data);
       
       // Show success message and reset form
       setSuccess('User created successfully with all details!');
@@ -602,7 +602,7 @@ const UserManagement = () => {
       toast.success('User added with photo, working hours, and service assignments');
       
     } catch (err) {
-      console.error('Error creating user:', err.response?.data || err.message);
+      logger.error('Error creating user:', err.response?.data || err.message);
       setError(err.response?.data?.msg || 'Failed to create user. Please try again.');
       toast.error('Failed to create user');
     } finally {
@@ -624,7 +624,7 @@ const UserManagement = () => {
         toast.success('User deleted successfully');
       } catch (err) {
         setError('Failed to delete user');
-        console.error(err);
+        logger.error(err);
         toast.error('Failed to delete user');
       }
     }

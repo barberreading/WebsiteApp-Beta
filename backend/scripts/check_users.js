@@ -5,20 +5,20 @@ require('dotenv').config();
 async function checkUsers() {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log('Connected to database');
+    logger.log('Connected to database');
     
     const users = await User.find({}, 'name email role').limit(10);
-    console.log('\nAvailable users:');
+    logger.log('\nAvailable users:');
     users.forEach(user => {
-      console.log(`- Email: ${user.email}`);
-      console.log(`  Role: ${user.role}`);
-      console.log(`  Name: ${user.name}`);
-      console.log('---');
+      logger.log(`- Email: ${user.email}`);
+      logger.log(`  Role: ${user.role}`);
+      logger.log(`  Name: ${user.name}`);
+      logger.log('---');
     });
     
     process.exit(0);
   } catch (error) {
-    console.error('Error:', error.message);
+    logger.error('Error:', error.message);
     process.exit(1);
   }
 }

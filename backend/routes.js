@@ -12,7 +12,7 @@ module.exports = function(app) {
                     const route = require(routesFile);
                     app.use(`/api/${module}`, route.router || route);
                 } catch (error) {
-                    console.error(`Error loading route for ${module}:`, error);
+                    logger.error(`Error loading route for ${module}:`, error);
                 }
             }
         }

@@ -81,52 +81,52 @@ async function restoreBookingData() {
       'Content-Type': 'application/json'
     };
     
-    console.log('Restoring booking keys...');
+    logger.log('Restoring booking keys...');
     
     for (const key of sampleKeys) {
       try {
         const response = await axios.post('http://localhost:3002/api/booking-categories/keys', key, { headers });
-        console.log(`✓ Created key: ${key.name}`);
+        logger.log(`✓ Created key: ${key.name}`);
       } catch (err) {
         if (err.response?.status === 400 && err.response?.data?.message?.includes('already exists')) {
-          console.log(`- Key '${key.name}' already exists`);
+          logger.log(`- Key '${key.name}' already exists`);
         } else {
-          console.log(`✗ Error creating key '${key.name}': ${err.response?.data?.message || err.message}`);
+          logger.log(`✗ Error creating key '${key.name}': ${err.response?.data?.message || err.message}`);
         }
       }
     }
     
-    console.log('\nRestoring location areas...');
+    logger.log('\nRestoring location areas...');
     
     for (const area of sampleAreas) {
       try {
         const response = await axios.post('http://localhost:3002/api/booking-categories/areas', area, { headers });
-        console.log(`✓ Created area: ${area.name}`);
+        logger.log(`✓ Created area: ${area.name}`);
       } catch (err) {
         if (err.response?.status === 400 && err.response?.data?.message?.includes('already exists')) {
-          console.log(`- Area '${area.name}' already exists`);
+          logger.log(`- Area '${area.name}' already exists`);
         } else {
-          console.log(`✗ Error creating area '${area.name}': ${err.response?.data?.message || err.message}`);
+          logger.log(`✗ Error creating area '${area.name}': ${err.response?.data?.message || err.message}`);
         }
       }
     }
     
-    console.log('\n🎉 Data restoration completed!');
+    logger.log('\n🎉 Data restoration completed!');
     
     // Verify the data was created
-    console.log('\nVerifying restored data...');
+    logger.log('\nVerifying restored data...');
     try {
       const keysResponse = await axios.get('http://localhost:3002/api/booking-categories/keys', { headers });
-      console.log(`Found ${keysResponse.data.data.length} booking keys`);
+      logger.log(`Found ${keysResponse.data.data.length} booking keys`);
       
       const areasResponse = await axios.get('http://localhost:3002/api/booking-categories/areas', { headers });
-      console.log(`Found ${areasResponse.data.data.length} location areas`);
+      logger.log(`Found ${areasResponse.data.data.length} location areas`);
     } catch (err) {
-      console.log('Error verifying data:', err.message);
+      logger.log('Error verifying data:', err.message);
     }
     
   } catch (error) {
-    console.error('Error during restoration:', error.message);
+    logger.error('Error during restoration:', error.message);
   }
 }
 

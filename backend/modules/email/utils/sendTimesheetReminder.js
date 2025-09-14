@@ -18,9 +18,9 @@ const sendTimesheetReminder = async (user, missingTimesheets) => {
     // Send email
     await sendEmail(user.email, subject, wrapEmailContent(body, subject));
     
-    console.log('Timesheet reminder email sent:');
+    logger.log('Timesheet reminder email sent:');
   } catch (error) {
-    console.error('Error sending timesheet reminder email:', error);
+    logger.error('Error sending timesheet reminder email:', error);
     throw error;
   }
 };

@@ -43,7 +43,7 @@ const sendTestEmail = async (settings, testEmail) => {
     
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Error sending test email:', error);
+    logger.error('Error sending test email:', error);
     throw error;
   }
 };

@@ -10,7 +10,7 @@ async function checkUserRole() {
     });
     
     const token = loginResponse.data.token;
-    console.log('Login successful');
+    logger.log('Login successful');
     
     // Get user profile
     const profileResponse = await axios.get('http://localhost:3002/api/auth/me', {
@@ -18,16 +18,16 @@ async function checkUserRole() {
     });
     
     const currentUser = profileResponse.data;
-    console.log('\n=== CURRENT USER OBJECT ===');
-    console.log('Name:', currentUser.name || currentUser.firstName + ' ' + currentUser.lastName);
-    console.log('Email:', currentUser.email);
-    console.log('Role:', currentUser.role);
-    console.log('ID:', currentUser._id);
-    console.log('Role type:', typeof currentUser.role);
-    console.log('Is staff?:', currentUser.role === 'staff');
+    logger.log('\n=== CURRENT USER OBJECT ===');
+    logger.log('Name:', currentUser.name || currentUser.firstName + ' ' + currentUser.lastName);
+    logger.log('Email:', currentUser.email);
+    logger.log('Role:', currentUser.role);
+    logger.log('ID:', currentUser._id);
+    logger.log('Role type:', typeof currentUser.role);
+    logger.log('Is staff?:', currentUser.role === 'staff');
     
   } catch (error) {
-    console.error('Error:', error.message);
+    logger.error('Error:', error.message);
   }
 }
 

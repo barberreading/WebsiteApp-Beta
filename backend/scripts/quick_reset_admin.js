@@ -11,13 +11,13 @@ async function quickResetAdmin() {
       useUnifiedTopology: true
     });
     
-    console.log('MongoDB Connected');
+    logger.log('MongoDB Connected');
     
     // Find the existing admin user
     const adminUser = await User.findOne({ email: 'andrew@everythingchildcareagency.co.uk' });
     
     if (!adminUser) {
-      console.log('Admin user not found!');
+      logger.log('Admin user not found!');
       process.exit(1);
     }
     
@@ -28,13 +28,13 @@ async function quickResetAdmin() {
     adminUser.password = hashedPassword;
     await adminUser.save();
     
-    console.log('Admin password reset successfully!');
-    console.log('Email: andrew@everythingchildcareagency.co.uk');
-    console.log('Password: admin123');
+    logger.log('Admin password reset successfully!');
+    logger.log('Email: andrew@everythingchildcareagency.co.uk');
+    logger.log('Password: admin123');
     
     process.exit(0);
   } catch (err) {
-    console.error('Error:', err.message);
+    logger.error('Error:', err.message);
     process.exit(1);
   }
 }

@@ -38,7 +38,7 @@ class OfflineBookingQueue {
     queue.push(queueItem);
     this.saveQueue(queue);
 
-    console.log('Booking added to offline queue:', queueItem.id);
+    logger.log('Booking added to offline queue:', queueItem.id);
     
     // Show user notification
     this.showOfflineNotification(queueItem);
@@ -59,7 +59,7 @@ class OfflineBookingQueue {
       const queue = localStorage.getItem(this.queueKey);
       return queue ? JSON.parse(queue) : [];
     } catch (error) {
-      console.error('Error reading offline queue:', error);
+      logger.error('Error reading offline queue:', error);
       return [];
     }
   }
@@ -71,7 +71,7 @@ class OfflineBookingQueue {
     try {
       localStorage.setItem(this.queueKey, JSON.stringify(queue));
     } catch (error) {
-      console.error('Error saving offline queue:', error);
+      logger.error('Error saving offline queue:', error);
     }
   }
 
@@ -87,13 +87,13 @@ class OfflineBookingQueue {
     const queue = this.getQueue();
     const pendingItems = queue.filter(item => item.metadata.status === 'pending');
 
-    console.log(`Processing ${pendingItems.length} pending bookings from offline queue`);
+    logger.log(`Processing ${pendingItems.length} pending bookings from offline queue`);
 
     for (const item of pendingItems) {
       try {
         await this.processQueueItem(item);
       } catch (error) {
-        console.error('Error processing queue item:', error);
+        logger.error('Error processing queue item:', error);
       }
     }
 
@@ -143,10 +143,10 @@ class OfflineBookingQueue {
           this.removeFromQueue(item.id);
         }, 30000); // Keep for 30 seconds
         
-        console.log('Offline booking successfully processed:', item.id);
+        logger.log('Offline booking successfully processed:', item.id);
       }
     } catch (error) {
-      console.error('Failed to process offline booking:', error);
+      logger.error('Failed to process offline booking:', error);
       
       // Update failure status
       queue[itemIndex].metadata.status = 'failed';
@@ -163,7 +163,7 @@ class OfflineBookingQueue {
         queue[itemIndex].metadata.status = 'pending';
         queue[itemIndex].metadata.nextRetry = new Date(Date.now() + delay).toISOString();
         
-        console.log(`Scheduling retry for booking ${item.id} in ${delay}ms`);
+        logger.log(`Scheduling retry for booking ${item.id} in ${delay}ms`);
         
         setTimeout(() => {
           this.processQueueItem(item);
@@ -189,17 +189,17 @@ class OfflineBookingQueue {
       await axiosInstance.post('/bookings/sync-calendar', {
         bookingId: bookingResponse._id || bookingResponse.id,
         source: 'offline_queue'
-      }).catch(err => console.warn('Calendar sync failed:', err));
+      }).catch(err => logger.warn('Calendar sync failed:', err));
       
       // Send email notifications
       await axiosInstance.post('/bookings/send-notifications', {
         bookingId: bookingResponse._id || bookingResponse.id,
         type: 'booking_created',
         source: 'offline_queue'
-      }).catch(err => console.warn('Email notification failed:', err));
+      }).catch(err => logger.warn('Email notification failed:', err));
       
     } catch (error) {
-      console.warn('Failed to send notifications for offline booking:', error);
+      logger.warn('Failed to send notifications for offline booking:', error);
     }
   }
 
@@ -210,7 +210,7 @@ class OfflineBookingQueue {
     const queue = this.getQueue();
     const filteredQueue = queue.filter(item => item.id !== itemId);
     this.saveQueue(filteredQueue);
-    console.log(`Removed item ${itemId} from offline queue`);
+    logger.log(`Removed item ${itemId} from offline queue`);
   }
 
   /**
@@ -266,7 +266,7 @@ class OfflineBookingQueue {
   initializeConnectionMonitoring() {
     // Process queue when coming online
     window.addEventListener('online', () => {
-      console.log('Connection restored - processing offline booking queue');
+      logger.log('Connection restored - processing offline booking queue');
       setTimeout(() => this.processQueue(), 1000);
     });
 
@@ -326,7 +326,7 @@ class OfflineBookingQueue {
           draggable: true
         }
       );
-    }).catch(err => console.warn('Toast notification failed:', err));
+    }).catch(err => logger.warn('Toast notification failed:', err));
   }
 
   /**
@@ -345,7 +345,7 @@ class OfflineBookingQueue {
           draggable: true
         }
       );
-    }).catch(err => console.warn('Toast notification failed:', err));
+    }).catch(err => logger.warn('Toast notification failed:', err));
   }
 
   /**
@@ -364,7 +364,7 @@ class OfflineBookingQueue {
           draggable: true
         }
       );
-    }).catch(err => console.warn('Toast notification failed:', err));
+    }).catch(err => logger.warn('Toast notification failed:', err));
   }
 
   /**
@@ -405,7 +405,7 @@ class OfflineBookingQueue {
       queue[itemIndex].metadata.lastAttempt = new Date().toISOString();
       queue[itemIndex].metadata.status = 'failed';
       this.saveQueue(queue);
-      console.log(`Updated retry count for item ${itemId}: ${queue[itemIndex].metadata.attempts}`);
+      logger.log(`Updated retry count for item ${itemId}: ${queue[itemIndex].metadata.attempts}`);
     }
   }
 }

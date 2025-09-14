@@ -36,7 +36,7 @@ const ErrorDashboard = () => {
       setErrors(response.data.logs);
       setTotalPages(response.data.pagination.pages);
     } catch (error) {
-      console.error('Failed to fetch errors:', error);
+      logger.error('Failed to fetch errors:', error);
       setErrorMessage('Failed to load error logs. Please try again later.');
     } finally {
       setLoading(false);
@@ -77,7 +77,7 @@ const ErrorDashboard = () => {
       setResolutionDialogOpen(false);
       fetchErrors(); // Refresh the list
     } catch (error) {
-      console.error('Failed to resolve error:', error);
+      logger.error('Failed to resolve error:', error);
       setErrorMessage('Failed to resolve error. Please try again.');
     } finally {
       setResolvingError(false);

@@ -97,7 +97,7 @@ const sendBookingConfirmation = async (booking, client, staff, service) => {
           emailBody += linksHtml;
         }
       } catch (error) {
-        console.error('Error fetching staff documents:', error);
+        logger.error('Error fetching staff documents:', error);
       }
     }
     
@@ -107,10 +107,10 @@ const sendBookingConfirmation = async (booking, client, staff, service) => {
     // Send email to client
     if (client && client.email) {
       await sendEmail(client.email, subject, wrapEmailContent(emailBody, subject, branding));
-      console.log('Booking confirmation email sent to client.');
+      logger.log('Booking confirmation email sent to client.');
     }
   } catch (error) {
-    console.error('Error sending booking confirmation email:', error);
+    logger.error('Error sending booking confirmation email:', error);
     throw error;
   }
 };

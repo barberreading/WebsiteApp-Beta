@@ -36,10 +36,10 @@ const AccountSettings = () => {
         
         <Box sx={{ p: 3 }}>
           {tabValue === 0 && (
-            <ChangePassword onSuccess={() => console.log('Password updated')} />
+            <ChangePassword onSuccess={() => logger.log('Password updated')} />
           )}
           {tabValue === 1 && (
-            <UpdateEmail onSuccess={() => console.log('Email updated')} />
+            <UpdateEmail onSuccess={() => logger.log('Email updated')} />
           )}
         </Box>
       </Box>

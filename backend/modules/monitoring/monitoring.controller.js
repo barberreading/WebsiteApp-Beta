@@ -14,11 +14,13 @@ class MonitoringController {
         data: {
           ...systemStatus,
           serverUptime: process.uptime(),
+          nodeVersion: process.version,
+          environment: process.env.NODE_ENV || 'production',
           timestamp: new Date().toISOString()
         }
       });
     } catch (error) {
-      console.error('Error getting monitoring status:', error);
+      logger.error('Error getting monitoring status:', error);
       await logError('MONITORING_STATUS_ERROR', error.message, {
         userId: req.user?.id,
         error: error.stack
@@ -59,7 +61,7 @@ class MonitoringController {
         autoResolutionEnabled: enabled
       });
     } catch (error) {
-      console.error('Error toggling auto-resolution:', error);
+      logger.error('Error toggling auto-resolution:', error);
       await logError('AUTO_RESOLUTION_TOGGLE_ERROR', error.message, {
         userId: req.user?.id,
         error: error.stack
@@ -94,7 +96,7 @@ class MonitoringController {
         data: systemStatus
       });
     } catch (error) {
-      console.error('Error performing manual health check:', error);
+      logger.error('Error performing manual health check:', error);
       await logError('MANUAL_HEALTH_CHECK_ERROR', error.message, {
         userId: req.user?.id,
         error: error.stack
@@ -130,7 +132,7 @@ class MonitoringController {
       // Get environment information
       const environmentInfo = {
         nodeEnv: process.env.NODE_ENV,
-        port: process.env.PORT || 3001,
+        port: process.env.PORT || 3002,
         mongoUri: process.env.MONGODB_URI ? 'Connected' : 'Not configured',
         jwtSecret: process.env.JWT_SECRET ? 'Configured' : 'Not configured'
       };
@@ -145,7 +147,7 @@ class MonitoringController {
         }
       });
     } catch (error) {
-      console.error('Error getting system metrics:', error);
+      logger.error('Error getting system metrics:', error);
       await logError('METRICS_ERROR', error.message, {
         userId: req.user?.id,
         error: error.stack
@@ -182,7 +184,7 @@ class MonitoringController {
         }
       });
     } catch (error) {
-      console.error('Error getting resolution history:', error);
+      logger.error('Error getting resolution history:', error);
       await logError('RESOLUTION_HISTORY_ERROR', error.message, {
         userId: req.user?.id,
         error: error.stack
@@ -213,7 +215,7 @@ class MonitoringController {
         status: errorMonitoringService.getSystemStatus()
       });
     } catch (error) {
-      console.error('Error starting monitoring service:', error);
+      logger.error('Error starting monitoring service:', error);
       await logError('MONITORING_START_ERROR', error.message, {
         userId: req.user?.id,
         error: error.stack
@@ -244,7 +246,7 @@ class MonitoringController {
         status: errorMonitoringService.getSystemStatus()
       });
     } catch (error) {
-      console.error('Error stopping monitoring service:', error);
+      logger.error('Error stopping monitoring service:', error);
       await logError('MONITORING_STOP_ERROR', error.message, {
         userId: req.user?.id,
         error: error.stack
@@ -310,7 +312,7 @@ class MonitoringController {
         data: statistics
       });
     } catch (error) {
-      console.error('Error getting error statistics:', error);
+      logger.error('Error getting error statistics:', error);
       await logError('ERROR_STATISTICS_ERROR', error.message, {
         userId: req.user?.id,
         error: error.stack

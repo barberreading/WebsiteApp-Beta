@@ -25,7 +25,7 @@ async function loginAsAdmin() {
   }
   
   try {
-    console.log('Attempting to login as admin user...');
+    logger.log('Attempting to login as admin user...');
     const response = await axios.post(`${BASE_URL}/api/auth/login`, {
       email: adminEmail,
       password: adminPassword
@@ -43,7 +43,7 @@ async function getCurrentBookingKeys(token) {
     });
     return response.data.data || [];
   } catch (error) {
-    console.error('Error fetching current booking keys:', error.message);
+    logger.error('Error fetching current booking keys:', error.message);
     return [];
   }
 }
@@ -53,29 +53,29 @@ async function createBookingKey(token, keyData) {
     const response = await axios.post(`${BASE_URL}/api/booking-categories/keys`, keyData, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    console.log(`✓ Created booking key: ${keyData.name}`);
+    logger.log(`✓ Created booking key: ${keyData.name}`);
     return response.data;
   } catch (error) {
-    console.error(`✗ Failed to create booking key '${keyData.name}':`, error.response?.data?.message || error.message);
+    logger.error(`✗ Failed to create booking key '${keyData.name}':`, error.response?.data?.message || error.message);
     return null;
   }
 }
 
 async function restoreCompleteBookingKeys() {
   try {
-    console.log('=== Restoring Complete Original Booking Keys ===\n');
+    logger.log('=== Restoring Complete Original Booking Keys ===\n');
     
     // Login as admin
     const token = await loginAsAdmin();
-    console.log('✓ Successfully authenticated as Andrew\n');
+    logger.log('✓ Successfully authenticated as Andrew\n');
     
     // Get current booking keys
-    console.log('Checking current booking keys...');
+    logger.log('Checking current booking keys...');
     const currentKeys = await getCurrentBookingKeys(token);
-    console.log(`Found ${currentKeys.length} existing booking keys\n`);
+    logger.log(`Found ${currentKeys.length} existing booking keys\n`);
     
     // Create missing booking keys
-    console.log('Creating missing original booking keys...');
+    logger.log('Creating missing original booking keys...');
     let createdCount = 0;
     
     for (const keyData of originalBookingKeysData) {
@@ -83,7 +83,7 @@ async function restoreCompleteBookingKeys() {
       const existingKey = currentKeys.find(key => key.name.toLowerCase() === keyData.name.toLowerCase());
       
       if (existingKey) {
-        console.log(`- Booking key '${keyData.name}' already exists`);
+        logger.log(`- Booking key '${keyData.name}' already exists`);
       } else {
         const result = await createBookingKey(token, keyData);
         if (result) {
@@ -92,21 +92,21 @@ async function restoreCompleteBookingKeys() {
       }
     }
     
-    console.log(`\n=== Restoration Complete ===`);
-    console.log(`Created ${createdCount} new booking keys`);
+    logger.log(`\n=== Restoration Complete ===`);
+    logger.log(`Created ${createdCount} new booking keys`);
     
     // Verify final state
-    console.log('\nFinal verification...');
+    logger.log('\nFinal verification...');
     const finalKeys = await getCurrentBookingKeys(token);
-    console.log(`Total booking keys now: ${finalKeys.length}`);
+    logger.log(`Total booking keys now: ${finalKeys.length}`);
     
-    console.log('\nCurrent booking keys:');
+    logger.log('\nCurrent booking keys:');
     finalKeys.forEach(key => {
-      console.log(`- ${key.name}: ${key.description}`);
+      logger.log(`- ${key.name}: ${key.description}`);
     });
     
   } catch (error) {
-    console.error('Error during restoration:', error.message);
+    logger.error('Error during restoration:', error.message);
   }
 }
 

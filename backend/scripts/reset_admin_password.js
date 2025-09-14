@@ -9,14 +9,14 @@ mongoose.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true
 })
 .then(async () => {
-  console.log('MongoDB Connected');
+  logger.log('MongoDB Connected');
   
   try {
     // Find admin user
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
     const plainPassword = process.env.ADMIN_PASSWORD || (() => {
-      console.error('ERROR: ADMIN_PASSWORD environment variable not set');
-      console.log('Please set ADMIN_PASSWORD environment variable before running this script');
+      logger.error('ERROR: ADMIN_PASSWORD environment variable not set');
+      logger.log('Please set ADMIN_PASSWORD environment variable before running this script');
       process.exit(1);
     })();
     
@@ -37,21 +37,21 @@ mongoose.connect(process.env.MONGO_URI, {
     );
     
     if (user) {
-      console.log('Admin password reset successfully');
-      console.log('Login with:');
-      console.log('Email:', adminEmail);
-      console.log('Password:', plainPassword);
+      logger.log('Admin password reset successfully');
+      logger.log('Login with:');
+      logger.log('Email:', adminEmail);
+      logger.log('Password:', plainPassword);
     } else {
-      console.log('Admin user not found');
+      logger.log('Admin user not found');
     }
     
     process.exit(0);
   } catch (err) {
-    console.error('Error:', err);
+    logger.error('Error:', err);
     process.exit(1);
   }
 })
 .catch(err => {
-  console.error('MongoDB connection error:', err);
+  logger.error('MongoDB connection error:', err);
   process.exit(1);
 });

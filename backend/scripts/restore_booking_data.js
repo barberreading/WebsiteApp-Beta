@@ -81,31 +81,31 @@ const sampleLocationAreas = [
 
 async function restoreBookingData() {
   try {
-    console.log('Connecting to database...');
+    logger.log('Connecting to database...');
     
     // Clear existing data
     await BookingKey.deleteMany({});
     await LocationArea.deleteMany({});
-    console.log('Cleared existing booking data');
+    logger.log('Cleared existing booking data');
     
     // Insert booking keys
     const createdKeys = await BookingKey.insertMany(sampleBookingKeys);
-    console.log(`Created ${createdKeys.length} booking keys:`);
+    logger.log(`Created ${createdKeys.length} booking keys:`);
     createdKeys.forEach(key => {
-      console.log(`- ${key.name}: ${key.description}`);
+      logger.log(`- ${key.name}: ${key.description}`);
     });
     
     // Insert location areas
     const createdAreas = await LocationArea.insertMany(sampleLocationAreas);
-    console.log(`\nCreated ${createdAreas.length} location areas:`);
+    logger.log(`\nCreated ${createdAreas.length} location areas:`);
     createdAreas.forEach(area => {
-      console.log(`- ${area.name}: ${area.description}`);
+      logger.log(`- ${area.name}: ${area.description}`);
     });
     
-    console.log('\nBooking data restoration completed successfully!');
+    logger.log('\nBooking data restoration completed successfully!');
     
   } catch (error) {
-    console.error('Error restoring booking data:', error);
+    logger.error('Error restoring booking data:', error);
   } finally {
     mongoose.disconnect();
   }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import logger from '../../utils/logger';
 
 // Component for protected routes
 const ProtectedRoute = ({ children }) => {
@@ -10,7 +11,7 @@ const ProtectedRoute = ({ children }) => {
   
   // If not authenticated, redirect to login
   if (!isAuthenticated) {
-    console.log('Not authenticated, redirecting to login');
+    logger.debug('Not authenticated, redirecting to login');
     return <Navigate to="/login" replace />;
   }
   

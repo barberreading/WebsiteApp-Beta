@@ -61,7 +61,7 @@ const logout = async (token, userId) => {
     await TokenBlacklist.blacklistToken(token, userId, 'logout');
     return { success: true, msg: 'Logged out successfully' };
   } catch (error) {
-    console.error('Logout error:', error);
+    logger.error('Logout error:', error);
     return { success: false, msg: 'Logout failed' };
   }
 };

@@ -88,7 +88,7 @@ const createLeaveRequest = async (data, user) => {
             await emailService.sendLeaveRequestSubmissionNotification(leaveRequest, staff);
         }
     } catch (error) {
-        console.error('Error sending leave request submission notification:', error);
+        logger.error('Error sending leave request submission notification:', error);
     }
 
     return leaveRequest;
@@ -119,7 +119,7 @@ const approveLeaveRequest = async (id, user) => {
             await emailService.sendLeaveRequestStatusNotification(staff, leaveRequest);
         }
     } catch (error) {
-        console.error('Error sending leave request notification:', error);
+        logger.error('Error sending leave request notification:', error);
     }
 
     return leaveRequest;
@@ -155,7 +155,7 @@ const denyLeaveRequest = async (id, user, denialReason) => {
             await emailService.sendLeaveRequestStatusNotification(staff, leaveRequest);
         }
     } catch (error) {
-        console.error('Error sending leave request notification:', error);
+        logger.error('Error sending leave request notification:', error);
     }
 
     return leaveRequest;
@@ -181,7 +181,7 @@ const withdrawLeaveRequest = async (id, user) => {
     try {
         await emailService.sendLeaveRequestWithdrawalNotification(leaveRequest, leaveRequest.staff);
     } catch (error) {
-        console.error('Error sending leave request withdrawal notification:', error);
+        logger.error('Error sending leave request withdrawal notification:', error);
     }
 };
 

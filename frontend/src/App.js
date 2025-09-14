@@ -59,6 +59,7 @@ import BookingNew from './pages/BookingNew';
 import BookingsList from './pages/BookingsList';
 import ClockInOut from './pages/ClockInOut';
 import UserGuide from './pages/UserGuide';
+import ResolutionHistory from './pages/ResolutionHistory';
 
 // Booking Components
 import BookingForm from './components/bookings/BookingForm';
@@ -93,7 +94,7 @@ function App() {
 
   // Add console log for debugging authentication state
   useEffect(() => {
-    console.log('Auth State:', { isAuthenticated, currentUser });
+    logger.log('Auth State:', { isAuthenticated, currentUser });
   }, [isAuthenticated, currentUser]);
   
   // Initialize date formatting to DD/MM/YYYY across the app
@@ -346,8 +347,14 @@ function App() {
           } />
           
           <Route path="/monitoring-dashboard" element={
-            <RoleRoute allowedRoles={['admin']}>
+            <RoleRoute allowedRoles={['superuser']}>
               <MonitoringDashboard />
+            </RoleRoute>
+          } />
+          
+          <Route path="/resolution-history" element={
+            <RoleRoute allowedRoles={['superuser']}>
+              <ResolutionHistory />
             </RoleRoute>
           } />
           

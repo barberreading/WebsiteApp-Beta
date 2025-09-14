@@ -8,10 +8,10 @@ const cron = require('node-cron');
 const cleanupExpiredTokens = async () => {
   try {
     const result = await TokenBlacklist.cleanupExpiredTokens();
-    console.log(`Token cleanup completed. Removed ${result.deletedCount} expired tokens.`);
+    logger.log(`Token cleanup completed. Removed ${result.deletedCount} expired tokens.`);
     return result;
   } catch (error) {
-    console.error('Token cleanup failed:', error);
+    logger.error('Token cleanup failed:', error);
     throw error;
   }
 };
@@ -40,7 +40,7 @@ const validateToken = async (token) => {
       return false;
     }
   } catch (error) {
-    console.error('Token validation error:', error);
+    logger.error('Token validation error:', error);
     return false;
   }
 };
@@ -52,11 +52,11 @@ const validateToken = async (token) => {
 const startTokenCleanupScheduler = () => {
   // Run cleanup every hour
   cron.schedule('0 * * * *', async () => {
-    console.log('Running scheduled token cleanup...');
+    logger.log('Running scheduled token cleanup...');
     await cleanupExpiredTokens();
   });
   
-  console.log('Token cleanup scheduler started (runs every hour)');
+  logger.log('Token cleanup scheduler started (runs every hour)');
 };
 
 /**
@@ -68,10 +68,10 @@ const startTokenCleanupScheduler = () => {
 const blacklistAllUserTokens = async (userId, reason = 'security_measure') => {
   try {
     const result = await TokenBlacklist.blacklistAllUserTokens(userId, reason);
-    console.log(`Blacklisted all tokens for user ${userId}. Reason: ${reason}`);
+    logger.log(`Blacklisted all tokens for user ${userId}. Reason: ${reason}`);
     return result;
   } catch (error) {
-    console.error('Failed to blacklist user tokens:', error);
+    logger.error('Failed to blacklist user tokens:', error);
     throw error;
   }
 };

@@ -103,14 +103,14 @@ const CustomDayView = ({
   const getBookingAtTime = (staffId, timeSlot) => {
     const booking = getBookingAtTimeSlot(bookings, staffId, currentDate, timeSlot);
     if (booking) {
-      console.log('📅 CustomDayView: Found booking for', staffId, 'at', timeSlot, ':', booking.title);
+      logger.log('📅 CustomDayView: Found booking for', staffId, 'at', timeSlot, ':', booking.title);
     }
     return booking;
   };
 
   // Debug effect to log booking data changes
   useEffect(() => {
-    console.log('📅 CustomDayView: Bookings data updated:', {
+    logger.log('📅 CustomDayView: Bookings data updated:', {
       totalBookings: bookings.length,
       currentDate: currentDate.toDateString(),
       selectedEmployees: selectedEmployees.map(emp => emp.name),

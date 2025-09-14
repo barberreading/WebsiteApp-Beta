@@ -34,11 +34,11 @@ class ErrorMonitoringService {
    */
   async startMonitoring() {
     if (this.isMonitoring) {
-      console.log('📊 Error monitoring service is already running');
+      logger.log('📊 Error monitoring service is already running');
       return;
     }
 
-    console.log('🚀 Starting Error Monitoring Service...');
+    logger.log('🚀 Starting Error Monitoring Service...');
     this.isMonitoring = true;
 
     // Start periodic health checks
@@ -49,7 +49,7 @@ class ErrorMonitoringService {
     // Initial health check
     await this.performHealthCheck();
     
-    console.log('✅ Error Monitoring Service started successfully');
+    logger.log('✅ Error Monitoring Service started successfully');
   }
 
   /**
@@ -60,7 +60,7 @@ class ErrorMonitoringService {
       return;
     }
 
-    console.log('🛑 Stopping Error Monitoring Service...');
+    logger.log('🛑 Stopping Error Monitoring Service...');
     this.isMonitoring = false;
 
     if (this.monitoringInterval) {
@@ -68,7 +68,7 @@ class ErrorMonitoringService {
       this.monitoringInterval = null;
     }
 
-    console.log('✅ Error Monitoring Service stopped');
+    logger.log('✅ Error Monitoring Service stopped');
   }
 
   /**
@@ -76,7 +76,7 @@ class ErrorMonitoringService {
    */
   async performHealthCheck() {
     try {
-      console.log('🔍 Performing system health check...');
+      logger.log('🔍 Performing system health check...');
       
       // Collect system metrics
       await this.collectSystemMetrics();
@@ -85,20 +85,20 @@ class ErrorMonitoringService {
       const issues = await this.identifyIssues();
       
       if (issues.length > 0) {
-        console.log(`⚠️ Found ${issues.length} issues:`, issues.map(i => i.type));
+        logger.log(`⚠️ Found ${issues.length} issues:`, issues.map(i => i.type));
         
         if (this.autoResolutionEnabled) {
           await this.resolveIssues(issues);
         }
       } else {
-        console.log('✅ System health check passed');
+        logger.log('✅ System health check passed');
       }
       
       // Log health status
       await this.logHealthStatus(issues);
       
     } catch (error) {
-      console.error('❌ Health check failed:', error);
+      logger.error('❌ Health check failed:', error);
       await this.logError('HEALTH_CHECK_FAILED', error.message, { error: error.stack });
     }
   }
@@ -166,7 +166,7 @@ class ErrorMonitoringService {
       });
       return errorCount;
     } catch (error) {
-      console.error('Failed to get recent error count:', error);
+      logger.error('Failed to get recent error count:', error);
       return 0;
     }
   }
@@ -246,7 +246,7 @@ class ErrorMonitoringService {
    */
   async resolveIssues(issues) {
     for (const issue of issues) {
-      console.log(`🔧 Attempting to resolve: ${issue.type}`);
+      logger.log(`🔧 Attempting to resolve: ${issue.type}`);
       
       try {
         const resolved = await this.resolveIssue(issue);
@@ -267,19 +267,19 @@ class ErrorMonitoringService {
         }
         
         if (resolved) {
-          console.log(`✅ Successfully resolved: ${issue.type}`);
+          logger.log(`✅ Successfully resolved: ${issue.type}`);
           await this.logError('ISSUE_RESOLVED', `Automatically resolved ${issue.type}`, {
             issue: issue,
             resolution: resolutionRecord
           });
         } else {
-          console.log(`❌ Failed to resolve: ${issue.type}`);
+          logger.log(`❌ Failed to resolve: ${issue.type}`);
           await this.logError('RESOLUTION_FAILED', `Failed to resolve ${issue.type}`, {
             issue: issue
           });
         }
       } catch (resolutionError) {
-        console.error(`💥 Error while resolving ${issue.type}:`, resolutionError);
+        logger.error(`💥 Error while resolving ${issue.type}:`, resolutionError);
         await this.logError('RESOLUTION_ERROR', `Error during resolution of ${issue.type}`, {
           issue: issue,
           error: resolutionError.stack
@@ -309,7 +309,7 @@ class ErrorMonitoringService {
         return await this.resolveDiskAccess();
       
       default:
-        console.log(`⚠️ No resolution strategy for issue type: ${issue.type}`);
+        logger.log(`⚠️ No resolution strategy for issue type: ${issue.type}`);
         return false;
     }
   }
@@ -319,18 +319,18 @@ class ErrorMonitoringService {
    */
   async resolveHighMemoryUsage() {
     try {
-      console.log('🧠 Attempting to resolve high memory usage...');
+      logger.log('🧠 Attempting to resolve high memory usage...');
       
       // Force garbage collection if available
       if (global.gc) {
         global.gc();
-        console.log('🗑️ Forced garbage collection');
+        logger.log('🗑️ Forced garbage collection');
       }
       
       // Clear any large caches
       if (global.appCache) {
         global.appCache.clear();
-        console.log('🗑️ Cleared application cache');
+        logger.log('🗑️ Cleared application cache');
       }
       
       // Wait a moment and check if memory usage improved
@@ -340,13 +340,13 @@ class ErrorMonitoringService {
       const improvement = this.systemMetrics.memory.process.heapUsed - newMemoryUsage.heapUsed;
       
       if (improvement > 0) {
-        console.log(`🧠 Memory usage improved by ${(improvement / 1024 / 1024).toFixed(2)}MB`);
+        logger.log(`🧠 Memory usage improved by ${(improvement / 1024 / 1024).toFixed(2)}MB`);
         return true;
       }
       
       return false;
     } catch (error) {
-      console.error('Failed to resolve high memory usage:', error);
+      logger.error('Failed to resolve high memory usage:', error);
       return false;
     }
   }
@@ -356,7 +356,7 @@ class ErrorMonitoringService {
    */
   async resolveHighProcessMemory() {
     try {
-      console.log('⚡ Attempting to resolve high process memory...');
+      logger.log('⚡ Attempting to resolve high process memory...');
       
       // Similar to high memory usage but more aggressive
       if (global.gc) {
@@ -377,12 +377,12 @@ class ErrorMonitoringService {
       
       const clearedModules = initialModules - Object.keys(require.cache).length;
       if (clearedModules > 0) {
-        console.log(`🗑️ Cleared ${clearedModules} cached modules`);
+        logger.log(`🗑️ Cleared ${clearedModules} cached modules`);
       }
       
       return true;
     } catch (error) {
-      console.error('Failed to resolve high process memory:', error);
+      logger.error('Failed to resolve high process memory:', error);
       return false;
     }
   }
@@ -392,30 +392,30 @@ class ErrorMonitoringService {
    */
   async resolveHighErrorRate() {
     try {
-      console.log('🚨 Attempting to resolve high error rate...');
+      logger.log('🚨 Attempting to resolve high error rate...');
       
       // Analyze recent errors to identify patterns
       const recentErrors = await this.getRecentErrors();
       const errorPatterns = this.analyzeErrorPatterns(recentErrors);
       
-      console.log('📊 Error patterns identified:', errorPatterns);
+      logger.log('📊 Error patterns identified:', errorPatterns);
       
       // Implement circuit breaker pattern for failing endpoints
       if (errorPatterns.apiErrors > 5) {
-        console.log('🔌 Implementing temporary circuit breaker for API endpoints');
+        logger.log('🔌 Implementing temporary circuit breaker for API endpoints');
         // This would integrate with your API middleware
         global.circuitBreakerActive = true;
         
         // Reset circuit breaker after 5 minutes
         setTimeout(() => {
           global.circuitBreakerActive = false;
-          console.log('🔌 Circuit breaker reset');
+          logger.log('🔌 Circuit breaker reset');
         }, 300000);
       }
       
       return true;
     } catch (error) {
-      console.error('Failed to resolve high error rate:', error);
+      logger.error('Failed to resolve high error rate:', error);
       return false;
     }
   }
@@ -425,22 +425,22 @@ class ErrorMonitoringService {
    */
   async resolveDatabaseConnection() {
     try {
-      console.log('🗄️ Attempting to resolve database connection...');
+      logger.log('🗄️ Attempting to resolve database connection...');
       
       // Try to reconnect to database
       const mongoose = require('mongoose');
       
       if (mongoose.connection.readyState !== 1) {
-        console.log('🔄 Attempting database reconnection...');
+        logger.log('🔄 Attempting database reconnection...');
         await mongoose.connection.close();
         await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/websiteapp');
-        console.log('✅ Database reconnected successfully');
+        logger.log('✅ Database reconnected successfully');
         return true;
       }
       
       return true;
     } catch (error) {
-      console.error('Failed to resolve database connection:', error);
+      logger.error('Failed to resolve database connection:', error);
       return false;
     }
   }
@@ -450,17 +450,17 @@ class ErrorMonitoringService {
    */
   async resolveDiskAccess() {
     try {
-      console.log('💾 Attempting to resolve disk access issues...');
+      logger.log('💾 Attempting to resolve disk access issues...');
       
       // Check if we can create a temporary file
       const tempFile = path.join(os.tmpdir(), `health-check-${Date.now()}.tmp`);
       await fs.writeFile(tempFile, 'health check');
       await fs.unlink(tempFile);
       
-      console.log('✅ Disk access restored');
+      logger.log('✅ Disk access restored');
       return true;
     } catch (error) {
-      console.error('Failed to resolve disk access:', error);
+      logger.error('Failed to resolve disk access:', error);
       return false;
     }
   }
@@ -475,7 +475,7 @@ class ErrorMonitoringService {
         timestamp: { $gte: oneHourAgo }
       }).sort({ timestamp: -1 }).limit(100);
     } catch (error) {
-      console.error('Failed to get recent errors:', error);
+      logger.error('Failed to get recent errors:', error);
       return [];
     }
   }
@@ -526,7 +526,7 @@ class ErrorMonitoringService {
 
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('📊 Health Status:', JSON.stringify(healthStatus, null, 2));
+      logger.log('📊 Health Status:', JSON.stringify(healthStatus, null, 2));
     }
 
     // Store health status (you could save this to database or file)
@@ -553,7 +553,7 @@ class ErrorMonitoringService {
 
       await errorLog.save();
     } catch (error) {
-      console.error('Failed to log error to database:', error);
+      logger.error('Failed to log error to database:', error);
     }
   }
 
@@ -575,7 +575,7 @@ class ErrorMonitoringService {
    */
   setAutoResolution(enabled) {
     this.autoResolutionEnabled = enabled;
-    console.log(`🤖 Auto-resolution ${enabled ? 'enabled' : 'disabled'}`);
+    logger.log(`🤖 Auto-resolution ${enabled ? 'enabled' : 'disabled'}`);
   }
 }
 

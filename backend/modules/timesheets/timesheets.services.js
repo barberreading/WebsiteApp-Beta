@@ -344,7 +344,7 @@ const getClientApprovalTimesheets = async (clientId) => {
       rejected: []
     };
   } catch (error) {
-    console.error('Error fetching client approval timesheets:', error);
+    logger.error('Error fetching client approval timesheets:', error);
     throw error;
   }
 };
@@ -388,7 +388,7 @@ const clientApproveTimesheet = async (timesheetId, clientId, approvalData) => {
 
     return timesheet;
   } catch (error) {
-    console.error('Error approving timesheet:', error);
+    logger.error('Error approving timesheet:', error);
     throw error;
   }
 };

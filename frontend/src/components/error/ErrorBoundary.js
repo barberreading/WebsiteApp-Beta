@@ -21,7 +21,7 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     // Log the error to the console
-    console.error("Error caught by ErrorBoundary:", error, errorInfo);
+    logger.error("Error caught by ErrorBoundary:", error, errorInfo);
     
     // Update state with error details
     this.setState({
@@ -52,7 +52,7 @@ class ErrorBoundary extends Component {
 
       this.setState({ reportSent: true });
     } catch (err) {
-      console.error("Failed to send error report:", err);
+      logger.error("Failed to send error report:", err);
     }
   };
 

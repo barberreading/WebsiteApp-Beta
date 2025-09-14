@@ -11,30 +11,30 @@ mongoose.connect(process.env.MONGO_URI, {
 
 async function checkLeaveRequests() {
   try {
-    console.log('Checking leave requests in database...');
+    logger.log('Checking leave requests in database...');
     
     // Get all leave requests
     const leaveRequests = await LeaveRequest.find().populate('staff', 'name email role');
-    console.log(`Found ${leaveRequests.length} leave requests:`);
+    logger.log(`Found ${leaveRequests.length} leave requests:`);
     
     leaveRequests.forEach((request, index) => {
-      console.log(`${index + 1}. Staff: ${request.staff?.name || 'Unknown'} (${request.staff?.email || 'No email'})`);
-      console.log(`   Dates: ${request.startDate.toDateString()} to ${request.endDate.toDateString()}`);
-      console.log(`   Status: ${request.status}`);
-      console.log(`   Reason: ${request.reason}`);
-      console.log('---');
+      logger.log(`${index + 1}. Staff: ${request.staff?.name || 'Unknown'} (${request.staff?.email || 'No email'})`);
+      logger.log(`   Dates: ${request.startDate.toDateString()} to ${request.endDate.toDateString()}`);
+      logger.log(`   Status: ${request.status}`);
+      logger.log(`   Reason: ${request.reason}`);
+      logger.log('---');
     });
     
     // Get all staff users
     const staffUsers = await User.find({ role: 'staff' });
-    console.log(`\nFound ${staffUsers.length} staff users:`);
+    logger.log(`\nFound ${staffUsers.length} staff users:`);
     staffUsers.forEach((user, index) => {
-      console.log(`${index + 1}. ${user.name} (${user.email}) - ID: ${user._id}`);
+      logger.log(`${index + 1}. ${user.name} (${user.email}) - ID: ${user._id}`);
     });
     
     // If no leave requests exist, create a test one
     if (leaveRequests.length === 0 && staffUsers.length > 0) {
-      console.log('\nNo leave requests found. Creating a test leave request...');
+      logger.log('\nNo leave requests found. Creating a test leave request...');
       
       const testLeaveRequest = new LeaveRequest({
         staff: staffUsers[0]._id,
@@ -45,18 +45,18 @@ async function checkLeaveRequests() {
       });
       
       await testLeaveRequest.save();
-      console.log('Test leave request created successfully!');
+      logger.log('Test leave request created successfully!');
       
       // Show the created request
       const createdRequest = await LeaveRequest.findById(testLeaveRequest._id).populate('staff', 'name email');
-      console.log('Created request details:');
-      console.log(`Staff: ${createdRequest.staff.name}`);
-      console.log(`Dates: ${createdRequest.startDate.toDateString()} to ${createdRequest.endDate.toDateString()}`);
-      console.log(`Status: ${createdRequest.status}`);
+      logger.log('Created request details:');
+      logger.log(`Staff: ${createdRequest.staff.name}`);
+      logger.log(`Dates: ${createdRequest.startDate.toDateString()} to ${createdRequest.endDate.toDateString()}`);
+      logger.log(`Status: ${createdRequest.status}`);
     }
     
   } catch (error) {
-    console.error('Error checking leave requests:', error);
+    logger.error('Error checking leave requests:', error);
   } finally {
     mongoose.connection.close();
   }

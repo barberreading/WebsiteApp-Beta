@@ -16,12 +16,12 @@ async function createTestAlert() {
   try {
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI);
-    console.log('Connected to MongoDB');
+    logger.log('Connected to MongoDB');
 
     // Find a manager user to create the alert
     const manager = await User.findOne({ role: 'manager' });
     if (!manager) {
-      console.log('No manager found to create alert');
+      logger.log('No manager found to create alert');
       return;
     }
 
@@ -30,12 +30,12 @@ async function createTestAlert() {
     const client = await Client.findOne({});
 
     if (!service) {
-      console.log('Missing service data');
+      logger.log('Missing service data');
       return;
     }
 
     if (!client) {
-      console.log('Missing client data');
+      logger.log('Missing client data');
       return;
     }
 
@@ -64,23 +64,23 @@ async function createTestAlert() {
     });
 
     await testAlert.save();
-    console.log('\n=== TEST ALERT CREATED ===');
-    console.log(`Alert ID: ${testAlert._id}`);
-    console.log(`Title: ${testAlert.title}`);
-    console.log(`Status: ${testAlert.status}`);
-    console.log(`Send to All: ${testAlert.sendToAll}`);
-    console.log(`Start Time: ${testAlert.startTime}`);
-    console.log(`End Time: ${testAlert.endTime}`);
+    logger.log('\n=== TEST ALERT CREATED ===');
+    logger.log(`Alert ID: ${testAlert._id}`);
+    logger.log(`Title: ${testAlert.title}`);
+    logger.log(`Status: ${testAlert.status}`);
+    logger.log(`Send to All: ${testAlert.sendToAll}`);
+    logger.log(`Start Time: ${testAlert.startTime}`);
+    logger.log(`End Time: ${testAlert.endTime}`);
 
     // Verify the alert was created
     const openAlerts = await BookingAlert.find({ status: 'open' });
-    console.log(`\nTotal open alerts in database: ${openAlerts.length}`);
+    logger.log(`\nTotal open alerts in database: ${openAlerts.length}`);
 
   } catch (error) {
-    console.error('Error:', error);
+    logger.error('Error:', error);
   } finally {
     await mongoose.disconnect();
-    console.log('\nDisconnected from MongoDB');
+    logger.log('\nDisconnected from MongoDB');
   }
 }
 

@@ -135,7 +135,7 @@ const UserTemplateManager = ({ onSelectTemplate }) => {
       }
       setShowModal(false);
     } catch (err) {
-      console.error('Error saving template:', err);
+      logger.error('Error saving template:', err);
     }
   };
 

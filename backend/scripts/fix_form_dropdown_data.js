@@ -6,20 +6,20 @@ require('dotenv').config();
 
 async function fixFormDropdownData() {
   try {
-    console.log('🔧 FIXING FORM DROPDOWN DATA ISSUES');
-    console.log('=====================================');
+    logger.log('🔧 FIXING FORM DROPDOWN DATA ISSUES');
+    logger.log('=====================================');
     
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });
     
-    console.log(`✅ Connected to database: ${mongoose.connection.name}`);
+    logger.log(`✅ Connected to database: ${mongoose.connection.name}`);
     
     // Fix 1: Ensure all staff users have firstName and lastName fields
-    console.log('\n🔧 FIXING STAFF USERS - Adding firstName/lastName fields...');
+    logger.log('\n🔧 FIXING STAFF USERS - Adding firstName/lastName fields...');
     const staffUsers = await User.find({ role: 'staff' });
-    console.log(`Found ${staffUsers.length} staff users to check`);
+    logger.log(`Found ${staffUsers.length} staff users to check`);
     
     for (const staff of staffUsers) {
       let updated = false;
@@ -50,16 +50,16 @@ async function fixFormDropdownData() {
       
       if (updated) {
         await User.findByIdAndUpdate(staff._id, updates);
-        console.log(`  ✅ Updated ${staff.email}: ${updates.firstName} ${updates.lastName}`);
+        logger.log(`  ✅ Updated ${staff.email}: ${updates.firstName} ${updates.lastName}`);
       } else {
-        console.log(`  ✓ ${staff.email}: Already has firstName/lastName`);
+        logger.log(`  ✓ ${staff.email}: Already has firstName/lastName`);
       }
     }
     
     // Fix 2: Check and fix corrupted client data
-    console.log('\n🔧 CHECKING CLIENT DATA...');
+    logger.log('\n🔧 CHECKING CLIENT DATA...');
     const clients = await Client.find({});
-    console.log(`Found ${clients.length} clients`);
+    logger.log(`Found ${clients.length} clients`);
     
     let corruptedClients = 0;
     for (const client of clients) {
@@ -67,7 +67,7 @@ async function fixFormDropdownData() {
       const clientStr = JSON.stringify(client);
       if (clientStr.length > 10000 || clientStr.includes('\\x') || clientStr.includes('\\u')) {
         corruptedClients++;
-        console.log(`  ❌ Corrupted client found: ${client._id} (${clientStr.length} chars)`);
+        logger.log(`  ❌ Corrupted client found: ${client._id} (${clientStr.length} chars)`);
         
         // Try to fix basic fields
         const cleanClient = {
@@ -83,18 +83,18 @@ async function fixFormDropdownData() {
         };
         
         await Client.findByIdAndUpdate(client._id, cleanClient);
-        console.log(`    ✅ Fixed client: ${cleanClient.name}`);
+        logger.log(`    ✅ Fixed client: ${cleanClient.name}`);
       }
     }
     
     if (corruptedClients === 0) {
-      console.log('  ✅ All client data appears clean');
+      logger.log('  ✅ All client data appears clean');
     }
     
     // Fix 3: Verify services are working
-    console.log('\n🔧 CHECKING SERVICES DATA...');
+    logger.log('\n🔧 CHECKING SERVICES DATA...');
     const services = await Service.find({});
-    console.log(`Found ${services.length} services`);
+    logger.log(`Found ${services.length} services`);
     
     let activeServices = 0;
     services.forEach(service => {
@@ -102,11 +102,11 @@ async function fixFormDropdownData() {
         activeServices++;
       }
     });
-    console.log(`  ✅ ${activeServices} active services available`);
+    logger.log(`  ✅ ${activeServices} active services available`);
     
     // Fix 4: Create test data if collections are empty
     if (clients.length === 0) {
-      console.log('\n🔧 CREATING TEST CLIENT DATA...');
+      logger.log('\n🔧 CREATING TEST CLIENT DATA...');
       const testClients = [
         {
           name: 'John Smith',
@@ -146,43 +146,43 @@ async function fixFormDropdownData() {
       for (const clientData of testClients) {
         const client = new Client(clientData);
         await client.save();
-        console.log(`  ✅ Created test client: ${clientData.name}`);
+        logger.log(`  ✅ Created test client: ${clientData.name}`);
       }
     }
     
     // Final verification
-    console.log('\n🔍 FINAL VERIFICATION...');
+    logger.log('\n🔍 FINAL VERIFICATION...');
     
     // Check staff with firstName/lastName
     const verifyStaff = await User.find({ role: 'staff' }).select('firstName lastName name email');
-    console.log(`\n📊 STAFF USERS (${verifyStaff.length} total):`);
+    logger.log(`\n📊 STAFF USERS (${verifyStaff.length} total):`);
     verifyStaff.forEach(staff => {
       const displayName = staff.firstName && staff.lastName ? `${staff.firstName} ${staff.lastName}` : staff.name;
-      console.log(`  - ${displayName} (${staff.email})`);
+      logger.log(`  - ${displayName} (${staff.email})`);
     });
     
     // Check clean clients
     const verifyClients = await Client.find({}).select('name email').limit(5);
-    console.log(`\n📊 CLIENTS (${verifyClients.length} total, showing first 5):`);
+    logger.log(`\n📊 CLIENTS (${verifyClients.length} total, showing first 5):`);
     verifyClients.forEach(client => {
-      console.log(`  - ${client.name} (${client.email})`);
+      logger.log(`  - ${client.name} (${client.email})`);
     });
     
     // Check services
     const verifyServices = await Service.find({ isActive: { $ne: false } }).select('name').limit(5);
-    console.log(`\n📊 SERVICES (showing first 5):`);
+    logger.log(`\n📊 SERVICES (showing first 5):`);
     verifyServices.forEach(service => {
-      console.log(`  - ${service.name}`);
+      logger.log(`  - ${service.name}`);
     });
     
-    console.log('\n✅ FORM DROPDOWN DATA FIX COMPLETE!');
-    console.log('🎯 All form dropdowns should now work properly');
+    logger.log('\n✅ FORM DROPDOWN DATA FIX COMPLETE!');
+    logger.log('🎯 All form dropdowns should now work properly');
     
   } catch (error) {
-    console.error('❌ Fix failed:', error.message);
+    logger.error('❌ Fix failed:', error.message);
   } finally {
     await mongoose.connection.close();
-    console.log('\n🔌 Database connection closed');
+    logger.log('\n🔌 Database connection closed');
   }
 }
 

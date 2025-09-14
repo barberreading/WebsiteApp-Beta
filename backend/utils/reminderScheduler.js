@@ -24,14 +24,14 @@ const scheduleAllReminders = async () => {
       reminderSent: { $ne: true }
     });
     
-    console.log(`Scheduling reminders for ${bookings.length} bookings`);
+    logger.log(`Scheduling reminders for ${bookings.length} bookings`);
     
     // Schedule a reminder for each booking
     for (const booking of bookings) {
       await scheduleReminder(booking);
     }
   } catch (error) {
-    console.error('Error scheduling reminders:', error);
+    logger.error('Error scheduling reminders:', error);
   }
 };
 
@@ -48,7 +48,7 @@ const scheduleReminder = async (booking) => {
     const service = await Service.findById(booking.service).select('name duration category');
     
     if (!client || !client.email) {
-      console.log(`No client email found for booking ${booking._id}`);
+      logger.log(`No client email found for booking ${booking._id}`);
       return;
     }
     
@@ -69,12 +69,12 @@ const scheduleReminder = async (booking) => {
     
     // If 24-hour reminder time is in the past, send immediately if not already sent
     if (timeUntil24hReminder <= 0 && !booking.reminderSent) {
-      console.log(`Sending immediate 24h reminder for booking ${booking._id}`);
+      logger.log(`Sending immediate 24h reminder for booking ${booking._id}`);
       await sendBookingReminder(fullBooking, client, staff, service);
       needsUpdate = true;
     } else if (timeUntil24hReminder > 0) {
       // Schedule the 24-hour reminder
-      console.log(`Scheduling 24h reminder for booking ${booking._id} in ${Math.floor(timeUntil24hReminder / 1000 / 60)} minutes`);
+      logger.log(`Scheduling 24h reminder for booking ${booking._id} in ${Math.floor(timeUntil24hReminder / 1000 / 60)} minutes`);
       
       setTimeout(async () => {
         try {
@@ -83,20 +83,20 @@ const scheduleReminder = async (booking) => {
           // Mark 24h reminder as sent
           await Booking.findByIdAndUpdate(booking._id, { reminderSent: true });
         } catch (error) {
-          console.error(`Error sending 24h reminder for booking ${booking._id}:`, error);
+          logger.error(`Error sending 24h reminder for booking ${booking._id}:`, error);
         }
       }, timeUntil24hReminder);
     }
     
     // If 1-hour reminder time is in the past but booking hasn't started yet, send immediately
     if (timeUntil1hReminder <= 0 && now < booking.startTime && !booking.hourReminderSent) {
-      console.log(`Sending immediate 1h reminder for booking ${booking._id}`);
+      logger.log(`Sending immediate 1h reminder for booking ${booking._id}`);
       await sendBookingReminder(fullBooking, client, staff, service, true); // true indicates 1-hour reminder
       needsUpdate = true;
       booking.hourReminderSent = true;
     } else if (timeUntil1hReminder > 0) {
       // Schedule the 1-hour reminder
-      console.log(`Scheduling 1h reminder for booking ${booking._id} in ${Math.floor(timeUntil1hReminder / 1000 / 60)} minutes`);
+      logger.log(`Scheduling 1h reminder for booking ${booking._id} in ${Math.floor(timeUntil1hReminder / 1000 / 60)} minutes`);
       
       setTimeout(async () => {
         try {
@@ -105,7 +105,7 @@ const scheduleReminder = async (booking) => {
           // Mark 1h reminder as sent
           await Booking.findByIdAndUpdate(booking._id, { hourReminderSent: true });
         } catch (error) {
-          console.error(`Error sending 1h reminder for booking ${booking._id}:`, error);
+          logger.error(`Error sending 1h reminder for booking ${booking._id}:`, error);
         }
       }, timeUntil1hReminder);
     }
@@ -121,7 +121,7 @@ const scheduleReminder = async (booking) => {
       }
     }
   } catch (error) {
-    console.error(`Error scheduling reminder for booking ${booking._id}:`, error);
+    logger.error(`Error scheduling reminder for booking ${booking._id}:`, error);
   }
 };
 
@@ -147,7 +147,7 @@ const scheduleDailyReminderCheck = () => {
     setInterval(scheduleAllReminders, 24 * 60 * 60 * 1000);
   }, timeUntilMidnight);
   
-  console.log(`Scheduled daily reminder check to run in ${Math.floor(timeUntilMidnight / 1000 / 60)} minutes`);
+  logger.log(`Scheduled daily reminder check to run in ${Math.floor(timeUntilMidnight / 1000 / 60)} minutes`);
 };
 
 module.exports = {

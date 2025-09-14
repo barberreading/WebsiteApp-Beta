@@ -9,19 +9,19 @@ require('dotenv').config();
 
 async function createTestCalendarData() {
     try {
-        console.log('Connecting to MongoDB...');
+        logger.log('Connecting to MongoDB...');
         await mongoose.connect(process.env.MONGO_URI);
-        console.log('Connected to MongoDB');
+        logger.log('Connected to MongoDB');
 
         // Find the staff user
         const staffEmail = 'barberreading@hotmail.co.uk';
         const staffUser = await User.findOne({ email: staffEmail });
         if (!staffUser) {
-            console.log('❌ Staff user not found!');
+            logger.log('❌ Staff user not found!');
             return;
         }
         
-        console.log(`✅ Found staff user: ${staffUser._id}`);
+        logger.log(`✅ Found staff user: ${staffUser._id}`);
         
         // Get or create a test client
         let testClient = await Client.findOne({ name: 'Test Client' });
@@ -37,7 +37,7 @@ async function createTestCalendarData() {
                 }
             });
             await testClient.save();
-            console.log('✅ Created test client');
+            logger.log('✅ Created test client');
         }
         
         // Create a test service with required createdBy field
@@ -49,7 +49,7 @@ async function createTestCalendarData() {
             createdBy: staffUser._id
         });
         await testService.save();
-        console.log('✅ Created test service');
+        logger.log('✅ Created test service');
         
         // Create test booking for today
         const today = new Date();
@@ -73,7 +73,7 @@ async function createTestCalendarData() {
             status: 'scheduled'
         });
         await testBooking.save();
-        console.log('✅ Created test booking for today');
+        logger.log('✅ Created test booking for today');
         
         // Create test booking alert with all required fields
         const alertStartTime = new Date(tomorrow);
@@ -95,7 +95,7 @@ async function createTestCalendarData() {
             status: 'open'
         });
         await testAlert.save();
-        console.log('✅ Created test booking alert for tomorrow');
+        logger.log('✅ Created test booking alert for tomorrow');
         
         // Create test leave request (must be at least one week in advance)
         const twoWeeksFromNow = new Date(today);
@@ -115,30 +115,30 @@ async function createTestCalendarData() {
             appliedDate: today
         });
         await testLeaveRequest.save();
-        console.log('✅ Created test leave request for next week');
+        logger.log('✅ Created test leave request for next week');
         
         // Verify the created data
-        console.log('\n--- VERIFICATION ---');
+        logger.log('\n--- VERIFICATION ---');
         const bookings = await Booking.find({ staffId: staffUser._id });
         const alerts = await BookingAlert.find({ staffId: staffUser._id });
         const leaveRequests = await LeaveRequest.find({ staffId: staffUser._id });
         
-        console.log(`📅 Total Bookings: ${bookings.length}`);
-        console.log(`🚨 Total Alerts: ${alerts.length}`);
-        console.log(`🏖️ Total Leave Requests: ${leaveRequests.length}`);
-        console.log(`🎯 Total Calendar Events: ${bookings.length + alerts.length + leaveRequests.length}`);
+        logger.log(`📅 Total Bookings: ${bookings.length}`);
+        logger.log(`🚨 Total Alerts: ${alerts.length}`);
+        logger.log(`🏖️ Total Leave Requests: ${leaveRequests.length}`);
+        logger.log(`🎯 Total Calendar Events: ${bookings.length + alerts.length + leaveRequests.length}`);
         
-        console.log('\n✅ Test calendar data created successfully!');
-        console.log('   Now the staff calendar should display these events.');
-        console.log('   Please refresh the calendar page to see the new data.');
+        logger.log('\n✅ Test calendar data created successfully!');
+        logger.log('   Now the staff calendar should display these events.');
+        logger.log('   Please refresh the calendar page to see the new data.');
         
     } catch (error) {
-        console.error('❌ Error:', error.message);
-        console.error('Stack:', error.stack);
+        logger.error('❌ Error:', error.message);
+        logger.error('Stack:', error.stack);
     } finally {
-        console.log('\nDisconnecting from MongoDB...');
+        logger.log('\nDisconnecting from MongoDB...');
         await mongoose.disconnect();
-        console.log('Disconnected from MongoDB');
+        logger.log('Disconnected from MongoDB');
     }
 }
 

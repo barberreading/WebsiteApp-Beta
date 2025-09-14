@@ -9,7 +9,7 @@ exports.searchStaffByDistance = async (req, res) => {
       data: staff
     });
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     res.status(500).json({
       success: false,
       message: err.message || 'Server Error'

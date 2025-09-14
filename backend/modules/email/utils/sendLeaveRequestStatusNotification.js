@@ -35,7 +35,7 @@ const sendLeaveRequestStatusNotification = async (leaveRequest, staff, status) =
 
     return true;
   } catch (error) {
-    console.error(`Error sending leave request ${status} notification:`, error);
+    logger.error(`Error sending leave request ${status} notification:`, error);
     return false;
   }
 };

@@ -171,7 +171,7 @@ const uploadPhoto = async (userId, file) => {
     await new Promise((resolve, reject) => {
         file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
             if (err) {
-                console.error(err);
+                logger.error(err);
                 return reject(new ErrorResponse('Problem with file upload', 500));
             }
             await User.findByIdAndUpdate(userId, { photo: file.name });

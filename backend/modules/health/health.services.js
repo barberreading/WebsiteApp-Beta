@@ -28,7 +28,7 @@ exports.healthCheck = async () => {
                 healthStatus.status = 'degraded';
             }
         } catch (dbError) {
-            console.error('Database health check failed:', dbError);
+            logger.error('Database health check failed:', dbError);
             healthStatus.services.database = 'unhealthy';
             healthStatus.status = 'degraded';
         }
@@ -36,7 +36,7 @@ exports.healthCheck = async () => {
         return healthStatus;
 
     } catch (error) {
-        console.error('Health check error:', error);
+        logger.error('Health check error:', error);
         return {
             status: 'unhealthy',
             timestamp: new Date().toISOString(),
@@ -94,7 +94,7 @@ exports.detailedHealthCheck = async () => {
         return detailedHealth;
 
     } catch (error) {
-        console.error('Detailed health check error:', error);
+        logger.error('Detailed health check error:', error);
         return {
             status: 'unhealthy',
             timestamp: new Date().toISOString(),

@@ -55,7 +55,7 @@ TokenBlacklistSchema.statics.blacklistToken = async function(token, userId, reas
     
     return true;
   } catch (error) {
-    console.error('Error blacklisting token:', error);
+    logger.error('Error blacklisting token:', error);
     return false;
   }
 };
@@ -66,7 +66,7 @@ TokenBlacklistSchema.statics.isTokenBlacklisted = async function(token) {
     const blacklistedToken = await this.findOne({ token });
     return !!blacklistedToken;
   } catch (error) {
-    console.error('Error checking token blacklist:', error);
+    logger.error('Error checking token blacklist:', error);
     return false;
   }
 };
@@ -75,7 +75,7 @@ TokenBlacklistSchema.statics.isTokenBlacklisted = async function(token) {
 TokenBlacklistSchema.statics.blacklistAllUserTokens = async function(userId, reason = 'security_breach') {
   // This is a placeholder - in a real implementation, you'd need to track active tokens
   // For now, we'll just mark the user as requiring re-authentication
-  console.log(`All tokens for user ${userId} should be considered invalid due to: ${reason}`);
+  logger.log(`All tokens for user ${userId} should be considered invalid due to: ${reason}`);
   return true;
 };
 
@@ -85,10 +85,10 @@ TokenBlacklistSchema.statics.cleanupExpired = async function() {
     const result = await this.deleteMany({
       expiresAt: { $lt: new Date() }
     });
-    console.log(`Cleaned up ${result.deletedCount} expired blacklisted tokens`);
+    logger.log(`Cleaned up ${result.deletedCount} expired blacklisted tokens`);
     return result.deletedCount;
   } catch (error) {
-    console.error('Error cleaning up expired tokens:', error);
+    logger.error('Error cleaning up expired tokens:', error);
     return 0;
   }
 };

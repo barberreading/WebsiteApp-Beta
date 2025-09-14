@@ -40,7 +40,7 @@ const sendBookingCancellationNotification = async (booking) => {
       
       return true;
     } catch (error) {
-      console.error('Error sending booking cancellation notification:', error);
+      logger.error('Error sending booking cancellation notification:', error);
       return false;
     }
   }

@@ -29,7 +29,7 @@ const getEmailTemplate = async (type, variables) => {
     
     return { subject, body };
   } catch (error) {
-    console.error(`Error getting email template '${type}':`, error);
+    logger.error(`Error getting email template '${type}':`, error);
     throw error;
   }
 };

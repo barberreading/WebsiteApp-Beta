@@ -31,7 +31,7 @@ async function loginAsAdmin() {
   }
   
   try {
-    console.log('Attempting to login as admin user...');
+    logger.log('Attempting to login as admin user...');
     const response = await axios.post(`${BASE_URL}/api/auth/login`, {
       email: adminEmail,
       password: adminPassword
@@ -43,7 +43,7 @@ async function loginAsAdmin() {
 }
 
 async function restoreBookingKeys(token) {
-  console.log('\nRestoring booking keys...');
+  logger.log('\nRestoring booking keys...');
   
   for (const keyData of bookingKeysData) {
     try {
@@ -57,19 +57,19 @@ async function restoreBookingKeys(token) {
           }
         }
       );
-      console.log(`✅ Created booking key: ${keyData.name}`);
+      logger.log(`✅ Created booking key: ${keyData.name}`);
     } catch (error) {
       if (error.response?.status === 400 && error.response?.data?.message?.includes('already exists')) {
-        console.log(`ℹ️  Booking key already exists: ${keyData.name}`);
+        logger.log(`ℹ️  Booking key already exists: ${keyData.name}`);
       } else {
-        console.log(`❌ Failed to create booking key ${keyData.name}:`, error.response?.data?.message || error.message);
+        logger.log(`❌ Failed to create booking key ${keyData.name}:`, error.response?.data?.message || error.message);
       }
     }
   }
 }
 
 async function restoreLocationAreas(token) {
-  console.log('\nRestoring location areas...');
+  logger.log('\nRestoring location areas...');
   
   for (const areaData of locationAreasData) {
     try {
@@ -83,48 +83,48 @@ async function restoreLocationAreas(token) {
           }
         }
       );
-      console.log(`✅ Created location area: ${areaData.name}`);
+      logger.log(`✅ Created location area: ${areaData.name}`);
     } catch (error) {
       if (error.response?.status === 400 && error.response?.data?.message?.includes('already exists')) {
-        console.log(`ℹ️  Location area already exists: ${areaData.name}`);
+        logger.log(`ℹ️  Location area already exists: ${areaData.name}`);
       } else {
-        console.log(`❌ Failed to create location area ${areaData.name}:`, error.response?.data?.message || error.message);
+        logger.log(`❌ Failed to create location area ${areaData.name}:`, error.response?.data?.message || error.message);
       }
     }
   }
 }
 
 async function verifyData(token) {
-  console.log('\nVerifying restored data...');
+  logger.log('\nVerifying restored data...');
   
   try {
     const keysResponse = await axios.get(`${BASE_URL}/api/booking-categories/keys`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    console.log(`📊 Total booking keys: ${keysResponse.data.length}`);
+    logger.log(`📊 Total booking keys: ${keysResponse.data.length}`);
     
     const areasResponse = await axios.get(`${BASE_URL}/api/booking-categories/areas`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    console.log(`📊 Total location areas: ${areasResponse.data.length}`);
+    logger.log(`📊 Total location areas: ${areasResponse.data.length}`);
     
   } catch (error) {
-    console.log('❌ Failed to verify data:', error.response?.data?.message || error.message);
+    logger.log('❌ Failed to verify data:', error.response?.data?.message || error.message);
   }
 }
 
 async function restoreData() {
   try {
     const token = await loginAsAdmin();
-    console.log('✅ Successfully authenticated');
+    logger.log('✅ Successfully authenticated');
     
     await restoreBookingKeys(token);
     await restoreLocationAreas(token);
     await verifyData(token);
     
-    console.log('\n🎉 Booking keys and location areas restoration completed!');
+    logger.log('\n🎉 Booking keys and location areas restoration completed!');
   } catch (error) {
-    console.log('❌ Restoration failed:', error.message);
+    logger.log('❌ Restoration failed:', error.message);
   }
 }
 

@@ -5,29 +5,29 @@ const BookingAlert = require('./models/BookingAlert');
 async function checkBookingAlerts() {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log('Connected to MongoDB');
+    logger.log('Connected to MongoDB');
     
     const count = await BookingAlert.countDocuments();
-    console.log('Total booking alerts:', count);
+    logger.log('Total booking alerts:', count);
     
     // Get all booking alerts
     const alerts = await BookingAlert.find()
       .limit(10);
     
-    console.log('Sample booking alerts:');
+    logger.log('Sample booking alerts:');
     alerts.forEach(alert => {
-      console.log('- Alert:', alert.title);
-      console.log('  Status:', alert.status);
-      console.log('  Start:', alert.startTime);
-      console.log('  End:', alert.endTime);
-      console.log('  Send to all:', alert.sendToAll);
-      console.log('  Location areas:', alert.selectedLocationAreas);
-      console.log('---');
+      logger.log('- Alert:', alert.title);
+      logger.log('  Status:', alert.status);
+      logger.log('  Start:', alert.startTime);
+      logger.log('  End:', alert.endTime);
+      logger.log('  Send to all:', alert.sendToAll);
+      logger.log('  Location areas:', alert.selectedLocationAreas);
+      logger.log('---');
     });
     
     process.exit(0);
   } catch (error) {
-    console.error('Error:', error);
+    logger.error('Error:', error);
     process.exit(1);
   }
 }

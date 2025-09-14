@@ -72,7 +72,7 @@ const sendMissingTimesheetReminders = async (startDate, endDate) => {
           results.sent++;
           results.staffNotified.push(staff.email);
         } catch (error) {
-          console.error(`Failed to send reminder to ${staff.email}:`, error);
+          logger.error(`Failed to send reminder to ${staff.email}:`, error);
           results.failed++;
         }
       }
@@ -83,7 +83,7 @@ const sendMissingTimesheetReminders = async (startDate, endDate) => {
     
     return results;
   } catch (error) {
-    console.error('Error sending missing timesheet reminders:', error);
+    logger.error('Error sending missing timesheet reminders:', error);
     return {
       total: 0,
       sent: 0,
@@ -139,14 +139,14 @@ const sendClientApprovalReminders = async () => {
         results.sent++;
         results.clientsNotified.push(client.email);
       } catch (error) {
-        console.error(`Failed to send reminder to client ${client.email}:`, error);
+        logger.error(`Failed to send reminder to client ${client.email}:`, error);
         results.failed++;
       }
     }
     
     return results;
   } catch (error) {
-    console.error('Error sending client approval reminders:', error);
+    logger.error('Error sending client approval reminders:', error);
     return {
       total: 0,
       sent: 0,
@@ -187,7 +187,7 @@ const notifyStaffAboutPendingApprovals = async (pendingTimesheets) => {
       try {
         await emailService.sendPendingApprovalNotification(staff, timesheets);
       } catch (error) {
-        console.error(`Failed to notify staff ${staff.email}:`, error);
+        logger.error(`Failed to notify staff ${staff.email}:`, error);
       }
     }
     
@@ -201,11 +201,11 @@ const notifyStaffAboutPendingApprovals = async (pendingTimesheets) => {
       try {
         await emailService.sendManagerPendingApprovalSummary(manager, pendingTimesheets);
       } catch (error) {
-        console.error(`Failed to notify manager ${manager.email}:`, error);
+        logger.error(`Failed to notify manager ${manager.email}:`, error);
       }
     }
   } catch (error) {
-    console.error('Error notifying about pending approvals:', error);
+    logger.error('Error notifying about pending approvals:', error);
   }
 };
 
@@ -259,14 +259,14 @@ const sendApprovalNotifications = async () => {
         results.sent++;
         results.staffNotified.push(staff.email);
       } catch (error) {
-        console.error(`Failed to send notification to ${staff.email}:`, error);
+        logger.error(`Failed to send notification to ${staff.email}:`, error);
         results.failed++;
       }
     }
     
     return results;
   } catch (error) {
-    console.error('Error sending approval notifications:', error);
+    logger.error('Error sending approval notifications:', error);
     return {
       total: 0,
       sent: 0,

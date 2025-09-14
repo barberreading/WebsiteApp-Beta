@@ -63,7 +63,7 @@ const WeeklyView = ({ bookings, services, staff, onDateSelect }) => {
     }
     
     setFilteredBookings(filtered);
-    console.log('Filtered bookings:', filtered.length);
+    logger.log('Filtered bookings:', filtered.length);
   }, [bookings, selectedService, selectedStaff]);
 
   // Navigate to previous week

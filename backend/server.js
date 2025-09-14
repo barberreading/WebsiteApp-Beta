@@ -8,6 +8,13 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const winston = require('winston');
+const logger = require('./utils/logger');
+
+// Security middleware imports
+const { errorSanitizerMiddleware } = require('./middleware/errorSanitizer');
+const { securityHeadersMiddleware, corsMiddleware, createRateLimiter } = require('./middleware/securityHeaders');
+const { inputValidationMiddleware } = require('./middleware/inputValidation');
+const { securityMonitoringMiddleware, trackFailedLoginMiddleware } = require('./middleware/securityMonitoring');
 const logManager = require('./modules/logging/logging.services.js');
 const { generalLimiter, authLimiter, passwordResetLimiter, uploadLimiter, createLimiter } = require('./middleware/rateLimiter');
 
@@ -51,20 +58,31 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
-// Middleware
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-})); // Security headers with cross-origin resource policy
+// Security middleware (applied first)
+app.use(securityHeadersMiddleware);
+app.use(corsMiddleware);
 
-// Configure CORS with specific options
-app.use(cors({
-  origin: ['http://localhost:3001', 'http://localhost:3002'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
-})); // Enable CORS with specific configuration
-app.use(express.json({ limit: '500mb' })); // Parse JSON bodies with greatly increased size limit
-app.use(express.urlencoded({ limit: '500mb', extended: true })); // Parse URL-encoded bodies with greatly increased size limit
+// Security monitoring (track requests and detect threats)
+app.use(securityMonitoringMiddleware);
+app.use(trackFailedLoginMiddleware);
+
+// Rate limiting
+app.use(createRateLimiter(15 * 60 * 1000, 100)); // 100 requests per 15 minutes
+
+// Input validation and sanitization
+app.use(inputValidationMiddleware);
+
+// Body parsing with security limits
+app.use(express.json({ 
+  limit: '1mb',
+  verify: (req, res, buf) => {
+    req.rawBody = buf;
+  }
+}));
+app.use(express.urlencoded({ 
+  extended: true, 
+  limit: '1mb'
+}));
 app.use(morgan('combined')); // HTTP request logger
 
 // Apply general rate limiting to all routes
@@ -90,9 +108,9 @@ if (process.env.NODE_ENV === 'production' || process.pkg) {
   const frontendBuildPath = path.join(__dirname, '..', 'frontend', 'build');
   if (fs.existsSync(frontendBuildPath)) {
     app.use(express.static(frontendBuildPath));
-    console.log('Serving static files from:', frontendBuildPath);
+    logger.info('Serving static files from:', frontendBuildPath);
   } else {
-    console.log('Frontend build path not found:', frontendBuildPath);
+    logger.info('Frontend build path not found:', frontendBuildPath);
   }
 }
 
@@ -144,6 +162,7 @@ app.use('/api/password-reset', passwordResetLimiter, passwordResetRoutes);
 app.use('/api/calendar-integration', calendarIntegrationRoutes);
 app.use('/api/document-reminders', documentRemindersRoutes);
 app.use('/api/logging', loggingRoutes);
+app.use('/api/monitoring', require('./modules/monitoring/monitoring.routes'));
 
 // Add a root endpoint for basic connectivity checks
 app.get('/api', (req, res) => {
@@ -181,10 +200,10 @@ if (process.env.NODE_ENV === 'production' || process.pkg) {
       frontendBuildPath = path.join(__dirname, '..', 'frontend', 'build', 'index.html');
     }
     
-    console.log('Looking for frontend at:', frontendBuildPath);
-    console.log('File exists:', fs.existsSync(frontendBuildPath));
-    console.log('__dirname:', __dirname);
-    console.log('process.pkg:', !!process.pkg);
+    logger.info('Looking for frontend at:', frontendBuildPath);
+    logger.info('File exists:', fs.existsSync(frontendBuildPath));
+    logger.info('__dirname:', __dirname);
+    logger.info('process.pkg:', !!process.pkg);
     
     if (fs.existsSync(frontendBuildPath)) {
       res.sendFile(path.resolve(frontendBuildPath));
@@ -198,9 +217,9 @@ if (process.env.NODE_ENV === 'production' || process.pkg) {
       
       let found = false;
       for (const altPath of alternativePaths) {
-        console.log('Trying alternative path:', altPath);
+        logger.info('Trying alternative path:', altPath);
         if (fs.existsSync(altPath)) {
-          console.log('Found frontend at:', altPath);
+          logger.info('Found frontend at:', altPath);
           res.sendFile(path.resolve(altPath));
           found = true;
           break;
@@ -208,7 +227,7 @@ if (process.env.NODE_ENV === 'production' || process.pkg) {
       }
       
       if (!found) {
-        console.log('Frontend not found in any path');
+        logger.info('Frontend not found in any path');
         res.status(404).json({ 
           message: 'Frontend not found', 
           searchedPaths: [frontendBuildPath, ...alternativePaths],
@@ -222,6 +241,7 @@ if (process.env.NODE_ENV === 'production' || process.pkg) {
 }
 
 // Error handling middleware (must be last)
+app.use(errorSanitizerMiddleware);
 app.use(notFound); // Handle 404 errors
 app.use(errorHandler); // Handle all other errors
 
@@ -275,7 +295,7 @@ const PORT = process.env.PORT || 3002;
 if (process.env.NODE_ENV !== 'test') {
     connectDB().then(() => {
         app.listen(PORT, async () => {
-            logger.info(`Server running on port ${PORT}`, { service: 'test-api' });
+            logger.info(`Server is running on port ${PORT}`, { service: 'test-api' });
 
             // Initialize log manager
             logManager.checkAllLogs();

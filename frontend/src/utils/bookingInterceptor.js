@@ -124,7 +124,7 @@ class BookingInterceptor {
     const config = error.config;
     const bookingData = this.parseBookingData(config.data);
     
-    console.log('Intercepting failed booking request:', {
+    logger.log('Intercepting failed booking request:', {
       url: config.url,
       error: error.message,
       status: error.response?.status
@@ -159,7 +159,7 @@ class BookingInterceptor {
 
       return Promise.resolve(offlineResponse);
     } catch (queueError) {
-      console.error('Failed to add booking to offline queue:', queueError);
+      logger.error('Failed to add booking to offline queue:', queueError);
       
       // If we can't queue it, reject with enhanced error info
       const enhancedError = new Error(
@@ -182,7 +182,7 @@ class BookingInterceptor {
       }
       return requestData || {};
     } catch (error) {
-      console.warn('Failed to parse booking data:', error);
+      logger.warn('Failed to parse booking data:', error);
       return {};
     }
   }
@@ -270,7 +270,7 @@ class BookingInterceptor {
    */
   async syncQueue() {
     if (!navigator.onLine) {
-      console.log('Cannot sync: offline');
+      logger.log('Cannot sync: offline');
       return { success: false, reason: 'offline' };
     }
 
@@ -279,7 +279,7 @@ class BookingInterceptor {
       return { success: true, synced: 0 };
     }
 
-    console.log(`Syncing ${queuedBookings.length} offline bookings...`);
+    logger.log(`Syncing ${queuedBookings.length} offline bookings...`);
     
     try {
       // Prepare bookings for sync
@@ -298,7 +298,7 @@ class BookingInterceptor {
         const { successful, failed, duplicates } = response.data.data;
         const { summary } = response.data;
 
-        console.log('Sync completed:', summary);
+        logger.log('Sync completed:', summary);
 
         // Remove successfully synced items from queue
         successful.forEach(item => {
@@ -325,7 +325,7 @@ class BookingInterceptor {
         throw new Error(response.data.error || 'Sync failed');
       }
     } catch (error) {
-      console.error('Sync failed:', error);
+      logger.error('Sync failed:', error);
       return {
         success: false,
         error: error.message,
@@ -380,7 +380,7 @@ class BookingInterceptor {
         }
       }
     } catch (error) {
-      console.warn('Failed to check recent connection errors:', error);
+      logger.warn('Failed to check recent connection errors:', error);
     }
 
     return false;
@@ -404,7 +404,7 @@ class BookingInterceptor {
       
       localStorage.setItem('recent_connection_errors', JSON.stringify(trimmedErrors));
     } catch (storageError) {
-      console.warn('Failed to record connection error:', storageError);
+      logger.warn('Failed to record connection error:', storageError);
     }
   }
 
@@ -412,7 +412,7 @@ class BookingInterceptor {
    * Initialize the booking interceptor
    */
   initialize() {
-    console.log('Booking interceptor initialized');
+    logger.log('Booking interceptor initialized');
     // Initialize offline queue connection monitoring
     offlineBookingQueue.initializeConnectionMonitoring();
     return this;
@@ -422,7 +422,7 @@ class BookingInterceptor {
    * Cleanup interceptors and resources
    */
   cleanup() {
-    console.log('Cleaning up booking interceptor');
+    logger.log('Cleaning up booking interceptor');
     // Stop periodic processing
     offlineBookingQueue.stopPeriodicProcessing();
     

@@ -65,7 +65,7 @@ const ResourcesManagement = () => {
       setResources(response.data);
       setTotalResources(response.data.length);
     } catch (err) {
-      console.error('Error fetching resources:', err);
+      logger.error('Error fetching resources:', err);
       setError('Failed to load resources. Please try again later.');
       toast.error('Error loading resources');
     } finally {
@@ -81,7 +81,7 @@ const ResourcesManagement = () => {
       const response = await axiosInstance.get('/services', { headers });
       setAvailableServices(response.data);
     } catch (err) {
-      console.error('Error fetching services:', err);
+      logger.error('Error fetching services:', err);
       toast.error('Error loading services');
     }
   };
@@ -158,7 +158,7 @@ const ResourcesManagement = () => {
       });
       fetchResources();
     } catch (err) {
-      console.error('Error adding resource:', err);
+      logger.error('Error adding resource:', err);
       toast.error('Failed to add resource');
     }
   };

@@ -6,17 +6,17 @@ require('dotenv').config();
 async function resetRachelPassword() {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log('Connected to MongoDB');
+    logger.log('Connected to MongoDB');
     
     const rachel = await User.findOne({ email: 'rachel.green@everythingchildcareagency.co.uk' });
     
     if (!rachel) {
-      console.log('Rachel Green not found');
+      logger.log('Rachel Green not found');
       return;
     }
     
-    console.log('Found Rachel Green:', rachel.name);
-    console.log('Current password hash exists:', !!rachel.password);
+    logger.log('Found Rachel Green:', rachel.name);
+    logger.log('Current password hash exists:', !!rachel.password);
     
     // Hash the password Staff123!
     const salt = await bcrypt.genSalt(10);
@@ -28,19 +28,19 @@ async function resetRachelPassword() {
       isActive: true
     });
     
-    console.log('✅ Password reset to "Staff123!" for Rachel Green');
-    console.log('✅ User set to active');
+    logger.log('✅ Password reset to "Staff123!" for Rachel Green');
+    logger.log('✅ User set to active');
     
     // Verify the password works
     const updatedRachel = await User.findById(rachel._id);
     const isMatch = await bcrypt.compare('Staff123!', updatedRachel.password);
-    console.log('✅ Password verification:', isMatch ? 'SUCCESS' : 'FAILED');
+    logger.log('✅ Password verification:', isMatch ? 'SUCCESS' : 'FAILED');
     
   } catch (error) {
-    console.error('Error:', error.message);
+    logger.error('Error:', error.message);
   } finally {
     await mongoose.disconnect();
-    console.log('Disconnected from MongoDB');
+    logger.log('Disconnected from MongoDB');
   }
 }
 

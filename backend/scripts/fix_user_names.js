@@ -4,7 +4,7 @@ require('dotenv').config();
 
 async function fixUserNames() {
   try {
-    console.log('Fixing user names...');
+    logger.log('Fixing user names...');
     
     // Connect to database
     const connectionString = process.env.SYNOLOGY_MONGO_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/test';
@@ -13,23 +13,23 @@ async function fixUserNames() {
       useUnifiedTopology: true
     });
     
-    console.log('Connected successfully!');
+    logger.log('Connected successfully!');
     
     // Get all users and check their structure
     const users = await User.find({});
-    console.log(`\nFound ${users.length} users. Checking structure...`);
+    logger.log(`\nFound ${users.length} users. Checking structure...`);
     
     users.forEach((user, index) => {
-      console.log(`\nUser ${index + 1}:`);
-      console.log(`- ID: ${user._id}`);
-      console.log(`- Email: ${user.email}`);
-      console.log(`- Role: ${user.role}`);
-      console.log(`- firstName: ${user.firstName}`);
-      console.log(`- lastName: ${user.lastName}`);
-      console.log(`- Full object keys:`, Object.keys(user.toObject()));
+      logger.log(`\nUser ${index + 1}:`);
+      logger.log(`- ID: ${user._id}`);
+      logger.log(`- Email: ${user.email}`);
+      logger.log(`- Role: ${user.role}`);
+      logger.log(`- firstName: ${user.firstName}`);
+      logger.log(`- lastName: ${user.lastName}`);
+      logger.log(`- Full object keys:`, Object.keys(user.toObject()));
       
       if (index >= 2) { // Only show first 3 users to avoid spam
-        console.log(`... and ${users.length - 3} more users`);
+        logger.log(`... and ${users.length - 3} more users`);
         return false;
       }
     });
@@ -38,23 +38,23 @@ async function fixUserNames() {
     const sampleUser = users[0];
     if (sampleUser) {
       const userObj = sampleUser.toObject();
-      console.log('\nSample user full structure:', JSON.stringify(userObj, null, 2));
+      logger.log('\nSample user full structure:', JSON.stringify(userObj, null, 2));
       
       // Check for common name field variations
       const nameFields = ['name', 'fullName', 'displayName', 'username'];
       nameFields.forEach(field => {
         if (userObj[field]) {
-          console.log(`Found ${field}: ${userObj[field]}`);
+          logger.log(`Found ${field}: ${userObj[field]}`);
         }
       });
     }
     
     // If users have email but no firstName/lastName, let's extract names from email or create default names
     const usersNeedingNames = users.filter(user => !user.firstName || !user.lastName);
-    console.log(`\n${usersNeedingNames.length} users need name fixes`);
+    logger.log(`\n${usersNeedingNames.length} users need name fixes`);
     
     if (usersNeedingNames.length > 0) {
-      console.log('\nFixing user names...');
+      logger.log('\nFixing user names...');
       
       for (const user of usersNeedingNames) {
         let firstName, lastName;
@@ -76,7 +76,7 @@ async function fixUserNames() {
           lastName = 'User';
         }
         
-        console.log(`Updating ${user.email}: ${firstName} ${lastName}`);
+        logger.log(`Updating ${user.email}: ${firstName} ${lastName}`);
         
         await User.findByIdAndUpdate(user._id, {
           firstName: firstName,
@@ -84,22 +84,22 @@ async function fixUserNames() {
         });
       }
       
-      console.log('\n✅ User names have been fixed!');
+      logger.log('\n✅ User names have been fixed!');
     }
     
     // Verify the fix
-    console.log('\n=== VERIFICATION ===');
+    logger.log('\n=== VERIFICATION ===');
     const updatedUsers = await User.find({}).select('firstName lastName email role');
-    console.log(`Updated users:`);
+    logger.log(`Updated users:`);
     updatedUsers.forEach(user => {
-      console.log(`- ${user.firstName} ${user.lastName} (${user.email}) - Role: ${user.role}`);
+      logger.log(`- ${user.firstName} ${user.lastName} (${user.email}) - Role: ${user.role}`);
     });
     
   } catch (error) {
-    console.error('Fix failed:', error.message);
+    logger.error('Fix failed:', error.message);
   } finally {
     await mongoose.connection.close();
-    console.log('\nDatabase connection closed');
+    logger.log('\nDatabase connection closed');
   }
 }
 

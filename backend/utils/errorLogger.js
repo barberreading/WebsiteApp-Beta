@@ -2,15 +2,33 @@ const ErrorLog = require('../models/ErrorLog');
 
 /**
  * Log an error to the database
- * @param {Object} errorData - Error data to log
+ * @param {String|Object} typeOrErrorData - Error type string or complete error data object
+ * @param {String} message - Error message (optional if first param is object)
+ * @param {Object} metadata - Additional error metadata (optional if first param is object)
  * @returns {Promise<Object>} - The saved error log
  */
-const logError = async (errorData) => {
+const logError = async (typeOrErrorData, message, metadata = {}) => {
   try {
+    let errorData;
+    
+    // Handle both old format (object) and new format (type, message, metadata)
+    if (typeof typeOrErrorData === 'object' && typeOrErrorData !== null) {
+      // Old format: single object parameter
+      errorData = typeOrErrorData;
+    } else {
+      // New format: separate parameters
+      errorData = {
+        type: typeOrErrorData,
+        message: message,
+        ...metadata,
+        timestamp: new Date()
+      };
+    }
+    
     const errorLog = new ErrorLog(errorData);
     return await errorLog.save();
   } catch (error) {
-    console.error('Failed to log error:', error);
+    logger.error('Failed to log error:', error);
     throw error;
   }
 };
@@ -36,7 +54,7 @@ const getErrorLogs = async (filters = {}, options = {}) => {
       .limit(limit)
       .skip(skip);
   } catch (error) {
-    console.error('Failed to get error logs:', error);
+    logger.error('Failed to get error logs:', error);
     throw error;
   }
 };
@@ -61,7 +79,7 @@ const resolveErrorLog = async (errorId, resolvedById, resolution) => {
       { new: true }
     ).populate('resolvedBy', 'name email');
   } catch (error) {
-    console.error('Failed to resolve error log:', error);
+    logger.error('Failed to resolve error log:', error);
     throw error;
   }
 };

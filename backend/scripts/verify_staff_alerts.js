@@ -9,12 +9,12 @@ const loginAndGetToken = async () => {
     });
 
     const token = loginRes.data.token;
-    console.log('---TOKEN---');
-    console.log(token);
-    console.log('---END-TOKEN---');
+    logger.log('---TOKEN---');
+    logger.log(token);
+    logger.log('---END-TOKEN---');
 
   } catch (err) {
-    console.error('Error during login:', err.response ? err.response.data : err.message);
+    logger.error('Error during login:', err.response ? err.response.data : err.message);
   }
 };
 

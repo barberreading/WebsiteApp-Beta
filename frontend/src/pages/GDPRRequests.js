@@ -18,7 +18,7 @@ const GDPRRequests = () => {
       setError('');
     } catch (err) {
       setError('Failed to fetch GDPR requests');
-      console.error(err);
+      logger.error(err);
     } finally {
       setLoading(false);
     }
@@ -36,7 +36,7 @@ const GDPRRequests = () => {
       fetchRequests();
     } catch (err) {
       setError('Failed to submit data request');
-      console.error(err);
+      logger.error(err);
     } finally {
       setLoading(false);
     }
@@ -51,7 +51,7 @@ const GDPRRequests = () => {
         fetchRequests();
       } catch (err) {
         setError('Failed to submit deletion request');
-        console.error(err);
+        logger.error(err);
       } finally {
         setLoading(false);
       }
@@ -66,7 +66,7 @@ const GDPRRequests = () => {
       fetchRequests();
     } catch (err) {
       setError(`Failed to ${action} request`);
-      console.error(err);
+      logger.error(err);
     } finally {
       setLoading(false);
     }

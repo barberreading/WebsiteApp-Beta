@@ -35,7 +35,7 @@ const TimesheetApprovalDashboard = () => {
       setRejectedTimesheets(response.data.rejected || []);
     } catch (err) {
       setError('Failed to fetch timesheets. Please try again later.');
-      console.error('Error fetching timesheets:', err);
+      logger.error('Error fetching timesheets:', err);
     } finally {
       setLoading(false);
     }
@@ -72,7 +72,7 @@ const TimesheetApprovalDashboard = () => {
       
     } catch (err) {
       setError('Failed to update timesheet status. Please try again.');
-      console.error('Error updating timesheet:', err);
+      logger.error('Error updating timesheet:', err);
     }
   };
 
@@ -87,7 +87,7 @@ const TimesheetApprovalDashboard = () => {
       }
       return format(date, 'dd/MM/yyyy');
     } catch (error) {
-      console.error('Error formatting date:', error);
+      logger.error('Error formatting date:', error);
       return 'Invalid Date';
     }
   };

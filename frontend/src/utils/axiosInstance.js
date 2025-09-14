@@ -26,25 +26,25 @@ axiosRetry(axiosInstance, {
   retryCondition: (error) => {
     // Retry on network errors
     if (axiosRetry.isNetworkError(error)) {
-      console.log('Network error detected, retrying...', error.message);
+      logger.log('Network error detected, retrying...', error.message);
       return true;
     }
     
     // Retry on 5xx server errors (but not 4xx client errors)
     if (axiosRetry.isRetryableError(error)) {
-      console.log('Server error detected, retrying...', error.response?.status);
+      logger.log('Server error detected, retrying...', error.response?.status);
       return true;
     }
     
     // Retry on timeout errors
     if (error.code === 'ECONNABORTED') {
-      console.log('Request timeout, retrying...', error.message);
+      logger.log('Request timeout, retrying...', error.message);
       return true;
     }
     
     // Retry on connection refused (server down)
     if (error.code === 'ECONNREFUSED') {
-      console.log('Connection refused, server may be down, retrying...', error.message);
+      logger.log('Connection refused, server may be down, retrying...', error.message);
       return true;
     }
     
@@ -56,7 +56,7 @@ axiosRetry(axiosInstance, {
     return false;
   },
   onRetry: (retryCount, error, requestConfig) => {
-    console.log(`Retry attempt ${retryCount} for ${requestConfig.method?.toUpperCase()} ${requestConfig.url}`);
+    logger.log(`Retry attempt ${retryCount} for ${requestConfig.method?.toUpperCase()} ${requestConfig.url}`);
   },
 });
 
@@ -74,13 +74,13 @@ axiosInstance.interceptors.response.use(
     // Enhanced error handling with user-friendly messages
     if (error.response) {
       // Server responded with error status
-      console.error(`API Error ${error.response.status}:`, error.response.data);
+      logger.error(`API Error ${error.response.status}:`, error.response.data);
     } else if (error.request) {
       // Request was made but no response received
-      console.error('Network Error:', error.message);
+      logger.error('Network Error:', error.message);
     } else {
       // Something else happened
-      console.error('Request Error:', error.message);
+      logger.error('Request Error:', error.message);
     }
     
     return Promise.reject(error);

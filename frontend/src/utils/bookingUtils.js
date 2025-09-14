@@ -55,7 +55,7 @@ export const normalizeBookingDates = (dateValue) => {
     try {
       return parseISO(dateValue);
     } catch (error) {
-      console.warn('Failed to parse ISO date string:', dateValue, error);
+      logger.warn('Failed to parse ISO date string:', dateValue, error);
       return null;
     }
   }
@@ -69,7 +69,7 @@ export const normalizeBookingDates = (dateValue) => {
   try {
     return new Date(dateValue);
   } catch (error) {
-    console.warn('Failed to normalize date value:', dateValue, error);
+    logger.warn('Failed to normalize date value:', dateValue, error);
     return null;
   }
 };
@@ -89,7 +89,7 @@ export const getStaffBookingsForDate = (bookings, staffId, date) => {
     
     // Debug logging
     if (booking.title && (dateMatch || staffMatch)) {
-      console.log('🔍 BookingUtils: Filtering booking:', {
+      logger.log('🔍 BookingUtils: Filtering booking:', {
         title: booking.title,
         bookingStaff: booking.extendedProps?.staff,
         targetStaff: staffId,
@@ -104,7 +104,7 @@ export const getStaffBookingsForDate = (bookings, staffId, date) => {
     return dateMatch && staffMatch;
   });
   
-  console.log(`📊 BookingUtils: Found ${filtered.length} bookings for staff ${staffId} on ${date.toDateString()}`);
+  logger.log(`📊 BookingUtils: Found ${filtered.length} bookings for staff ${staffId} on ${date.toDateString()}`);
   return filtered;
 };
 

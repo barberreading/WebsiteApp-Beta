@@ -47,7 +47,7 @@ const Reports = () => {
       setReportData(res.data);
     } catch (err) {
       setError('Failed to generate report');
-      console.error(err);
+      logger.error(err);
     }
     setLoading(false);
   };

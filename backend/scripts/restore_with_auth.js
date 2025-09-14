@@ -28,13 +28,13 @@ async function loginAsAdmin() {
   try {
     // First, let's connect to MongoDB to find an admin user
     await mongoose.connect('mongodb://localhost:27017/test');
-    console.log('Connected to MongoDB');
+    logger.log('Connected to MongoDB');
     
     const User = require('./models/User');
     const adminUser = await User.findOne({ role: { $in: ['admin', 'superuser'] } });
     
     if (!adminUser) {
-      console.log('No admin user found. Creating a temporary admin user...');
+      logger.log('No admin user found. Creating a temporary admin user...');
       const bcrypt = require('bcryptjs');
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash('temppass123', salt);
@@ -47,7 +47,7 @@ async function loginAsAdmin() {
       });
       
       await tempAdmin.save();
-      console.log('Temporary admin user created');
+      logger.log('Temporary admin user created');
       
       // Login with temp admin
       const loginResponse = await axios.post('http://localhost:3002/api/auth/login', {
@@ -57,7 +57,7 @@ async function loginAsAdmin() {
       
       return loginResponse.data.token;
     } else {
-      console.log(`Found admin user: ${adminUser.email}`);
+      logger.log(`Found admin user: ${adminUser.email}`);
       // For existing admin, we'll need to reset password temporarily
       const bcrypt = require('bcryptjs');
       const salt = await bcrypt.genSalt(10);
@@ -66,7 +66,7 @@ async function loginAsAdmin() {
       adminUser.password = hashedPassword;
       await adminUser.save();
       
-      console.log('Temporarily reset admin password');
+      logger.log('Temporarily reset admin password');
       
       // Login with admin
       const loginResponse = await axios.post('http://localhost:3002/api/auth/login', {
@@ -77,14 +77,14 @@ async function loginAsAdmin() {
       return loginResponse.data.token;
     }
   } catch (error) {
-    console.error('Login error:', error.message);
+    logger.error('Login error:', error.message);
     throw error;
   }
 }
 
 async function restoreData() {
   try {
-    console.log('Getting admin authentication...');
+    logger.log('Getting admin authentication...');
     const token = await loginAsAdmin();
     
     const headers = {
@@ -92,53 +92,53 @@ async function restoreData() {
       'Content-Type': 'application/json'
     };
 
-    console.log('\nRestoring booking keys...');
+    logger.log('\nRestoring booking keys...');
     for (const key of sampleKeys) {
       try {
         const response = await axios.post('http://localhost:3002/api/booking-categories/keys', key, { headers });
-        console.log(`✓ Created key: ${key.name}`);
+        logger.log(`✓ Created key: ${key.name}`);
       } catch (err) {
         if (err.response?.status === 400 && err.response?.data?.message?.includes('already exists')) {
-          console.log(`- Key already exists: ${key.name}`);
+          logger.log(`- Key already exists: ${key.name}`);
         } else {
-          console.log(`✗ Error creating key '${key.name}': ${err.response?.data?.message || err.message}`);
+          logger.log(`✗ Error creating key '${key.name}': ${err.response?.data?.message || err.message}`);
         }
       }
     }
 
-    console.log('\nRestoring location areas...');
+    logger.log('\nRestoring location areas...');
     for (const area of sampleAreas) {
       try {
         const response = await axios.post('http://localhost:3002/api/booking-categories/areas', area, { headers });
-        console.log(`✓ Created area: ${area.name}`);
+        logger.log(`✓ Created area: ${area.name}`);
       } catch (err) {
         if (err.response?.status === 400 && err.response?.data?.message?.includes('already exists')) {
-          console.log(`- Area already exists: ${area.name}`);
+          logger.log(`- Area already exists: ${area.name}`);
         } else {
-          console.log(`✗ Error creating area '${area.name}': ${err.response?.data?.message || err.message}`);
+          logger.log(`✗ Error creating area '${area.name}': ${err.response?.data?.message || err.message}`);
         }
       }
     }
 
-    console.log('\n🎉 Data restoration completed!');
+    logger.log('\n🎉 Data restoration completed!');
 
     // Verify the data
-    console.log('\nVerifying restored data...');
+    logger.log('\nVerifying restored data...');
     try {
       const keysResponse = await axios.get('http://localhost:3002/api/booking-categories/keys', { headers });
-      console.log(`Found ${keysResponse.data.data.length} booking keys`);
+      logger.log(`Found ${keysResponse.data.data.length} booking keys`);
       
       const areasResponse = await axios.get('http://localhost:3002/api/booking-categories/areas', { headers });
-      console.log(`Found ${areasResponse.data.data.length} location areas`);
+      logger.log(`Found ${areasResponse.data.data.length} location areas`);
     } catch (err) {
-      console.log('Error verifying data:', err.response?.data?.message || err.message);
+      logger.log('Error verifying data:', err.response?.data?.message || err.message);
     }
 
   } catch (error) {
-    console.error('Restoration failed:', error.message);
+    logger.error('Restoration failed:', error.message);
   } finally {
     await mongoose.disconnect();
-    console.log('\nDisconnected from MongoDB');
+    logger.log('\nDisconnected from MongoDB');
   }
 }
 

@@ -7,9 +7,9 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log('MongoDB Connected'))
+.then(() => logger.log('MongoDB Connected'))
 .catch(err => {
-  console.error('MongoDB Connection Error:', err);
+  logger.error('MongoDB Connection Error:', err);
   process.exit(1);
 });
 
@@ -34,10 +34,10 @@ const updateSuperuser = async () => {
       }
     );
 
-    console.log('Superuser updated successfully:', superuser);
+    logger.log('Superuser updated successfully:', superuser);
     process.exit(0);
   } catch (err) {
-    console.error('Error updating superuser:', err);
+    logger.error('Error updating superuser:', err);
     process.exit(1);
   }
 };

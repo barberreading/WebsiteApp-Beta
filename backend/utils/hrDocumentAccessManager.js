@@ -73,7 +73,7 @@ const createHRDocumentAccess = async (booking) => {
     return hrDocumentAccess;
     
   } catch (error) {
-    console.error('Error creating HR document access:', error);
+    logger.error('Error creating HR document access:', error);
     throw error;
   }
 };
@@ -130,7 +130,7 @@ const updateHRDocumentAccess = async (booking, originalBooking) => {
     return existingAccess;
     
   } catch (error) {
-    console.error('Error updating HR document access:', error);
+    logger.error('Error updating HR document access:', error);
     throw error;
   }
 };
@@ -152,7 +152,7 @@ const revokeHRDocumentAccess = async (bookingId) => {
     
     return false;
   } catch (error) {
-    console.error('Error revoking HR document access:', error);
+    logger.error('Error revoking HR document access:', error);
     throw error;
   }
 };
@@ -177,7 +177,7 @@ const cleanupExpiredAccess = async () => {
     
     return result.modifiedCount;
   } catch (error) {
-    console.error('Error cleaning up expired HR document access:', error);
+    logger.error('Error cleaning up expired HR document access:', error);
     throw error;
   }
 };

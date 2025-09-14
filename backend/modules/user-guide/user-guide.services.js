@@ -11,7 +11,7 @@ exports.getUserGuide = async () => {
     const content = fs.readFileSync(userGuidePath, 'utf8');
     return content;
   } catch (err) {
-    console.error(err.message);
+    logger.error(err.message);
     throw new Error('Server Error');
   }
 };
@@ -33,7 +33,7 @@ exports.updateUserGuide = async (content) => {
     // Write the new content
     fs.writeFileSync(userGuidePath, content);
   } catch (err) {
-    console.error(err.message);
+    logger.error(err.message);
     throw new Error('Server Error');
   }
 };

@@ -50,7 +50,7 @@ const CircularPhotoUpload = ({ currentPhoto, onPhotoUpdate, size = 150 }) => {
         setLoading(false);
       };
     } catch (err) {
-      console.error('Upload error:', err);
+      logger.error('Upload error:', err);
       setError('Error uploading photo');
       setLoading(false);
     }

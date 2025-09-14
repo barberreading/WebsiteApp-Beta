@@ -79,7 +79,7 @@ const EmailTemplates = () => {
         }
       }
     } catch (error) {
-      console.error('Error loading templates:', error);
+      logger.error('Error loading templates:', error);
       setAlert({ open: true, message: 'Failed to load email templates', severity: 'error' });
     } finally {
       setLoading(false);
@@ -156,7 +156,7 @@ const EmailTemplates = () => {
         fetchTemplates();
       }
     } catch (error) {
-      console.error('Error saving template:', error);
+      logger.error('Error saving template:', error);
       showAlert(error.response?.data?.message || 'Failed to save template', 'error');
     }
   };
@@ -173,7 +173,7 @@ const EmailTemplates = () => {
         fetchTemplates();
       }
     } catch (error) {
-      console.error('Error deleting template:', error);
+      logger.error('Error deleting template:', error);
       showAlert(error.response?.data?.message || 'Failed to delete template', 'error');
     }
   };

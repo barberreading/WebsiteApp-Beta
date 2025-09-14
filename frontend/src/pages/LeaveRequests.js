@@ -39,7 +39,7 @@ const LeaveRequests = () => {
       setLeaveRequests(res.data.data || []);
     } catch (err) {
       setError('Failed to fetch leave requests');
-      console.error(err);
+      logger.error(err);
     } finally {
       setLoading(false);
     }
@@ -50,7 +50,7 @@ const LeaveRequests = () => {
       const res = await axiosInstance.get('/bookings/range?limit=1000');
       setBookings(res.data.bookings || res.data || []);
     } catch (err) {
-      console.error('Failed to fetch bookings:', err);
+      logger.error('Failed to fetch bookings:', err);
     }
   };
   
@@ -108,7 +108,7 @@ const LeaveRequests = () => {
       fetchLeaveRequests();
     } catch (err) {
       toast.error('Failed to approve leave request');
-      console.error(err);
+      logger.error(err);
     } finally {
       setLoading(false);
     }
@@ -134,7 +134,7 @@ const LeaveRequests = () => {
       fetchLeaveRequests();
     } catch (err) {
       toast.error('Failed to reject leave request');
-      console.error(err);
+      logger.error(err);
     } finally {
       setLoading(false);
     }

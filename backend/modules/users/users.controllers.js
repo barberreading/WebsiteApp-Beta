@@ -19,7 +19,7 @@ const getProfile = asyncHandler(async (req, res, next) => {
  * @access Private
  */
 const getStaff = asyncHandler(async (req, res, next) => {
-    console.log('🔧 GET /api/users/staff - User requesting:', {
+    logger.log('🔧 GET /api/users/staff - User requesting:', {
         id: req.user?.id,
         name: req.user?.name,
         email: req.user?.email,
@@ -28,8 +28,8 @@ const getStaff = asyncHandler(async (req, res, next) => {
     
     const staffMembers = await userService.getStaff(req.user);
     
-    console.log('🔧 Staff members found:', staffMembers.length);
-    console.log('🔧 Staff members details:', staffMembers.map(user => ({ 
+    logger.log('🔧 Staff members found:', staffMembers.length);
+    logger.log('🔧 Staff members details:', staffMembers.map(user => ({ 
         id: user._id, 
         name: user.name, 
         email: user.email, 
@@ -37,7 +37,7 @@ const getStaff = asyncHandler(async (req, res, next) => {
         active: user.active 
     })));
     
-    console.log('🔧 Sending response with', staffMembers.length, 'staff members');
+    logger.log('🔧 Sending response with', staffMembers.length, 'staff members');
     res.json(staffMembers);
 });
 

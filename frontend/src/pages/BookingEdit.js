@@ -64,7 +64,7 @@ const BookingEdit = () => {
       } catch (err) {
         setError('Failed to load booking details');
         setLoading(false);
-        console.error(err);
+        logger.error(err);
       }
     };
 
@@ -86,7 +86,7 @@ const BookingEdit = () => {
         setStaff(staffRes.data);
       } catch (err) {
         setError('Failed to load form data');
-        console.error(err);
+        logger.error(err);
       }
     };
 
@@ -125,8 +125,8 @@ const BookingEdit = () => {
         sendNotification: sendNotification
       };
       
-      console.log('Update type:', updateType);
-      console.log('Series ID:', formData.seriesId);
+      logger.log('Update type:', updateType);
+      logger.log('Series ID:', formData.seriesId);
       
       if (updateType === 'series' && formData.seriesId) {
         // Update all bookings in the series
@@ -134,7 +134,7 @@ const BookingEdit = () => {
           `/bookings/series/${formData.seriesId}`,
           dataToSend
         );
-        console.log('Series update response:', res.data);
+        logger.log('Series update response:', res.data);
         setSuccess(`All bookings in series updated successfully (${res.data.count} bookings)`);
         // Dispatch custom event to trigger calendar refresh
         window.dispatchEvent(new CustomEvent('bookingCreated'));
@@ -156,7 +156,7 @@ const BookingEdit = () => {
       }, 1500);
     } catch (err) {
       setError(err.response?.data?.msg || 'Failed to update booking');
-      console.error(err);
+      logger.error(err);
     }
   };
   
@@ -264,7 +264,7 @@ const BookingEdit = () => {
         }, 1500);
       } catch (err) {
         setError(err.response?.data?.msg || 'Failed to delete booking');
-        console.error(err);
+        logger.error(err);
       }
     }
   };
@@ -322,7 +322,7 @@ const BookingEdit = () => {
             onClick={() => {
               setShowSeriesModal(false);
               // Ensure we're passing the correct option to updateBooking
-              console.log('Applying changes with option:', editOption);
+              logger.log('Applying changes with option:', editOption);
               updateBooking(editOption);
             }}
           >

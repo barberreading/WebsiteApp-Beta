@@ -18,13 +18,13 @@ const RoleRoute = ({ allowedRoles, roles, children }) => {
   
   // Safety check for undefined user
   if (!currentUser) {
-    console.error('User is undefined in RoleRoute');
+    logger.error('User is undefined in RoleRoute');
     return <Navigate to="/login" replace />;
   }
   
   // Always allow superuser access to all routes
   if (currentUser.role === 'superuser' || currentUser.role === 'admin') {
-    console.log('Superuser/Admin access granted');
+    logger.log('Superuser/Admin access granted');
     return children;
   }
   
@@ -33,7 +33,7 @@ const RoleRoute = ({ allowedRoles, roles, children }) => {
     return children;
   }
   
-  console.log('Access denied for role:', currentUser.role, 'Required roles:', effectiveRoles);
+  logger.log('Access denied for role:', currentUser.role, 'Required roles:', effectiveRoles);
   
   // If user's role is not allowed, redirect to dashboard
   return <Navigate to="/dashboard" replace />;

@@ -15,7 +15,7 @@ const logFrontendError = async (errorData, authorizationHeader) => {
                 userId = decoded.user.id;
                 userRole = decoded.user.role;
             } catch (err) {
-                console.log('Invalid token in error report');
+                logger.log('Invalid token in error report');
             }
         }
     }

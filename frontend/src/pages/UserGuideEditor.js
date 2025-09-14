@@ -30,7 +30,7 @@ const UserGuideEditor = () => {
         setError('');
       } catch (err) {
         setError('Failed to load user guide content');
-        console.error(err);
+        logger.error(err);
       } finally {
         setLoading(false);
       }
@@ -53,7 +53,7 @@ const UserGuideEditor = () => {
       }, 3000);
     } catch (err) {
       setError('Failed to update user guide');
-      console.error(err);
+      logger.error(err);
     } finally {
       setSaving(false);
     }

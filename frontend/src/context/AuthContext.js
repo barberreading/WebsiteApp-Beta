@@ -19,10 +19,10 @@ export const AuthProvider = ({ children }) => {
   // Wrapper to debug setCurrentUser calls
   const setCurrentUser = (user) => {
     if (user === null && currentUser !== null) {
-      console.log('🚨 setCurrentUser(null) called - User being logged out:');
-      console.log('Stack trace:', new Error().stack);
-      console.log('Previous user:', currentUser);
-      console.log('Timestamp:', new Date().toISOString());
+      logger.log('🚨 setCurrentUser(null) called - User being logged out:');
+      logger.log('Stack trace:', new Error().stack);
+      logger.log('Previous user:', currentUser);
+      logger.log('Timestamp:', new Date().toISOString());
     }
     setCurrentUserState(user);
   };
@@ -78,16 +78,16 @@ export const AuthProvider = ({ children }) => {
             throw apiErr; // Re-throw to be caught by outer catch
           }
         } catch (err) {
-          console.error('Error loading user:', err);
+          logger.error('Error loading user:', err);
           
           // Note: axios-retry automatically handles network errors and server downtime
           // Only logout if it's an authentication error (401/403)
           // Don't logout on network errors or temporary server issues
           if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-            console.log('Authentication error - logging out');
+            logger.log('Authentication error - logging out');
             logout();
           } else {
-            console.log('Network/server error - keeping authentication state');
+            logger.log('Network/server error - keeping authentication state');
             // For network errors, keep the current authentication state
             // axios-retry will have already attempted retries for network issues
             setIsUserLoaded(true);
@@ -155,15 +155,15 @@ export const AuthProvider = ({ children }) => {
               setCurrentUser(res.data.user);
               setIsAuthenticated(true);
               setIsUserLoaded(true);
-              console.log('✅ User data set from login response:', res.data.user);
+              logger.log('✅ User data set from login response:', res.data.user);
             } else {
               // If no user data in response, load it separately with a small delay
-              console.log('🔄 Loading user data separately...');
+              logger.log('🔄 Loading user data separately...');
               setTimeout(async () => {
                 try {
                   await loadUser();
                 } catch (err) {
-                  console.error('Failed to load user after login:', err);
+                  logger.error('Failed to load user after login:', err);
                 }
               }, 100);
             }
@@ -219,7 +219,7 @@ export const AuthProvider = ({ children }) => {
          try {
            await axiosInstance.post('/auth/logout');
          } catch (err) {
-           console.error('Error during logout:', err);
+           logger.error('Error during logout:', err);
            // Continue with local logout even if backend call fails
          }
        }
@@ -263,15 +263,15 @@ export const AuthProvider = ({ children }) => {
       }
     }).filter(info => info !== null);
     
-    console.log('📊 LOGOUT DEBUG HISTORY:');
+    logger.log('📊 LOGOUT DEBUG HISTORY:');
     debugInfo.forEach((info, index) => {
-      console.log(`--- Logout Event ${index + 1} ---`);
-      console.log('Timestamp:', info.timestamp);
-      console.log('URL:', info.url);
-      console.log('User:', info.currentUser?.name || 'None');
-      console.log('Was Authenticated:', info.isAuthenticated);
-      console.log('Stack Trace:', info.stackTrace);
-      console.log('---');
+      logger.log(`--- Logout Event ${index + 1} ---`);
+      logger.log('Timestamp:', info.timestamp);
+      logger.log('URL:', info.url);
+      logger.log('User:', info.currentUser?.name || 'None');
+      logger.log('Was Authenticated:', info.isAuthenticated);
+      logger.log('Stack Trace:', info.stackTrace);
+      logger.log('---');
     });
     
     return debugInfo;
@@ -295,12 +295,12 @@ export const AuthProvider = ({ children }) => {
       if (e.newValue === null) {
         // Token was removed in another tab - logout
         if (currentUser) {
-          console.log('Authentication session ended in another tab - logging out');
+          logger.log('Authentication session ended in another tab - logging out');
           logout();
         }
       } else if (e.newValue !== localStorage.getItem('token')) {
         // Token was updated in another tab - reload user
-        console.log('Authentication session updated in another tab - reloading user');
+        logger.log('Authentication session updated in another tab - reloading user');
         debounceTimeout.current = setTimeout(() => {
           loadUser();
         }, 100); // Small delay to prevent race conditions
@@ -466,7 +466,7 @@ export const AuthProvider = ({ children }) => {
               testUserData.email = testNursery.email;
             }
           } catch (error) {
-            console.warn('Could not fetch Test Nursery client data:', error);
+            logger.warn('Could not fetch Test Nursery client data:', error);
           }
         }
         
@@ -497,7 +497,7 @@ export const AuthProvider = ({ children }) => {
         return { success: true };
       }
     } catch (error) {
-      console.error('Error during impersonation:', error);
+      logger.error('Error during impersonation:', error);
       return { success: false, error: 'Failed to impersonate user' };
     }
   };

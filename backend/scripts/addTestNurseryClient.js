@@ -9,7 +9,7 @@ async function addTestNurseryClient() {
   try {
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI);
-    console.log('Connected to MongoDB');
+    logger.log('Connected to MongoDB');
 
     // Check if 'test nursery' client already exists
     const existingClient = await Client.findOne({ 
@@ -20,7 +20,7 @@ async function addTestNurseryClient() {
     });
 
     if (existingClient) {
-      console.log('Test nursery client already exists:', existingClient.name);
+      logger.log('Test nursery client already exists:', existingClient.name);
       return;
     }
 
@@ -38,14 +38,14 @@ async function addTestNurseryClient() {
     });
 
     await testNurseryClient.save();
-    console.log('Successfully added Test Nursery client:', testNurseryClient.name);
-    console.log('Client ID:', testNurseryClient._id);
+    logger.log('Successfully added Test Nursery client:', testNurseryClient.name);
+    logger.log('Client ID:', testNurseryClient._id);
 
   } catch (error) {
-    console.error('Error adding test nursery client:', error);
+    logger.error('Error adding test nursery client:', error);
   } finally {
     await mongoose.connection.close();
-    console.log('Database connection closed');
+    logger.log('Database connection closed');
   }
 }
 

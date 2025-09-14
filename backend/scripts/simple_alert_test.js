@@ -2,7 +2,7 @@ const axios = require('axios');
 
 async function testStaffAlerts() {
     try {
-        console.log('Testing staff booking alerts...');
+        logger.log('Testing staff booking alerts...');
         
         // Login as staff
         const login = await axios.post('http://localhost:3002/api/auth/login', {
@@ -10,35 +10,35 @@ async function testStaffAlerts() {
             password: 'password123'
         });
         
-        console.log('✓ Staff login successful:', login.data.user.name);
-        console.log('  User ID:', login.data.user._id);
-        console.log('  Role:', login.data.user.role);
+        logger.log('✓ Staff login successful:', login.data.user.name);
+        logger.log('  User ID:', login.data.user._id);
+        logger.log('  Role:', login.data.user.role);
         
         // Get booking alerts
         const alerts = await axios.get('http://localhost:3002/api/booking-alerts/available', {
             headers: { Authorization: `Bearer ${login.data.token}` }
         });
         
-        console.log('\n✓ Booking alerts retrieved:', alerts.data.alerts?.length || 0);
+        logger.log('\n✓ Booking alerts retrieved:', alerts.data.alerts?.length || 0);
         
         if (alerts.data.alerts && alerts.data.alerts.length > 0) {
-            console.log('\nAlert details:');
+            logger.log('\nAlert details:');
             alerts.data.alerts.forEach((alert, i) => {
-                console.log(`  ${i+1}. ${alert.service} - ${alert.date} ${alert.startTime}`);
-                console.log(`     Client: ${alert.clientName}`);
-                console.log(`     Status: ${alert.status}`);
+                logger.log(`  ${i+1}. ${alert.service} - ${alert.date} ${alert.startTime}`);
+                logger.log(`     Client: ${alert.clientName}`);
+                logger.log(`     Status: ${alert.status}`);
             });
             
-            console.log('\n✅ SUCCESS: Booking alerts are available for staff user!');
-            console.log('   With our Calendar.js fix, these should now display in the staff calendar.');
+            logger.log('\n✅ SUCCESS: Booking alerts are available for staff user!');
+            logger.log('   With our Calendar.js fix, these should now display in the staff calendar.');
         } else {
-            console.log('\n⚠️  No booking alerts found for this staff user.');
+            logger.log('\n⚠️  No booking alerts found for this staff user.');
         }
         
     } catch (error) {
-        console.error('❌ Error:', error.message);
+        logger.error('❌ Error:', error.message);
         if (error.response?.data) {
-            console.error('   Response:', error.response.data);
+            logger.error('   Response:', error.response.data);
         }
     }
 }

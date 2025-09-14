@@ -36,7 +36,7 @@ const sendBookingUpdateNotification = async (booking) => {
       
       return true;
     } catch (error) {
-      console.error('Error sending booking update notification:', error);
+      logger.error('Error sending booking update notification:', error);
       return false;
     }
   }

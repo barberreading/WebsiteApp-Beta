@@ -6,7 +6,7 @@ const path = require('path');
  * Create a test timesheet image for OCR testing
  */
 function createTestTimesheetImage() {
-  console.log('Creating test timesheet image...');
+  logger.log('Creating test timesheet image...');
   
   // Create canvas
   const canvas = createCanvas(800, 600);
@@ -75,25 +75,25 @@ function createTestTimesheetImage() {
   const imagePath = path.join(testImagesDir, 'sample.png');
   fs.writeFileSync(imagePath, buffer);
   
-  console.log(`✓ Test timesheet image created: ${imagePath}`);
+  logger.log(`✓ Test timesheet image created: ${imagePath}`);
   return imagePath;
 }
 
 // Create the test image
 try {
   const imagePath = createTestTimesheetImage();
-  console.log('Test image ready for OCR testing!');
+  logger.log('Test image ready for OCR testing!');
 } catch (error) {
-  console.error('Error creating test image:', error.message);
-  console.log('Note: canvas package may not be installed. Installing...');
+  logger.error('Error creating test image:', error.message);
+  logger.log('Note: canvas package may not be installed. Installing...');
   
   // Try to install canvas if not available
   const { execSync } = require('child_process');
   try {
     execSync('npm install canvas', { stdio: 'inherit' });
-    console.log('Canvas installed. Please run this script again.');
+    logger.log('Canvas installed. Please run this script again.');
   } catch (installError) {
-    console.error('Failed to install canvas:', installError.message);
-    console.log('You can manually install it with: npm install canvas');
+    logger.error('Failed to install canvas:', installError.message);
+    logger.log('You can manually install it with: npm install canvas');
   }
 }

@@ -17,7 +17,7 @@ const formatDateToUK = (date) => {
 
 // Export a function to be called in App.js and the formatDateToUK utility
 export const initializeDateFormatting = () => {
-  console.log('Date formatting initialized to DD/MM/YYYY format');
+  logger.log('Date formatting initialized to DD/MM/YYYY format');
 };
 
 // Export the formatting function for direct use in components

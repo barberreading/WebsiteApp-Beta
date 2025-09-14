@@ -29,7 +29,7 @@ const ClockInOut = () => {
       
       // Fetch current clock status
       const statusRes = await axiosInstance.get('/timesheets/current-status');
-      console.log('Status response:', statusRes.data);
+      logger.log('Status response:', statusRes.data);
       
       if (statusRes.data && statusRes.data.clockedIn) {
         setClockStatus('in');
@@ -44,10 +44,10 @@ const ClockInOut = () => {
       setClients(clientsRes.data || []);
       
     } catch (err) {
-      console.error('Error initializing:', err.message || err);
+      logger.error('Error initializing:', err.message || err);
       if (err.response) {
-        console.error('Response data:', err.response.data);
-        console.error('Response status:', err.response.status);
+        logger.error('Response data:', err.response.data);
+        logger.error('Response status:', err.response.status);
       }
       setClockStatus('error');
       setError('Failed to load data. Please refresh the page or check your login status.');
@@ -84,7 +84,7 @@ const ClockInOut = () => {
       setSuccess('You have successfully clocked in!');
       setShowClientModal(false);
     } catch (err) {
-      console.error('Error clocking in:', err);
+      logger.error('Error clocking in:', err);
       if (err.response?.data?.msg === 'No client found for today. Please select a client manually.') {
         // Show client selection modal if no client found
         setShowClientModal(true);
@@ -146,7 +146,7 @@ const ClockInOut = () => {
       setSuccess('You have successfully clocked out!');
       setShowTimeEditModal(false);
     } catch (err) {
-      console.error('Error clocking out:', err);
+      logger.error('Error clocking out:', err);
       setError(err.response?.data?.msg || 'Failed to clock out. Please try again.');
     } finally {
       setLoading(false);

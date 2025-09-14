@@ -83,7 +83,7 @@ const ManagerTodoList = () => {
       });
 
     } catch (err) {
-      console.error('Error fetching todo items:', err);
+      logger.error('Error fetching todo items:', err);
       setError('Failed to load manager tasks');
     } finally {
       setLoading(false);
@@ -198,7 +198,7 @@ const ManagerTodoList = () => {
       setShowDetailsModal(false);
       
     } catch (err) {
-      console.error('Error performing quick action:', err);
+      logger.error('Error performing quick action:', err);
       setError(`Failed to ${action} item`);
     }
   };

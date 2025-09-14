@@ -29,7 +29,7 @@ const Services = () => {
       setLoading(false);
     } catch (err) {
       toast.error('Failed to fetch services');
-      console.error(err);
+      logger.error(err);
       setLoading(false);
     }
   };
@@ -40,7 +40,7 @@ const Services = () => {
       const res = await axiosInstance.get('/booking-categories/keys');
       setBookingKeys(res.data.data || []);
     } catch (err) {
-      console.error('Failed to fetch booking keys:', err);
+      logger.error('Failed to fetch booking keys:', err);
     }
   };
 
@@ -51,7 +51,7 @@ const Services = () => {
       setPredefinedColors(res.data.colors || []);
       setColorNames(res.data.colorNames || []);
     } catch (err) {
-      console.error('Failed to fetch predefined colors:', err);
+      logger.error('Failed to fetch predefined colors:', err);
       // Fallback to default pastel colors if API fails
       setPredefinedColors([
         '#FFE5E5', '#E5E5FF', '#E5FFE5', '#FFE5CC', '#F0E5FF', '#FFFFE5',
@@ -98,7 +98,7 @@ const Services = () => {
     } catch (err) {
       const errorMsg = err.response?.data?.msg || 'Operation failed';
       toast.error(errorMsg);
-      console.error(err);
+      logger.error(err);
     }
   };
 
@@ -143,7 +143,7 @@ const Services = () => {
       } catch (err) {
         const errorMsg = err.response?.data?.msg || 'Failed to delete service';
         toast.error(errorMsg);
-        console.error(err);
+        logger.error(err);
       }
     }
   };
@@ -160,7 +160,7 @@ const Services = () => {
     } catch (err) {
       const errorMsg = err.response?.data?.msg || 'Failed to update service status';
       toast.error(errorMsg);
-      console.error(err);
+      logger.error(err);
     }
   };
 

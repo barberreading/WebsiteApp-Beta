@@ -24,7 +24,7 @@ const forgotPassword = async (email, protocol, host) => {
 
     return { success: true, data: 'Email sent' };
   } catch (err) {
-    console.log(err);
+    logger.log(err);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 

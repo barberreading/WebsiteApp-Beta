@@ -46,7 +46,7 @@ const LeaveRequestList = () => {
       const response = await axiosInstance.get('/leave-requests');
       setRequests(response.data.data);
     } catch (err) {
-      console.error('Error fetching leave requests:', err);
+      logger.error('Error fetching leave requests:', err);
       setError('Failed to load leave requests. Please try again.');
     } finally {
       setLoading(false);
@@ -63,7 +63,7 @@ const LeaveRequestList = () => {
       setSuccess('Leave request approved successfully!');
       fetchRequests(); // Refresh the list
     } catch (err) {
-      console.error('Error approving leave request:', err);
+      logger.error('Error approving leave request:', err);
       setError(err.response?.data?.message || 'Failed to approve leave request');
     }
   };
@@ -82,7 +82,7 @@ const LeaveRequestList = () => {
       setDenyDialog({ open: false, requestId: null });
       fetchRequests(); // Refresh the list
     } catch (err) {
-      console.error('Error denying leave request:', err);
+      logger.error('Error denying leave request:', err);
       setError(err.response?.data?.message || 'Failed to deny leave request');
     }
   };
@@ -93,7 +93,7 @@ const LeaveRequestList = () => {
       setSuccess('Leave request withdrawn successfully!');
       fetchRequests(); // Refresh the list
     } catch (err) {
-      console.error('Error withdrawing leave request:', err);
+      logger.error('Error withdrawing leave request:', err);
       setError(err.response?.data?.message || 'Failed to withdraw leave request');
     }
   };

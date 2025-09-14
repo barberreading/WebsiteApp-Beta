@@ -21,10 +21,10 @@ const sendTimesheetSubmissionReminder = async (staff, pendingTimesheets, isLocko
 
     const info = await sendEmail(staff.email, subject, wrapEmailContent(body, subject));
 
-    console.log('Timesheet submission reminder email sent:', info.messageId);
+    logger.log('Timesheet submission reminder email sent:', info.messageId);
     return info;
   } catch (error) {
-    console.error('Error sending timesheet submission reminder email:', error);
+    logger.error('Error sending timesheet submission reminder email:', error);
     throw error;
   }
 };

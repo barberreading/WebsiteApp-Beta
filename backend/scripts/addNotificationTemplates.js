@@ -72,17 +72,17 @@ const addTemplates = async () => {
       const existingTemplate = await EmailTemplate.findOne({ type: template.type });
       
       if (existingTemplate) {
-        console.log(`Template ${template.type} already exists, updating...`);
+        logger.log(`Template ${template.type} already exists, updating...`);
         await EmailTemplate.findByIdAndUpdate(existingTemplate._id, template);
       } else {
-        console.log(`Adding new template: ${template.type}`);
+        logger.log(`Adding new template: ${template.type}`);
         await EmailTemplate.create(template);
       }
     }
     
-    console.log('All templates added/updated successfully!');
+    logger.log('All templates added/updated successfully!');
   } catch (error) {
-    console.error('Error adding templates:', error);
+    logger.error('Error adding templates:', error);
   } finally {
     mongoose.disconnect();
   }

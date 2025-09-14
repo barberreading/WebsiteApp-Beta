@@ -3,17 +3,17 @@
  */
 const initSchedulers = () => {
   try {
-    console.log('Initializing schedulers...');
+    logger.log('Initializing schedulers...');
     
     // Initialize document reminder scheduler if available
     try {
       const reminderScheduler = require('./reminderScheduler');
       if (reminderScheduler && reminderScheduler.init) {
         reminderScheduler.init();
-        console.log('Document reminder scheduler initialized');
+        logger.log('Document reminder scheduler initialized');
       }
     } catch (error) {
-      console.log('Document reminder scheduler not available:', error.message);
+      logger.log('Document reminder scheduler not available:', error.message);
     }
     
     // Initialize timesheet scheduler if available
@@ -21,15 +21,15 @@ const initSchedulers = () => {
       const timesheetScheduler = require('./timesheetScheduler');
       if (timesheetScheduler && timesheetScheduler.init) {
         timesheetScheduler.init();
-        console.log('Timesheet scheduler initialized');
+        logger.log('Timesheet scheduler initialized');
       }
     } catch (error) {
-      console.log('Timesheet scheduler not available:', error.message);
+      logger.log('Timesheet scheduler not available:', error.message);
     }
     
-    console.log('Schedulers initialization completed');
+    logger.log('Schedulers initialization completed');
   } catch (error) {
-    console.error('Error initializing schedulers:', error);
+    logger.error('Error initializing schedulers:', error);
   }
 };
 

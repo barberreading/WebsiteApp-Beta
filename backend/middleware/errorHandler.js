@@ -29,12 +29,12 @@ const errorHandler = async (err, req, res, next) => {
   try {
     await ErrorLog.create(errorLog);
   } catch (logError) {
-    console.error('Failed to log error to database:', logError.message);
+    logger.error('Failed to log error to database:', logError.message);
   }
 
   // Console log in development
   if (process.env.NODE_ENV === 'development') {
-    console.error('Error:', err);
+    logger.error('Error:', err);
   }
 
   // Mongoose bad ObjectId

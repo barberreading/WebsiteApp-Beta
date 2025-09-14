@@ -19,7 +19,7 @@ const addSamplePhotos = async () => {
       useUnifiedTopology: true
     });
     
-    console.log('Connected to MongoDB');
+    logger.log('Connected to MongoDB');
     
     // Find all staff members without photos
     const staffMembers = await User.find({
@@ -31,7 +31,7 @@ const addSamplePhotos = async () => {
       ]
     });
     
-    console.log(`Found ${staffMembers.length} staff members without photos`);
+    logger.log(`Found ${staffMembers.length} staff members without photos`);
     
     // Add sample photos to staff members
     for (let i = 0; i < staffMembers.length; i++) {
@@ -42,14 +42,14 @@ const addSamplePhotos = async () => {
         photo: sampleAvatars[photoIndex]
       });
       
-      console.log(`Added photo to ${staff.name}`);
+      logger.log(`Added photo to ${staff.name}`);
     }
     
-    console.log('Sample photos added successfully!');
+    logger.log('Sample photos added successfully!');
     process.exit(0);
     
   } catch (error) {
-    console.error('Error adding sample photos:', error);
+    logger.error('Error adding sample photos:', error);
     process.exit(1);
   }
 };

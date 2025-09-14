@@ -292,18 +292,18 @@ UserSchema.methods.getSignedJwtToken = function(rememberMe = false) {
 // Match user entered password to hashed password in database
 UserSchema.methods.matchPassword = async function(enteredPassword) {
   try {
-    console.log('Comparing passwords...');
-    console.log('Entered password length:', enteredPassword.length);
-    console.log('Stored password hash:', this.password);
+    logger.log('Comparing passwords...');
+    logger.log('Entered password length:', enteredPassword.length);
+    logger.log('Stored password hash:', this.password);
     
     // Force string conversion to handle any type issues
     const passwordString = String(enteredPassword);
     const isMatch = await bcrypt.compare(passwordString, this.password);
     
-    console.log('Password comparison result:', isMatch);
+    logger.log('Password comparison result:', isMatch);
     return isMatch;
   } catch (err) {
-    console.error('Error comparing passwords:', err);
+    logger.error('Error comparing passwords:', err);
     return false;
   }
 };

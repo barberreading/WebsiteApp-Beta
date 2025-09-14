@@ -7,9 +7,9 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log('MongoDB Connected'))
+.then(() => logger.log('MongoDB Connected'))
 .catch(err => {
-  console.error('MongoDB Connection Error:', err);
+  logger.error('MongoDB Connection Error:', err);
   process.exit(1);
 });
 
@@ -432,29 +432,29 @@ const addEmailTemplates = async () => {
     const existingTemplates = await EmailTemplate.find();
     
     if (existingTemplates.length > 0) {
-      console.log(`Found ${existingTemplates.length} existing templates.`);
+      logger.log(`Found ${existingTemplates.length} existing templates.`);
       
       // Update existing templates
       for (const template of emailTemplates) {
         const existingTemplate = existingTemplates.find(t => t.type === template.type && t.name === template.name);
         
         if (existingTemplate) {
-          console.log(`Updating template: ${template.name}`);
+          logger.log(`Updating template: ${template.name}`);
           await EmailTemplate.findByIdAndUpdate(existingTemplate._id, template);
         } else {
-          console.log(`Adding new template: ${template.name}`);
+          logger.log(`Adding new template: ${template.name}`);
           await EmailTemplate.create(template);
         }
       }
     } else {
       // Add all templates
-      console.log('No existing templates found. Adding all templates...');
+      logger.log('No existing templates found. Adding all templates...');
       await EmailTemplate.insertMany(emailTemplates);
     }
     
-    console.log('Email templates added/updated successfully!');
+    logger.log('Email templates added/updated successfully!');
   } catch (error) {
-    console.error('Error adding email templates:', error);
+    logger.error('Error adding email templates:', error);
   } finally {
     mongoose.disconnect();
   }
