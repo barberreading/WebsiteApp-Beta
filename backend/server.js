@@ -150,6 +150,23 @@ app.get('/api', (req, res) => {
   res.json({ message: 'Staff Management API is running', timestamp: new Date().toISOString() });
 });
 
+// Add root endpoint for development mode
+app.get('/', (req, res) => {
+  if (process.env.NODE_ENV === 'production' || process.pkg) {
+    // This will be handled by the catch-all route below
+    return;
+  }
+  res.json({ 
+    message: 'Staff Management Backend API Server', 
+    version: '1.3-beta',
+    status: 'running',
+    environment: process.env.NODE_ENV || 'development',
+    frontend_url: 'http://localhost:3001',
+    api_base: '/api',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Serve React app for all non-API routes in production
 if (process.env.NODE_ENV === 'production' || process.pkg) {
   app.get('*', (req, res) => {
