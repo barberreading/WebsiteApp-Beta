@@ -17,6 +17,8 @@ A comprehensive desktop application for staff management built with Electron, Re
 - **Timesheet Management**: Time tracking and reporting
 - **Leave Request System**: Automated leave management
 - **Audit Trail**: Comprehensive activity logging
+- **System Monitoring**: Real-time system health monitoring and error tracking (Beta 1.3)
+- **Admin Dashboard**: Advanced monitoring dashboard for system administrators (Beta 1.3)
 
 ### Security Features
 - **JWT Authentication**: Secure token-based authentication
