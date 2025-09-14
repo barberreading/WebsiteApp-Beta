@@ -227,6 +227,11 @@ synology_*.md
 /backend/uploads/*
 !/backend/uploads/.gitkeep
 
+# Backup files (too large for GitHub)
+backups/*.zip
+backups/*.tar.gz
+backups/*.7z
+
 # Security and audit files (keep these for reference)
 # DESKTOP_AUDIT_REPORT.md - Keep this
 # SECURITY_REPORT.md - Keep this
