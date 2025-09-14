@@ -10,7 +10,7 @@ async function checkTestDatabaseData() {
     console.log('Checking data in TEST database...');
     
     // Connect to the test database instead of staff-management
-    const testConnectionString = process.env.MONGO_URI.replace('/staff-management?', '/test?');
+    const testConnectionString = process.env.MONGO_URI.replace('/test?', '/test?');
     console.log('Connecting to test database:', testConnectionString.replace(/\/\/[^:]+:[^@]+@/, '//***:***@'));
     
     await mongoose.connect(testConnectionString, {

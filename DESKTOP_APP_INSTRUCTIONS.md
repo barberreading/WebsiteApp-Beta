@@ -77,7 +77,7 @@ All built files will be in the `dist/` directory after building.
 
 ### Linux Users:
 1. Download the `.AppImage` file
-2. Make it executable: `chmod +x Staff-Management-Desktop.AppImage`
+2. Make it executable: `chmod +x Test-Desktop.AppImage`
 3. Double-click to run, or run from terminal
 
 ## Features

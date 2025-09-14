@@ -10,7 +10,7 @@ const { getEmailTransporter, getSenderInfo } = require('../email.config');
 const sendEmail = async (to, subject, html) => {
   try {
     const transporter = await getEmailTransporter();
-    const from = getSenderInfo();
+    const from = await getSenderInfo();
 
     await transporter.sendMail({
       from,

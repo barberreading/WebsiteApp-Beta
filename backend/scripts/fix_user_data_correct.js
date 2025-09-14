@@ -7,7 +7,7 @@ async function fixUserDataCorrect() {
     console.log('Fixing user data with correct field names...');
     
     // Connect to database
-    const connectionString = process.env.SYNOLOGY_MONGO_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/staff-management';
+    const connectionString = process.env.SYNOLOGY_MONGO_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/test';
     await mongoose.connect(connectionString, {
       useNewUrlParser: true,
       useUnifiedTopology: true

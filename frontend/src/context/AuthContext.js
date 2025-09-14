@@ -80,20 +80,18 @@ export const AuthProvider = ({ children }) => {
         } catch (err) {
           console.error('Error loading user:', err);
           
-          // DISABLED: Emergency fallback - using normal authentication
-          // console.log('Backend connection failed - activating emergency access');
-          // const emergencyUser = {
-          //   _id: 'emergency_fallback_id',
-          //   id: 'emergency_fallback_id', 
-          //   name: 'Emergency Access',
-          //   email: 'admin@example.com',
-          //   role: 'admin'
-          // };
-          // setCurrentUser(emergencyUser);
-          // setIsAuthenticated(true);
-          
-          // Clear authentication on error
-          logout();
+          // Note: axios-retry automatically handles network errors and server downtime
+          // Only logout if it's an authentication error (401/403)
+          // Don't logout on network errors or temporary server issues
+          if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+            console.log('Authentication error - logging out');
+            logout();
+          } else {
+            console.log('Network/server error - keeping authentication state');
+            // For network errors, keep the current authentication state
+            // axios-retry will have already attempted retries for network issues
+            setIsUserLoaded(true);
+          }
         }
       }
       setIsUserLoaded(true); // Also set loaded here for cases with no token
@@ -157,10 +155,18 @@ export const AuthProvider = ({ children }) => {
               setCurrentUser(res.data.user);
               setIsAuthenticated(true);
               setIsUserLoaded(true);
+              console.log('✅ User data set from login response:', res.data.user);
+            } else {
+              // If no user data in response, load it separately with a small delay
+              console.log('🔄 Loading user data separately...');
+              setTimeout(async () => {
+                try {
+                  await loadUser();
+                } catch (err) {
+                  console.error('Failed to load user after login:', err);
+                }
+              }, 100);
             }
-            
-            // Always load user to ensure data is fresh and complete
-            await loadUser();
             
             setLoading(false);
             return { 
@@ -180,9 +186,11 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (err) {
         setLoading(false);
+        // Note: axios-retry automatically handles network errors and retries
+        // If we reach here, retries have been exhausted or it's a client error
         return {
           success: false,
-          error: err.response?.data?.msg || 'Invalid credentials'
+          error: err.response?.data?.msg || 'Login failed. Please check your connection and try again.'
         };
       }
     } finally {

@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-const { BookingKey, LocationArea } = require('./models/BookingCategories');
+const { BookingKey, LocationArea } = require('../models/BookingCategories');
 
 async function checkCurrentData() {
     try {
-        await mongoose.connect('mongodb://localhost:27017/staff-management');
+        await mongoose.connect('mongodb://localhost:27017/test');
         console.log('Connected to database');
         
         console.log('\n=== CURRENT BOOKING KEYS ===');

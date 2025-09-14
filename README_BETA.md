@@ -71,14 +71,14 @@ npm start
 
 ### 5. Access the Application
 - Frontend: http://localhost:3000
-- Backend API: http://localhost:5000
+- Backend API: http://localhost:3002
 
 ## 🔧 Configuration
 
 ### Environment Variables (Backend)
 ```env
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/staff-management
+PORT=3002
+MONGODB_URI=mongodb://localhost:27017/test
 JWT_SECRET=your-jwt-secret
 ADMIN_EMAIL=admin@yourcompany.com
 ADMIN_PASSWORD=your-secure-password
@@ -86,7 +86,7 @@ ADMIN_PASSWORD=your-secure-password
 
 ### Environment Variables (Frontend)
 ```env
-REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_API_URL=http://localhost:3002/api
 ```
 
 ## 📦 Production Deployment

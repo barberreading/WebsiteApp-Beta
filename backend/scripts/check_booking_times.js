@@ -3,7 +3,7 @@ const Booking = require('./models/Booking');
 
 async function checkBookingTimes() {
   try {
-    await mongoose.connect('mongodb://localhost:27017/staff-management');
+    await mongoose.connect('mongodb://localhost:27017/test');
     
     const booking = await Booking.findOne()
       .populate('staff', 'name')

@@ -1337,6 +1337,88 @@ const Calendar = () => {
     }
   }, [isUserLoaded, currentUser, fetchData, fetchBookingAlerts, fetchLeaveRequests]);
 
+  // Refresh data when page becomes visible (e.g., returning from booking creation)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && isUserLoaded && currentUser && currentUser.role) {
+        console.log('📱 Page became visible, refreshing calendar data...');
+        fetchData();
+        fetchBookingAlerts();
+        fetchLeaveRequests().then(leaveEvents => {
+          setLeaveRequests(leaveEvents);
+        }).catch(err => {
+          console.error("Error fetching leave requests on visibility change:", err);
+        });
+      }
+    };
+
+    const handleWindowFocus = () => {
+      if (isUserLoaded && currentUser && currentUser.role) {
+        console.log('🔄 Window focused, refreshing calendar data...');
+        fetchData();
+        fetchBookingAlerts();
+        fetchLeaveRequests().then(leaveEvents => {
+          setLeaveRequests(leaveEvents);
+        }).catch(err => {
+          console.error("Error fetching leave requests on window focus:", err);
+        });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleWindowFocus);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [isUserLoaded, currentUser, fetchData, fetchBookingAlerts, fetchLeaveRequests]);
+
+  // Periodic refresh to keep calendar data up-to-date
+  useEffect(() => {
+    if (!isUserLoaded || !currentUser || !currentUser.role) {
+      return;
+    }
+
+    // Set up periodic refresh every 2 minutes
+    const refreshInterval = setInterval(() => {
+      console.log('⏰ Periodic refresh of calendar data...');
+      fetchData();
+      fetchBookingAlerts();
+      fetchLeaveRequests().then(leaveEvents => {
+        setLeaveRequests(leaveEvents);
+      }).catch(err => {
+        console.error("Error fetching leave requests on periodic refresh:", err);
+      });
+    }, 2 * 60 * 1000); // 2 minutes
+
+    return () => {
+      clearInterval(refreshInterval);
+    };
+  }, [isUserLoaded, currentUser, fetchData, fetchBookingAlerts, fetchLeaveRequests]);
+
+  // Listen for booking creation events to refresh immediately
+  useEffect(() => {
+    const handleBookingCreated = () => {
+      if (isUserLoaded && currentUser && currentUser.role) {
+        console.log('🆕 New booking created, refreshing calendar data...');
+        fetchData();
+        fetchBookingAlerts();
+        fetchLeaveRequests().then(leaveEvents => {
+          setLeaveRequests(leaveEvents);
+        }).catch(err => {
+          console.error("Error fetching leave requests after booking creation:", err);
+        });
+      }
+    };
+
+    window.addEventListener('bookingCreated', handleBookingCreated);
+    
+    return () => {
+      window.removeEventListener('bookingCreated', handleBookingCreated);
+    };
+  }, [isUserLoaded, currentUser, fetchData, fetchBookingAlerts, fetchLeaveRequests]);
+
   useEffect(() => {
     if (serviceList) {
       fetchBookings();

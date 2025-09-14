@@ -46,7 +46,7 @@ const sendTimesheetStatusNotification = async (timesheet, staff, status, rejecti
         <li><strong>Status:</strong> <span style="color: ${statusColor}; font-weight: bold;">${statusText.charAt(0).toUpperCase() + statusText.slice(1)}</span></li>
         ${rejectionReason ? `<li><strong>Reason for Rejection:</strong> ${rejectionReason}</li>` : ''}
       </ul>
-      <p><a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/timesheets" style="padding: 10px 15px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">View Timesheets</a></p>
+      <p><a href="${process.env.FRONTEND_URL || 'http://localhost:3001'}/timesheets" style="padding: 10px 15px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">View Timesheets</a></p>
     `;
     
     try {

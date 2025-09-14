@@ -238,12 +238,12 @@ const CustomDayView = ({
         <div className="staff-headers-row">
           <div className="time-column-header">Time</div>
           <div className="staff-headers">
-            {selectedEmployees.map((staff, staffIndex) => (
-              <div key={staffIndex} className="staff-header">
-                {staff.photo ? (
+            {selectedEmployees.filter(staff => staff && staff.id && staff.name).map((staff, index) => (
+              <div key={index} className="staff-header">
+                      {staff.photo ? (
                         <img 
                           src={staff.photo} 
-                          alt={staff.name}
+                          alt={staff.name} 
                           className="staff-photo"
                           onError={(e) => {
                             e.target.style.display = 'none';
@@ -264,7 +264,7 @@ const CustomDayView = ({
             <div key={timeIndex} className="time-row">
               <div className="time-label">{timeSlot}</div>
               <div className="staff-columns">
-                {selectedEmployees.map((staff, staffIndex) => {
+                {selectedEmployees.filter(staff => staff && staff.id).map((staff, staffIndex) => {
                   const event = getEventAtTimeSlot(bookings, leaveRequests, bookingAlerts, staff.id, currentDate, timeSlot);
                   const isBooking = event && !event.extendedProps?.type;
                   const isLeaveRequest = event && event.extendedProps?.type === 'leave-request';

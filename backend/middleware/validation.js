@@ -154,6 +154,64 @@ const validateBooking = [
 ];
 
 /**
+ * Booking update validation (partial updates allowed)
+ */
+const validateBookingUpdate = [
+  body('client')
+    .optional()
+    .trim()
+    .isMongoId()
+    .withMessage('Invalid client ID'),
+  
+  body('staff')
+    .optional()
+    .trim()
+    .isMongoId()
+    .withMessage('Invalid staff ID'),
+  
+  body('service')
+    .optional()
+    .trim()
+    .isMongoId()
+    .withMessage('Invalid service ID'),
+  
+  body('startTime')
+    .optional()
+    .isISO8601()
+    .withMessage('Invalid start time format'),
+  
+  body('endTime')
+    .optional()
+    .isISO8601()
+    .withMessage('Invalid end time format'),
+  
+  body('title')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 200 })
+    .withMessage('Title must be between 1 and 200 characters'),
+  
+  body('description')
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('Description cannot exceed 500 characters'),
+  
+  body('status')
+    .optional()
+    .isIn(['scheduled', 'in-progress', 'completed', 'cancelled'])
+    .withMessage('Invalid status value'),
+  
+  body('notes')
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('Notes cannot exceed 500 characters'),
+  
+  handleValidationErrors
+];
+
+/**
  * Client validation
  */
 const validateClient = [
@@ -329,6 +387,7 @@ module.exports = {
   validateUserRegistration,
   validateUserLogin,
   validateBooking,
+  validateBookingUpdate,
   validateClient,
   validateService,
   validateBookingAlert,

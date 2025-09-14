@@ -6,7 +6,7 @@ async function checkAvailableDatabases() {
     console.log('Checking available databases on MongoDB Atlas...');
     
     // Connect to MongoDB Atlas without specifying a database
-    const baseConnectionString = process.env.MONGO_URI.replace('/staff-management?', '/?');
+    const baseConnectionString = process.env.MONGO_URI.replace('/test?', '/?');
     console.log('Base connection string:', baseConnectionString.replace(/\/\/[^:]+:[^@]+@/, '//***:***@'));
     
     await mongoose.connect(baseConnectionString, {
@@ -26,7 +26,7 @@ async function checkAvailableDatabases() {
     });
     
     // Check for common test database names
-    const possibleTestDbs = ['test', 'staff-test', 'staff-management-test', 'staff_test', 'staff_management_test'];
+    const possibleTestDbs = ['test', 'staff-test', 'test-test', 'staff_test', 'test_test'];
     console.log('\n=== CHECKING FOR TEST DATABASES ===');
     
     for (const dbName of possibleTestDbs) {

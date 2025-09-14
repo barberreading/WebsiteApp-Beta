@@ -97,7 +97,7 @@ class BackupRestoreSystem {
       fs.mkdirSync(dbBackupPath, { recursive: true });
 
       // Try to create MongoDB dump
-      const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/staff-management';
+      const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/test';
       const dbName = mongoUri.split('/').pop().split('?')[0];
       
       execSync(`mongodump --uri="${mongoUri}" --out="${dbBackupPath}"`, {

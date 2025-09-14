@@ -51,6 +51,65 @@ const getBookingsForClientAndStaff = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, count: bookings.length, data: bookings });
 });
 
+const syncOfflineBookings = asyncHandler(async (req, res) => {
+  const { bookings } = req.body;
+  
+  if (!bookings || !Array.isArray(bookings)) {
+    return res.status(400).json({ 
+      success: false, 
+      error: 'Invalid request: bookings array is required' 
+    });
+  }
+
+  const results = {
+    successful: [],
+    failed: [],
+    duplicates: []
+  };
+
+  for (const bookingData of bookings) {
+    try {
+      // Check for duplicates based on offline ID or booking details
+      if (bookingData.offlineId) {
+        const existingBooking = await bookingService.findBookingByOfflineId(bookingData.offlineId);
+        if (existingBooking) {
+          results.duplicates.push({
+            offlineId: bookingData.offlineId,
+            existingId: existingBooking._id,
+            reason: 'Booking already exists'
+          });
+          continue;
+        }
+      }
+
+      // Create the booking
+      const booking = await bookingService.createBooking(bookingData, req.user);
+      results.successful.push({
+        offlineId: bookingData.offlineId,
+        bookingId: booking._id,
+        booking: booking
+      });
+    } catch (error) {
+      results.failed.push({
+        offlineId: bookingData.offlineId,
+        error: error.message,
+        bookingData: bookingData
+      });
+    }
+  }
+
+  res.status(200).json({ 
+    success: true, 
+    data: results,
+    summary: {
+      total: bookings.length,
+      successful: results.successful.length,
+      failed: results.failed.length,
+      duplicates: results.duplicates.length
+    }
+  });
+});
+
 module.exports = {
   getBookings,
   getBookingActivity,
@@ -61,5 +120,6 @@ module.exports = {
   updateBooking,
   deleteBooking,
   getBookedStaffForClient,
-  getBookingsForClientAndStaff
+  getBookingsForClientAndStaff,
+  syncOfflineBookings
 };

@@ -22,7 +22,7 @@ const BookingNew = () => {
     startTime: '',
     endTime: '',
     notes: '',
-    status: 'confirmed'
+    status: 'scheduled'
   });
 
   // Fetch services, clients, and staff
@@ -65,6 +65,9 @@ const BookingNew = () => {
         formData
       );
       setSuccess('Booking created successfully');
+      
+      // Dispatch custom event to trigger calendar refresh
+      window.dispatchEvent(new CustomEvent('bookingCreated'));
       
       // Navigate back to calendar after short delay
       setTimeout(() => {

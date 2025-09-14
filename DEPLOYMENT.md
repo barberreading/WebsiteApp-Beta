@@ -71,11 +71,11 @@ npm run build
    ```javascript
    module.exports = {
      apps: [{
-       name: 'staff-management-backend',
+       name: 'test-backend',
        script: './backend/server.js',
        env: {
          NODE_ENV: 'production',
-         PORT: 5000
+         PORT: 3002
        },
        instances: 'max',
        exec_mode: 'cluster',
@@ -94,7 +94,7 @@ npm run build
 
 ## Nginx Configuration
 
-Create an Nginx configuration file (`/etc/nginx/sites-available/staff-management`):
+Create an Nginx configuration file (`/etc/nginx/sites-available/test`):
 
 ```nginx
 server {
@@ -124,7 +124,7 @@ server {
 
     # Backend API
     location /api {
-        proxy_pass http://localhost:5000;
+        proxy_pass http://localhost:3002;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -184,7 +184,7 @@ Schedule regular backups using cron:
 
 ### Common Issues
 
-1. **Port already in use**: Check if another process is using port 5000
+1. **Port already in use**: Check if another process is using port 3002
 2. **MongoDB connection failed**: Verify MongoDB is running and connection string is correct
 3. **Frontend not loading**: Check if build files exist in `frontend/build`
 4. **API requests failing**: Verify CORS configuration and API URL

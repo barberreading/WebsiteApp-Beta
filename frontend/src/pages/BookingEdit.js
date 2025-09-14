@@ -31,7 +31,7 @@ const BookingEdit = () => {
     endTime: '',
     notes: '',
     seriesId: '',
-    status: 'confirmed'
+    status: 'scheduled'
   });
 
   // Fetch booking data
@@ -136,6 +136,8 @@ const BookingEdit = () => {
         );
         console.log('Series update response:', res.data);
         setSuccess(`All bookings in series updated successfully (${res.data.count} bookings)`);
+        // Dispatch custom event to trigger calendar refresh
+        window.dispatchEvent(new CustomEvent('bookingCreated'));
       } else {
         // Update just this booking
         await axiosInstance.put(
@@ -144,6 +146,9 @@ const BookingEdit = () => {
         );
         setSuccess('Booking updated successfully');
       }
+      
+      // Dispatch custom event to trigger calendar refresh
+      window.dispatchEvent(new CustomEvent('bookingCreated'));
       
       // Navigate back to calendar after short delay
       setTimeout(() => {
@@ -178,6 +183,8 @@ const BookingEdit = () => {
           dataToSend
         );
         setSuccess(`All bookings in series cancelled successfully (${res.data.count} bookings)`);
+        // Dispatch custom event to trigger calendar refresh
+        window.dispatchEvent(new CustomEvent('bookingCreated'));
       } else {
         // Cancel just this booking
         await axiosInstance.put(
@@ -186,6 +193,9 @@ const BookingEdit = () => {
         );
         setSuccess('Booking cancelled successfully');
       }
+      
+      // Dispatch custom event to trigger calendar refresh
+      window.dispatchEvent(new CustomEvent('bookingCreated'));
       
       // Navigate back to calendar after short delay
       setTimeout(() => {

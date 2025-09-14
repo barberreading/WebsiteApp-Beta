@@ -10,7 +10,7 @@ const { initEmailSystem } = require('./utils/initEmailSystem');
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
-  defaultMeta: { service: 'staff-management-api' },
+  defaultMeta: { service: 'test-api' },
   transports: [
     new winston.transports.File({ 
       filename: 'error.log', 
@@ -34,7 +34,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const connectDB = async () => {
   try {
-    const connectionString = process.env.SYNOLOGY_MONGO_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/staff-management';
+    const connectionString = process.env.SYNOLOGY_MONGO_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/test';
     
     const connectionType = connectionString.includes('synology') ? 'Synology NAS' : 
                           connectionString.includes('mongodb.net') ? 'MongoDB Atlas' : 'Local MongoDB';
@@ -65,7 +65,7 @@ const PORT = process.env.PORT || 3002;
 
 connectDB().then(() => {
     app.listen(PORT, async () => {
-        logger.info(`Server running on port ${PORT}`, { service: 'staff-management-api' });
+        logger.info(`Server running on port ${PORT}`, { service: 'test-api' });
         logManager.checkAllLogs();
         // initSchedulers();
         // initEmailSystem();

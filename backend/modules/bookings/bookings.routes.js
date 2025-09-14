@@ -4,6 +4,7 @@ const { protect, authorize } = require('../../middleware/auth');
 const {
     sanitizeBody,
     validateBooking,
+    validateBookingUpdate,
     validateObjectId,
     validatePagination
 } = require('../../middleware/validation');
@@ -18,7 +19,8 @@ const {
     updateBooking, 
     deleteBooking,
     getBookedStaffForClient,
-    getBookingsForClientAndStaff 
+    getBookingsForClientAndStaff,
+    syncOfflineBookings 
 } = require('./bookings.controllers');
 
 // More specific routes should come before dynamic routes
@@ -32,6 +34,9 @@ router.route('/weekly').get(protect, getWeeklyBookings);
 // GET /api/bookings/activity
 router.route('/activity').get(protect, authorize('admin', 'superuser', 'manager'), getBookingActivity);
 
+// POST /api/bookings/sync-offline - Sync offline booking queue
+router.route('/sync-offline').post(protect, syncOfflineBookings);
+
 // GET /api/bookings/client/:clientId/booked-staff
 router.route('/client/:clientId/booked-staff').get(protect, authorize('client'), getBookedStaffForClient);
 
@@ -44,7 +49,7 @@ router.route('/').get(protect, validatePagination, getBookings).post(protect, cr
 // GET /api/bookings/:id, PUT /api/bookings/:id, DELETE /api/bookings/:id
 router.route('/:id')
     .get(protect, validateObjectId('id'), getBookingById)
-    .put(protect, createModifyLimiter, sanitizeBody, validateBooking, updateBooking)
+    .put(protect, createModifyLimiter, sanitizeBody, validateBookingUpdate, updateBooking)
     .delete(protect, createModifyLimiter, validateObjectId('id'), deleteBooking);
 
 module.exports = router;

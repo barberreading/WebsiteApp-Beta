@@ -18,7 +18,7 @@ echo DO NOT CLOSE THIS WINDOW WHILE USING THE APPLICATION
 echo.
 
 timeout /t 10 /nobreak > nul
-start http://localhost:3000
+start http://localhost:3001
 
 echo Application started successfully!
 timeout /t 5 /nobreak > nul

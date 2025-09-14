@@ -18,7 +18,7 @@ const errorLogger = winston.createLogger({
     winston.format.errors({ stack: true }),
     winston.format.json()
   ),
-  defaultMeta: { service: 'staff-management' },
+  defaultMeta: { service: 'test' },
   transports: [
     // Write all errors to error.log
     new winston.transports.File({ 

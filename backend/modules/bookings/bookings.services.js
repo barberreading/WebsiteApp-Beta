@@ -520,6 +520,22 @@ const getBookingsForClientAndStaff = async (clientId, staffId, user) => {
   return bookings;
 };
 
+const findBookingByOfflineId = async (offlineId) => {
+  if (!offlineId) {
+    return null;
+  }
+
+  // Look for booking with matching offline ID in notes or custom field
+  const booking = await Booking.findOne({
+    $or: [
+      { 'notes': { $regex: `offlineId:${offlineId}`, $options: 'i' } },
+      { 'offlineId': offlineId }
+    ]
+  });
+
+  return booking;
+};
+
 module.exports = {
   getBookings,
   getBookingActivity,
@@ -531,4 +547,5 @@ module.exports = {
   deleteBooking,
   getBookedStaffForClient,
   getBookingsForClientAndStaff,
+  findBookingByOfflineId,
 };

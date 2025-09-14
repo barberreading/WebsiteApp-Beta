@@ -66,7 +66,7 @@ async function finalVerificationTest() {
     console.log(`   Collections: ${collections.map(c => c.name).join(', ')}`);
     
     console.log('\n🎯 RESTORATION STATUS:');
-    console.log('   ✅ Database switched from "staff-management" to "test"');
+    console.log('   ✅ Database switched from "test" to "test"');
     console.log('   ✅ Staff data is available for managers');
     console.log('   ✅ Bookings have proper staff assignments');
     console.log('   ✅ Calendar should display all data correctly');

@@ -6,7 +6,7 @@ const User = require('./models/User');
 require('dotenv').config();
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/staff-management', {
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/test', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });

@@ -6,6 +6,7 @@ import ErrorBoundary from './components/error/ErrorBoundary';
 import NetworkErrorHandler from './components/error/NetworkErrorHandler';
 import ImpersonationBar from './components/auth/ImpersonationBar';
 import { initializeDateFormatting } from './utils/updateDateFormats';
+import bookingInterceptor from './utils/bookingInterceptor';
 
 // Auth Components
 import ForgotPassword from './components/auth/ForgotPassword';
@@ -79,6 +80,7 @@ import StaffDistanceSearch from './components/staff/StaffDistanceSearch';
 // Route Guards
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import RoleRoute from './components/auth/RoleRoute';
+import ServerStatusIndicator from './components/common/ServerStatusIndicator';
 
 import './App.css';
 import './responsive.css';
@@ -96,6 +98,15 @@ function App() {
   // Initialize date formatting to DD/MM/YYYY across the app
   useEffect(() => {
     initializeDateFormatting();
+  }, []);
+
+  // Initialize booking interceptor for offline functionality
+  useEffect(() => {
+    bookingInterceptor.initialize();
+    
+    return () => {
+      bookingInterceptor.cleanup();
+    };
   }, []);
 
   if (loading) {
@@ -407,6 +418,7 @@ function App() {
         </Routes>
       </main>
         <Footer />
+        <ServerStatusIndicator />
       </div>
       </UserTemplateProvider>
     </ErrorBoundary>

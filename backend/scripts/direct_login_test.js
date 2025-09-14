@@ -60,7 +60,7 @@ mongoose.connect(process.env.MONGO_URI, {
     // Test login directly with API
     console.log('Testing login with API...');
     try {
-      const loginResponse = await axios.post('http://localhost:5000/api/auth/login', {
+      const loginResponse = await axios.post('http://localhost:3002/api/auth/login', {
         email: adminEmail,
         password: plainPassword
       });

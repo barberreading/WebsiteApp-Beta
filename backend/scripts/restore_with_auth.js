@@ -27,7 +27,7 @@ const sampleAreas = [
 async function loginAsAdmin() {
   try {
     // First, let's connect to MongoDB to find an admin user
-    await mongoose.connect('mongodb://localhost:27017/staff-management');
+    await mongoose.connect('mongodb://localhost:27017/test');
     console.log('Connected to MongoDB');
     
     const User = require('./models/User');

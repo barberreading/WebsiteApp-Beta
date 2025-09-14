@@ -28,7 +28,7 @@ http.globalAgent.keepAliveMsecs = 60000; // Keep connections alive for 60 second
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
-  defaultMeta: { service: 'staff-management-api' },
+  defaultMeta: { service: 'test-api' },
   transports: [
     new winston.transports.File({ 
       filename: 'error.log', 
@@ -57,7 +57,7 @@ app.use(helmet({
 
 // Configure CORS with specific options
 app.use(cors({
-  origin: ['http://localhost:3001', 'http://localhost:3000'],
+  origin: ['http://localhost:3001', 'http://localhost:3002'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
@@ -214,7 +214,7 @@ const connectDB = async () => {
     // 1. SYNOLOGY_MONGO_URI from .env (if available)
     // 2. MONGO_URI from .env (fallback to Atlas)
     // 3. Local MongoDB as last resort
-    const connectionString = process.env.SYNOLOGY_MONGO_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/staff-management';
+    const connectionString = process.env.SYNOLOGY_MONGO_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/test';
     
     // Log which connection we're using (without exposing credentials)
     const connectionType = connectionString.includes('synology') ? 'Synology NAS' : 
@@ -257,7 +257,7 @@ const PORT = process.env.PORT || 3002;
 if (process.env.NODE_ENV !== 'test') {
     connectDB().then(() => {
         app.listen(PORT, async () => {
-            logger.info(`Server running on port ${PORT}`, { service: 'staff-management-api' });
+            logger.info(`Server running on port ${PORT}`, { service: 'test-api' });
 
             // Initialize log manager
             logManager.checkAllLogs();

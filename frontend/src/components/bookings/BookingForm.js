@@ -23,6 +23,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import axiosInstance from '../../utils/axiosInstance';
+import bookingInterceptor from '../../utils/bookingInterceptor';
+import offlineBookingQueue from '../../utils/offlineBookingQueue';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import { handleApiError, validateToken } from '../../utils/errorHandler';
@@ -92,7 +94,42 @@ const BookingForm = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [queueStats, setQueueStats] = useState({ pending: 0, failed: 0 });
   
+  // Monitor connection status and queue
+  useEffect(() => {
+    const updateConnectionStatus = () => {
+      setIsOffline(!navigator.onLine);
+      setQueueStats(bookingInterceptor.getQueueStatus());
+    };
+
+    const handleOnline = () => {
+      setIsOffline(false);
+      setQueueStats(bookingInterceptor.getQueueStatus());
+    };
+
+    const handleOffline = () => {
+      setIsOffline(true);
+    };
+
+    // Initial status
+    updateConnectionStatus();
+
+    // Listen for connection changes
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    // Update queue stats periodically
+    const statsInterval = setInterval(updateConnectionStatus, 5000);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      clearInterval(statsInterval);
+    };
+  }, []);
+
   // Fetch booking categories and keys
   useEffect(() => {
     const fetchBookingData = async () => {
@@ -474,12 +511,28 @@ const BookingForm = () => {
         
         console.log('Final booking data being sent:', bookingData);
         
+        let bookingResponse;
         if (isEditMode) {
-          const response = await axiosInstance.put(`/bookings/${id}`, bookingData);
-          console.log('Updated regular booking response:', response.data);
+          bookingResponse = await axiosInstance.put(`/bookings/${id}`, bookingData);
+          console.log('Updated regular booking response:', bookingResponse.data);
         } else {
-          const response = await axiosInstance.post('/bookings', bookingData);
-          console.log('Created regular booking response:', response.data);
+          // Use booking interceptor for creation with offline fallback
+          bookingResponse = await bookingInterceptor.createBookingWithFallback(bookingData, {
+            source: 'booking_form',
+            userAgent: navigator.userAgent
+          });
+          console.log('Created regular booking response:', bookingResponse.data);
+          
+          // Handle offline response
+          if (bookingResponse.data.offline) {
+            setError('');
+            setSuccess(true);
+            // Show different message for offline bookings
+            setTimeout(() => {
+              navigate('/bookings');
+            }, 3000); // Longer delay for offline message
+            return; // Exit early for offline bookings
+          }
         }
       } catch (bookingError) {
         console.error('Error saving regular booking:', bookingError);
@@ -905,6 +958,26 @@ const BookingForm = () => {
         <Typography variant="h5" gutterBottom>
           {isEditMode ? 'Edit Booking' : 'Create Booking'}
         </Typography>
+        
+        {/* Connection Status Indicator */}
+        {isOffline && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="body2">
+                📡 Offline Mode - Bookings will be saved locally and synced when connection is restored
+              </Typography>
+            </Box>
+          </Alert>
+        )}
+        
+        {/* Queue Status */}
+        {(queueStats.pending > 0 || queueStats.failed > 0) && (
+          <Alert severity="info" sx={{ mb: 2 }}>
+            <Typography variant="body2">
+              📋 Queue Status: {queueStats.pending} pending, {queueStats.failed} failed bookings
+            </Typography>
+          </Alert>
+        )}
         
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>

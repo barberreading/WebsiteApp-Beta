@@ -51,8 +51,13 @@ export const normalizeBookingDates = (dateValue) => {
   }
   
   // If it's a string, parse it
-  if (typeof dateValue === 'string') {
-    return parseISO(dateValue);
+  if (typeof dateValue === 'string' && dateValue.trim() !== '') {
+    try {
+      return parseISO(dateValue);
+    } catch (error) {
+      console.warn('Failed to parse ISO date string:', dateValue, error);
+      return null;
+    }
   }
   
   // If it's a number (timestamp), convert to Date
@@ -438,7 +443,13 @@ export const isStaffWorking = (staff, date, timeSlot) => {
 };
 
 // Generate CSS classes for booking slots
-export const generateSlotClasses = ({ hasBooking, bookingPosition, isWorking }) => {
+export const generateSlotClasses = (slotData) => {
+  // Handle null or undefined input
+  if (!slotData) {
+    return 'staff-time-slot empty';
+  }
+  
+  const { hasBooking, bookingPosition, isWorking } = slotData;
   const classes = ['staff-time-slot'];
   
   if (hasBooking) {

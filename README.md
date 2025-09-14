@@ -142,7 +142,7 @@ PORT=3002
 NODE_ENV=production
 
 # Database
-MONGO_URI=mongodb://localhost:27017/staff-management
+MONGO_URI=mongodb://localhost:27017/test
 
 # Authentication
 JWT_SECRET=your_super_secure_jwt_secret_here
