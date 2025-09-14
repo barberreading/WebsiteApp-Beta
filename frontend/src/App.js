@@ -49,6 +49,7 @@ import BookedStaffGallery from './pages/BookedStaffGallery';
 import StaffProfile from './pages/StaffProfile';
 import StaffHR from './pages/StaffHR';
 import BrandingManager from './components/admin/BrandingManager';
+import MonitoringDashboard from './components/MonitoringDashboard';
 import PublicDocument from './pages/PublicDocument';
 import BulkImport from './pages/BulkImport';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -341,6 +342,12 @@ function App() {
           <Route path="/error-dashboard" element={
             <RoleRoute allowedRoles={['superuser']}>
               <ErrorDashboard />
+            </RoleRoute>
+          } />
+          
+          <Route path="/monitoring-dashboard" element={
+            <RoleRoute allowedRoles={['admin']}>
+              <MonitoringDashboard />
             </RoleRoute>
           } />
           

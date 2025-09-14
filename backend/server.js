@@ -16,6 +16,7 @@ const loadRoutes = require('./routes');
 const { initSchedulers } = require('./utils/initSchedulers');
 const { initEmailSystem } = require('./utils/initEmailSystem');
 const { startTokenCleanupScheduler } = require('./utils/tokenCleanup');
+const errorMonitoringService = require('./services/errorMonitoringService');
 
 const app = express();
 
@@ -268,6 +269,14 @@ if (process.env.NODE_ENV !== 'test') {
             
             // Start token cleanup scheduler
             startTokenCleanupScheduler();
+            
+            // Start error monitoring service
+            try {
+                await errorMonitoringService.startMonitoring();
+                logger.info('Error monitoring service started successfully');
+            } catch (monitoringError) {
+                logger.error('Failed to start error monitoring service:', monitoringError);
+            }
         });
     });
 }

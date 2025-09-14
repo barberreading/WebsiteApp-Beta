@@ -296,6 +296,21 @@ const Dashboard = () => {
           </Col>
         )}
         
+        {hasRole(['admin']) && (
+          <Col md={3} sm={6} className="mb-3">
+            <Link to="/monitoring-dashboard" className="text-decoration-none">
+              <Card className="dashboard-card text-center h-100">
+                <Card.Body>
+                  <div className="dashboard-icon text-info">
+                    <i className="bi bi-activity"></i>
+                  </div>
+                  <h5>System Monitoring</h5>
+                </Card.Body>
+              </Card>
+            </Link>
+          </Col>
+        )}
+        
         {hasRole(['manager', 'superuser', 'client']) && (
           <Col md={3} sm={6} className="mb-3">
             <Link to="/reports" className="text-decoration-none">
